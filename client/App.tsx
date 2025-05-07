@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Menu } from './components/Menu';
-import type { MudProfile } from './components/ConnectView';
-import './App.css'; // or import styles from './App.module.css';
+import './App.css';
 
 function App() {
 	const outputRef = useRef<HTMLDivElement>(null);

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import ConnectView, { type MudProfile } from '../ConnectView';
+import ConnectView from '../ConnectView';
 import './styles.css';
 
 type MenuButton = {
@@ -41,11 +41,7 @@ function Popup({ isOpen, onClose, title, children }: PopupProps) {
 	);
 }
 
-export function Menu({
-	onProfileConnect,
-}: {
-	onProfileConnect?: (profile: MudProfile) => void;
-}) {
+export function Menu() {
 	const [activePopup, setActivePopup] = useState<string | null>(null);
 	const [showConnectView, setShowConnectView] = useState(false);
 
@@ -65,9 +61,8 @@ export function Menu({
 		setShowConnectView(false);
 	};
 
-	const handleProfileConnect = (profile: MudProfile) => {
+	const handleProfileConnect = () => {
 		setShowConnectView(false);
-		onProfileConnect?.(profile);
 	};
 
 	return (
