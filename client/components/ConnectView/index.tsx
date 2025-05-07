@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import './styles.css';
+import classNames from 'classnames';
 
 export type MudProfile = {
 	name: string;
@@ -14,21 +15,18 @@ type ConnectViewProps = {
 
 const STORAGE_KEY = 'mud_profiles';
 
-function loadProfiles(): MudProfile[] {
-	try {
-		const data = localStorage.getItem(STORAGE_KEY);
-		return data ? JSON.parse(data) : [];
-	} catch {
-		return [];
-	}
-}
-
-function saveProfiles(profiles: MudProfile[]) {
-	localStorage.setItem(STORAGE_KEY, JSON.stringify(profiles));
-}
+// function loadProfiles(): MudProfile[] {
+// 	try {
+// 		const data = localStorage.getItem(STORAGE_KEY);
+// 		console.log(`Loading profiles: ${data}`);
+// 		return data ? JSON.parse(data) : [];
+// 	} catch {
+// 		return [];
+// 	}
+// }
 
 export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
-	const [profiles, setProfiles] = useState<MudProfile[]>(loadProfiles());
+	const [profiles, setProfiles] = useState<MudProfile[]>([]);
 	const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
 	const [inputs, setInputs] = useState<MudProfile>({
 		name: '',
@@ -38,6 +36,7 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
 	const nameInputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
+		console.log('Saving profiles', profiles);
 		saveProfiles(profiles);
 	}, [profiles]);
 
@@ -47,6 +46,7 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
 		}
 	}, [selectedIdx]);
 
+	// Action Handlers
 	const handleSelect = (idx: number) => {
 		setSelectedIdx(idx);
 	};
@@ -65,6 +65,7 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
 	const handleRemove = () => {
 		if (selectedIdx !== null) {
 			const newProfiles = profiles.filter((_, i) => i !== selectedIdx);
+			console.trace('setProfiles called from handleRemove');
 			setProfiles(newProfiles);
 			setSelectedIdx(null);
 			setInputs({ name: '', address: '', port: '' });
@@ -84,10 +85,19 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
 			// Update existing
 			newProfiles[idx] = inputs;
 		}
+		console.trace(
+			`setProfiles called from handleConnect: ${JSON.stringify(newProfiles)}`
+		);
 		setProfiles(newProfiles);
 		setSelectedIdx(idx);
 		onConnect(inputs);
 	};
+
+	function saveProfiles(profiles: MudProfile[]) {
+		const profilesJsonStr = JSON.stringify(profiles);
+		console.log('Saving profiles', profilesJsonStr);
+		localStorage.setItem(STORAGE_KEY, profilesJsonStr);
+	}
 
 	return (
 		<div className='connect-modal-overlay'>
@@ -100,10 +110,9 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
 							profiles.map((profile, idx) => (
 								<div
 									key={profile.name + idx}
-									className={
-										'profile-item' +
-										(idx === selectedIdx ? ' ' + 'selected' : '')
-									}
+									className={classNames('profile-item', {
+										selected: idx === selectedIdx,
+									})}
 									onClick={() => handleSelect(idx)}
 								>
 									{profile.name}
@@ -144,7 +153,6 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
 							name='port'
 							value={inputs.port}
 							onChange={handleInputChange}
-							type='number'
 						/>
 					</div>
 					<div className={'button-row'}>

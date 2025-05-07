@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Menu } from './components/Menu';
 import type { MudProfile } from './components/ConnectView';
 import './App.css';
+import { isMockEnabled } from './utils/FeatureFlag';
 
 function App() {
 	const outputRef = useRef<HTMLDivElement>(null);
@@ -17,7 +18,13 @@ function App() {
 
 	useEffect(() => {
 		if (!selectedProfile) return;
-		const url = `ws://${window.location.host}/ws`;
+
+		let url = `ws://${window.location.host}/ws`;
+		if (isMockEnabled()) {
+			// Use /server/mock-proxy.js to proxy requests to localhost:4000
+			url = `ws://localhost:4000`;
+		}
+
 		let closedByUser = false;
 		let websocket: WebSocket;
 
