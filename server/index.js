@@ -53,10 +53,20 @@ wss.on('connection', (ws) => {
 				profileReceived = true;
 				return;
 			}
-			mudSocket.write(Buffer.from(message.toString(), 'utf8'));
+			// Ensure the message is properly encoded before sending to MUD
+			const encodedMessage = Buffer.from(message.toString(), 'utf8');
+			mudSocket.write(encodedMessage);
 		});
-		ws.on('close', () => mudSocket.end());
-		ws.on('error', () => mudSocket.end());
+
+		ws.on('close', () => {
+			mudSocket.end();
+			console.log('WebSocket client disconnected');
+		});
+
+		ws.on('error', () => {
+			mudSocket.end();
+			console.error('WebSocket error:', err);
+		});
 	});
 });
 
