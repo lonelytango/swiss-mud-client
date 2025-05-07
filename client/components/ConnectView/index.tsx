@@ -15,16 +15,6 @@ type ConnectViewProps = {
 
 const STORAGE_KEY = 'mud_profiles';
 
-// function loadProfiles(): MudProfile[] {
-// 	try {
-// 		const data = localStorage.getItem(STORAGE_KEY);
-// 		console.log(`Loading profiles: ${data}`);
-// 		return data ? JSON.parse(data) : [];
-// 	} catch {
-// 		return [];
-// 	}
-// }
-
 export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
 	const [profiles, setProfiles] = useState<MudProfile[]>([]);
 	const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
@@ -35,10 +25,11 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
 	});
 	const nameInputRef = useRef<HTMLInputElement>(null);
 
+	// Load profiles only once on mount
 	useEffect(() => {
-		console.log('Saving profiles', profiles);
-		saveProfiles(profiles);
-	}, [profiles]);
+		const loadedProfiles = loadProfiles();
+		setProfiles(loadedProfiles);
+	}, []);
 
 	useEffect(() => {
 		if (selectedIdx !== null && profiles[selectedIdx]) {
@@ -67,6 +58,7 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
 			const newProfiles = profiles.filter((_, i) => i !== selectedIdx);
 			console.trace('setProfiles called from handleRemove');
 			setProfiles(newProfiles);
+			saveProfiles(newProfiles);
 			setSelectedIdx(null);
 			setInputs({ name: '', address: '', port: '' });
 		}
@@ -89,13 +81,24 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
 			`setProfiles called from handleConnect: ${JSON.stringify(newProfiles)}`
 		);
 		setProfiles(newProfiles);
+		saveProfiles(newProfiles);
 		setSelectedIdx(idx);
 		onConnect(inputs);
 	};
 
+	function loadProfiles(): MudProfile[] {
+		try {
+			const data = localStorage.getItem(STORAGE_KEY);
+			console.log(`Loading profiles: ${data}`);
+			return data ? JSON.parse(data) : [];
+		} catch (error) {
+			console.error('Error loading profiles', error);
+			return [];
+		}
+	}
+
 	function saveProfiles(profiles: MudProfile[]) {
 		const profilesJsonStr = JSON.stringify(profiles);
-		console.log('Saving profiles', profilesJsonStr);
 		localStorage.setItem(STORAGE_KEY, profilesJsonStr);
 	}
 

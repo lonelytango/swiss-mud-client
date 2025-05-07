@@ -3,6 +3,7 @@ import { Menu } from './components/Menu';
 import type { MudProfile } from './components/ConnectView';
 import './App.css';
 import { isMockEnabled } from './utils/FeatureFlag';
+import classNames from 'classnames';
 
 function App() {
 	const outputRef = useRef<HTMLDivElement>(null);
@@ -112,8 +113,9 @@ function App() {
 		<div className='main'>
 			<Menu onProfileConnect={setSelectedProfile} />
 			<div
-				className='status'
-				style={{ color: status === 'Connected' ? '#00ff00' : '#ff0000' }}
+				className={classNames('status', {
+					connected: status === 'Connected',
+				})}
 			>
 				{selectedProfile
 					? `${status} (${selectedProfile.name})`
