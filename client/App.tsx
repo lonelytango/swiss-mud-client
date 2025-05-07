@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Menu } from './components/Menu';
+import type { MudProfile } from './components/ConnectView';
 import './App.css'; // or import styles from './App.module.css';
 
 function App() {
@@ -73,7 +74,7 @@ function App() {
 				className='status'
 				style={{ color: status === 'Connected' ? '#00ff00' : '#ff0000' }}
 			>
-				{status}
+				${status}
 			</div>
 			<div className='container'>
 				<div ref={outputRef} className='output' />

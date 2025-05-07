@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ConnectView, { type MudProfile } from '../ConnectView';
 import './styles.css';
 
 type MenuButton = {
@@ -40,15 +41,33 @@ function Popup({ isOpen, onClose, title, children }: PopupProps) {
 	);
 }
 
-export function Menu() {
+export function Menu({
+	onProfileConnect,
+}: {
+	onProfileConnect?: (profile: MudProfile) => void;
+}) {
 	const [activePopup, setActivePopup] = useState<string | null>(null);
+	const [showConnectView, setShowConnectView] = useState(false);
 
 	const handleButtonClick = (id: string) => {
-		setActivePopup(id);
+		if (id === 'connect') {
+			setShowConnectView(true);
+		} else {
+			setActivePopup(id);
+		}
 	};
 
 	const handleClose = () => {
 		setActivePopup(null);
+	};
+
+	const handleConnectViewCancel = () => {
+		setShowConnectView(false);
+	};
+
+	const handleProfileConnect = (profile: MudProfile) => {
+		setShowConnectView(false);
+		onProfileConnect?.(profile);
 	};
 
 	return (
@@ -64,13 +83,12 @@ export function Menu() {
 				</button>
 			))}
 
-			<Popup
-				isOpen={activePopup === 'connect'}
-				onClose={handleClose}
-				title='Connection Settings'
-			>
-				<p>Connection settings will go here</p>
-			</Popup>
+			{showConnectView && (
+				<ConnectView
+					onConnect={handleProfileConnect}
+					onCancel={handleConnectViewCancel}
+				/>
+			)}
 
 			<Popup
 				isOpen={activePopup === 'triggers'}
