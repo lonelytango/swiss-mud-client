@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Menu } from './components/Menu';
+import type { MudProfile } from './components/ConnectView';
 import './App.css';
 
 function App() {
@@ -9,36 +10,70 @@ function App() {
 	const [ws, setWs] = useState<WebSocket | null>(null);
 	const [commandHistory, setCommandHistory] = useState<string[]>([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
+	const [selectedProfile, setSelectedProfile] = useState<MudProfile | null>(
+		null
+	);
+	const [canSend, setCanSend] = useState(false);
 
 	useEffect(() => {
+		if (!selectedProfile) return;
+		const url = `ws://${window.location.host}/ws`;
+		let closedByUser = false;
+		let websocket: WebSocket;
+
 		const connect = () => {
-			const websocket = new WebSocket('ws://localhost:4000');
+			websocket = new WebSocket(url);
+
 			websocket.onopen = () => {
 				setStatus('Connected');
+				setCanSend(false);
+				// Send profile as first message
+				websocket.send(
+					JSON.stringify({
+						address: selectedProfile.address,
+						port: selectedProfile.port,
+					})
+				);
 				inputRef.current?.focus();
 			};
+
 			websocket.onclose = () => {
 				setStatus('Disconnected');
-				setTimeout(connect, 5000);
+				setCanSend(false);
+				if (!closedByUser) setTimeout(connect, 5000);
 			};
+
 			websocket.onerror = () => setStatus('Error occurred');
+
 			websocket.onmessage = (event) => {
 				if (outputRef.current) {
 					outputRef.current.innerHTML += event.data;
 					outputRef.current.scrollTop = outputRef.current.scrollHeight;
 				}
+				// Enable input after receiving confirmation from server
+				if (
+					typeof event.data === 'string' &&
+					event.data.includes('[INFO] Connected to MUD server')
+				) {
+					setCanSend(true);
+				}
 			};
+
 			setWs(websocket);
 		};
+
 		connect();
-		return () => ws?.close();
+		return () => {
+			closedByUser = true;
+			websocket?.close();
+		};
 		// eslint-disable-next-line
-	}, []);
+	}, [selectedProfile]);
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === 'Enter') {
 			const command = e.currentTarget.value;
-			if (ws && ws.readyState === WebSocket.OPEN) {
+			if (ws && ws.readyState === WebSocket.OPEN && canSend) {
 				ws.send(command + '\n');
 				if (command.trim()) {
 					setCommandHistory((prev) => [command, ...prev]);
@@ -68,12 +103,14 @@ function App() {
 
 	return (
 		<div className='main'>
-			<Menu />
+			<Menu onProfileConnect={setSelectedProfile} />
 			<div
 				className='status'
 				style={{ color: status === 'Connected' ? '#00ff00' : '#ff0000' }}
 			>
-				${status}
+				{selectedProfile
+					? `${status} (${selectedProfile.name})`
+					: 'No profile selected'}
 			</div>
 			<div className='container'>
 				<div ref={outputRef} className='output' />
@@ -83,7 +120,7 @@ function App() {
 					className='input'
 					placeholder='Type your command here...'
 					onKeyDown={handleKeyDown}
-					disabled={status !== 'Connected'}
+					disabled={!canSend}
 				/>
 			</div>
 		</div>
