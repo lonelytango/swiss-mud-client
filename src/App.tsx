@@ -6,7 +6,8 @@ function App() {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [status, setStatus] = useState('Disconnected');
 	const [ws, setWs] = useState<WebSocket | null>(null);
-	const [lastCommand, setLastCommand] = useState('');
+	const [commandHistory, setCommandHistory] = useState<string[]>([]);
+	const [historyIndex, setHistoryIndex] = useState(-1);
 
 	useEffect(() => {
 		const connect = () => {
@@ -33,17 +34,34 @@ function App() {
 		// eslint-disable-next-line
 	}, []);
 
-	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === 'Enter') {
 			const command = e.currentTarget.value;
 			if (ws && ws.readyState === WebSocket.OPEN) {
 				ws.send(command + '\n');
-				setLastCommand(command);
-				setTimeout(() => inputRef.current?.select(), 0);
+				if (command.trim()) {
+					setCommandHistory((prev) => [command, ...prev]);
+					setHistoryIndex(-1);
+				}
+				e.currentTarget.value = '';
 			}
-		} else if (e.currentTarget.value === lastCommand) {
-			e.currentTarget.value = e.key;
+		} else if (e.key === 'ArrowUp') {
 			e.preventDefault();
+			if (historyIndex < commandHistory.length - 1) {
+				const newIndex = historyIndex + 1;
+				setHistoryIndex(newIndex);
+				e.currentTarget.value = commandHistory[newIndex];
+			}
+		} else if (e.key === 'ArrowDown') {
+			e.preventDefault();
+			if (historyIndex > 0) {
+				const newIndex = historyIndex - 1;
+				setHistoryIndex(newIndex);
+				e.currentTarget.value = commandHistory[newIndex];
+			} else if (historyIndex === 0) {
+				setHistoryIndex(-1);
+				e.currentTarget.value = '';
+			}
 		}
 	};
 
@@ -62,7 +80,7 @@ function App() {
 					type='text'
 					className='input'
 					placeholder='Type your command here...'
-					onKeyPress={handleKeyPress}
+					onKeyDown={handleKeyDown}
 					disabled={status !== 'Connected'}
 				/>
 			</div>

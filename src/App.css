@@ -54,7 +54,7 @@ body {
   background-color: #000000;
   border-radius: 0;
   white-space: pre-wrap;
-  font-size: 14px;
+  font-size: 12px;
   line-height: 1.5;
   min-height: 0;
   width: 100%;
@@ -68,7 +68,8 @@ body {
   border-radius: 0;
   color: #ffffff;
   font-family: 'Courier New', monospace;
-  font-size: 14px;
+  font-size: 10px;
+  font-weight: 700;
   outline: none;
   flex-shrink: 0;
   width: 100%;
