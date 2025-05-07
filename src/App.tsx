@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Menu } from './components/Menu';
 import './App.css'; // or import styles from './App.module.css';
 
 function App() {
@@ -67,6 +68,7 @@ function App() {
 
 	return (
 		<div className='main'>
+			<Menu />
 			<div
 				className='status'
 				style={{ color: status === 'Connected' ? '#00ff00' : '#ff0000' }}

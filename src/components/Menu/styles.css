@@ -1,0 +1,92 @@
+.menu {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  background-color: #2a2a2a;
+  border-bottom: 1px solid #333;
+}
+
+.menu-button {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 4px;
+  color: #00ff00;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.menu-button:hover {
+  background-color: #333;
+  border-color: #00ff00;
+}
+
+.button-icon {
+  font-size: 20px;
+  margin-bottom: 3px;
+}
+
+.button-label {
+  font-size: 10px;
+}
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup {
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 4px;
+  min-width: 400px;
+  max-width: 80vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #333;
+}
+
+.popup-header h3 {
+  margin: 0;
+  color: #00ff00;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: #00ff00;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0 8px;
+}
+
+.close-button:hover {
+  color: #fff;
+}
+
+.popup-content {
+  padding: 20px;
+  overflow-y: auto;
+  color: #00ff00;
+} 
