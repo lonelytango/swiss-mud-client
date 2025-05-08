@@ -2,119 +2,93 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Menu } from './components/Menu';
 import type { MudProfile } from './components/ConnectView';
 import './App.css';
-import { isMockEnabled } from './utils/FeatureFlag';
 import classNames from 'classnames';
-import { expandAlias, Command } from './utils/AliasEngine/AliasEngine';
+import { Command } from './utils/AliasEngine/AliasEngine';
+import { CommandEngine } from './utils/CommandEngine/CommandEngine';
+import { WebSocketManager } from './utils/WebSocketManager/WebSocketManager';
 import { Alias } from './types';
 
 function App() {
 	const outputRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [status, setStatus] = useState('Disconnected');
-	const [ws, setWs] = useState<WebSocket | null>(null);
-	const [commandHistory, setCommandHistory] = useState<string[]>([]);
-	const [historyIndex, setHistoryIndex] = useState(-1);
 	const [selectedProfile, setSelectedProfile] = useState<MudProfile | null>(
 		null
 	);
 	const [canSend, setCanSend] = useState(false);
 	const [aliases, setAliases] = useState<Alias[]>([]);
+	const [commandEngine, setCommandEngine] = useState<CommandEngine | null>(
+		null
+	);
+	const [wsManager, setWsManager] = useState<WebSocketManager | null>(null);
+	const [commandHistory, setCommandHistory] = useState<string[]>([]);
+	const [historyIndex, setHistoryIndex] = useState(-1);
 
 	useEffect(() => {
 		const stored = localStorage.getItem('mud_aliases');
-		if (stored) setAliases(JSON.parse(stored));
+		if (stored) {
+			const parsedAliases = JSON.parse(stored);
+			setAliases(parsedAliases);
+			setCommandEngine(
+				new CommandEngine(parsedAliases, {
+					onCommandDisplay: (commands: Command[]) => {
+						if (outputRef.current) {
+							outputRef.current.innerHTML += commands
+								.map((cmd) => `<div class="user-cmd">&gt; ${cmd.content}</div>`)
+								.join('');
+							outputRef.current.scrollTop = outputRef.current.scrollHeight;
+						}
+					},
+					onCommandSend: (command: string) => {
+						wsManager?.send(command + '\n');
+					},
+				})
+			);
+		}
 	}, []);
+
+	useEffect(() => {
+		if (commandEngine) {
+			commandEngine.setAliases(aliases);
+		}
+	}, [aliases, commandEngine]);
 
 	useEffect(() => {
 		if (!selectedProfile) return;
 
-		let url = `ws://${window.location.host}/ws`;
-		if (isMockEnabled()) {
-			// Use /server/mock-proxy.js to proxy requests to localhost:4000
-			url = `ws://localhost:4000`;
-		}
-
-		let closedByUser = false;
-		let websocket: WebSocket;
-
-		const connect = () => {
-			websocket = new WebSocket(url);
-
-			websocket.onopen = () => {
+		const manager = new WebSocketManager({
+			onOpen: () => {
 				setStatus('Connected');
 				setCanSend(false);
-				// Send profile as first message
-				websocket.send(
-					JSON.stringify({
-						address: selectedProfile.address,
-						port: selectedProfile.port,
-					})
-				);
 				inputRef.current?.focus();
-			};
-
-			websocket.onclose = () => {
+			},
+			onClose: () => {
 				setStatus('Disconnected');
 				setCanSend(false);
-				if (!closedByUser) setTimeout(connect, 5000);
-			};
-
-			websocket.onerror = () => setStatus('Error occurred');
-
-			websocket.onmessage = (event) => {
+			},
+			onError: () => setStatus('Error occurred'),
+			onMessage: (data: string) => {
 				if (outputRef.current) {
-					outputRef.current.innerHTML += event.data;
+					outputRef.current.innerHTML += data;
 					outputRef.current.scrollTop = outputRef.current.scrollHeight;
 				}
-				// Enable input after receiving confirmation from server
-				if (
-					typeof event.data === 'string' &&
-					event.data.includes('[INFO] Connected to MUD server')
-				) {
-					setCanSend(true);
-				}
-			};
+			},
+			onConnected: () => setCanSend(true),
+		});
 
-			setWs(websocket);
-		};
+		manager.connect(selectedProfile);
+		setWsManager(manager);
 
-		connect();
 		return () => {
-			closedByUser = true;
-			websocket?.close();
+			manager.disconnect();
 		};
-		// eslint-disable-next-line
 	}, [selectedProfile]);
 
 	const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === 'Enter') {
 			const command = e.currentTarget.value;
-			if (ws && ws.readyState === WebSocket.OPEN && canSend) {
-				// Try alias expansion
-				const expanded = await expandAlias(command, aliases);
-				const toShow: Command[] = expanded
-					? expanded
-					: [{ type: 'command', content: command }];
-
-				if (outputRef.current) {
-					outputRef.current.innerHTML += toShow.map(
-						(cmd) => `<div class="user-cmd">&gt; ${cmd.content}</div>`
-					);
-					outputRef.current.scrollTop = outputRef.current.scrollHeight;
-				}
-
-				if (expanded) {
-					// Process commands with waits
-					for (const cmd of expanded) {
-						if (cmd.type === 'wait') {
-							await new Promise((resolve) => setTimeout(resolve, cmd.waitTime));
-						} else {
-							ws.send(cmd.content + '\n');
-						}
-					}
-				} else {
-					ws.send(command + '\n');
-				}
+			if (wsManager?.isConnected() && canSend && commandEngine) {
+				await commandEngine.processCommand(command);
 
 				if (command.trim()) {
 					setCommandHistory((prev) => [command, ...prev]);
