@@ -26,10 +26,11 @@ export class WebSocketManager {
 		}
 
 		this.currentProfile = profile;
-		let url = `ws://${window.location.host}/ws`;
-		if (isMockEnabled()) {
-			url = `ws://localhost:4000`;
-		}
+		// let url = `ws://${window.location.host}/ws`;
+		let url = 'wss://swiss-mud-proxy.fly.dev';
+		// if (isMockEnabled()) {
+		// 	url = `ws://localhost:4000`;
+		// }
 
 		this.ws = new WebSocket(url);
 		this.setupEventHandlers();

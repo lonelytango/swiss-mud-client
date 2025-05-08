@@ -7,6 +7,7 @@ import { Command } from './utils/AliasEngine/AliasEngine';
 import { CommandEngine } from './utils/CommandEngine/CommandEngine';
 import { WebSocketManager } from './utils/WebSocketManager/WebSocketManager';
 import { Alias, Variable } from './types';
+import { handleCommandInput } from './utils/CommandInput/CommandInput';
 
 function App() {
 	const outputRef = useRef<HTMLDivElement>(null);
@@ -112,39 +113,27 @@ function App() {
 	}, [selectedProfile]);
 
 	const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === 'Enter') {
-			const command = e.currentTarget.value;
-			if (wsManager?.isConnected() && canSend && commandEngine) {
-				await commandEngine.processCommand(command);
+		if (!commandEngine || !wsManager) return;
 
-				if (command.trim()) {
-					setCommandHistory((prev) => [command, ...prev]);
-					setHistoryIndex(-1);
-				}
-				// Keep the input value and select it for quick re-entry
-				setTimeout(() => {
-					if (inputRef.current) {
-						inputRef.current.select();
-					}
-				}, 0);
-			}
-		} else if (e.key === 'ArrowUp') {
-			e.preventDefault();
-			if (historyIndex < commandHistory.length - 1) {
-				const newIndex = historyIndex + 1;
-				setHistoryIndex(newIndex);
-				e.currentTarget.value = commandHistory[newIndex];
-			}
-		} else if (e.key === 'ArrowDown') {
-			e.preventDefault();
-			if (historyIndex > 0) {
-				const newIndex = historyIndex - 1;
-				setHistoryIndex(newIndex);
-				e.currentTarget.value = commandHistory[newIndex];
-			} else if (historyIndex === 0) {
-				setHistoryIndex(-1);
-				e.currentTarget.value = '';
-			}
+		// Add command history data to the input element
+		e.currentTarget.dataset.historyIndex = historyIndex.toString();
+		e.currentTarget.dataset.commandHistory = JSON.stringify(commandHistory);
+
+		handleCommandInput(e, {
+			commandEngine,
+			wsManager,
+			canSend,
+			onCommandHistoryUpdate: (command) => {
+				setCommandHistory((prev) => [command, ...prev]);
+			},
+			onHistoryIndexUpdate: setHistoryIndex,
+		});
+
+		// After handling the command, re-focus/select the input if Enter was pressed
+		if (e.key === 'Enter') {
+			setTimeout(() => {
+				inputRef.current?.select();
+			}, 0);
 		}
 	};
 
