@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import { Command } from './utils/AliasEngine/AliasEngine';
 import { CommandEngine } from './utils/CommandEngine/CommandEngine';
 import { WebSocketManager } from './utils/WebSocketManager/WebSocketManager';
-import { Alias } from './types';
+import { Alias, Variable } from './types';
 
 function App() {
 	const outputRef = useRef<HTMLDivElement>(null);
@@ -17,6 +17,7 @@ function App() {
 	);
 	const [canSend, setCanSend] = useState(false);
 	const [aliases, setAliases] = useState<Alias[]>([]);
+	const [variables, setVariables] = useState<Variable[]>([]);
 	const [commandEngine, setCommandEngine] = useState<CommandEngine | null>(
 		null
 	);
@@ -25,28 +26,46 @@ function App() {
 	const [historyIndex, setHistoryIndex] = useState(-1);
 
 	useEffect(() => {
-		const stored = localStorage.getItem('mud_aliases');
-		if (stored) {
-			const parsedAliases = JSON.parse(stored);
-			setAliases(parsedAliases);
-			setCommandEngine(
-				new CommandEngine(parsedAliases, {
-					onCommandDisplay: (commands: Command[]) => {
-						if (outputRef.current) {
-							outputRef.current.innerHTML += commands
-								.map((cmd) => `<div class="user-cmd">&gt; ${cmd.content}</div>`)
-								.join('');
-							outputRef.current.scrollTop = outputRef.current.scrollHeight;
-						}
-					},
-					onCommandSend: (command: string) => {
-						if (wsManager?.isConnected()) {
-							wsManager.send(command + '\n');
-						}
-					},
-				})
-			);
+		const storedAliases = localStorage.getItem('mud_aliases');
+		const storedVariables = localStorage.getItem('mud_variables');
+		let parsedAliases: Alias[] = [];
+		let parsedVariables: Variable[] = [];
+
+		if (storedAliases) {
+			try {
+				parsedAliases = JSON.parse(storedAliases);
+				setAliases(parsedAliases);
+			} catch (e) {
+				console.error('Failed to parse aliases:', e);
+			}
 		}
+
+		if (storedVariables) {
+			try {
+				parsedVariables = JSON.parse(storedVariables);
+				setVariables(parsedVariables);
+			} catch (e) {
+				console.error('Failed to parse variables:', e);
+			}
+		}
+
+		setCommandEngine(
+			new CommandEngine(parsedAliases, parsedVariables, {
+				onCommandDisplay: (commands: Command[]) => {
+					if (outputRef.current) {
+						outputRef.current.innerHTML += commands
+							.map((cmd) => `<div class="user-cmd">&gt; ${cmd.content}</div>`)
+							.join('');
+						outputRef.current.scrollTop = outputRef.current.scrollHeight;
+					}
+				},
+				onCommandSend: (command: string) => {
+					if (wsManager?.isConnected()) {
+						wsManager.send(command + '\n');
+					}
+				},
+			})
+		);
 	}, [wsManager]);
 
 	useEffect(() => {
@@ -54,6 +73,12 @@ function App() {
 			commandEngine.setAliases(aliases);
 		}
 	}, [aliases, commandEngine]);
+
+	useEffect(() => {
+		if (commandEngine) {
+			commandEngine.setVariables(variables);
+		}
+	}, [variables, commandEngine]);
 
 	useEffect(() => {
 		if (!selectedProfile) return;
@@ -129,6 +154,8 @@ function App() {
 				onProfileConnect={setSelectedProfile}
 				aliases={aliases}
 				setAliases={setAliases}
+				variables={variables}
+				setVariables={setVariables}
 			/>
 			<div
 				className={classNames('status', {

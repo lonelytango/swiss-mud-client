@@ -1,5 +1,5 @@
 import { Command, expandAlias } from '../AliasEngine/AliasEngine';
-import type { Alias } from '../../types';
+import type { Alias, Variable } from '../../types';
 
 export interface CommandEngineOptions {
 	onCommandDisplay: (commands: Command[]) => void;
@@ -8,10 +8,16 @@ export interface CommandEngineOptions {
 
 export class CommandEngine {
 	private aliases: Alias[];
+	private variables: Variable[];
 	private options: CommandEngineOptions;
 
-	constructor(aliases: Alias[], options: CommandEngineOptions) {
+	constructor(
+		aliases: Alias[],
+		variables: Variable[],
+		options: CommandEngineOptions
+	) {
 		this.aliases = aliases;
+		this.variables = variables;
 		this.options = options;
 	}
 
@@ -19,9 +25,13 @@ export class CommandEngine {
 		this.aliases = aliases;
 	}
 
+	public setVariables(variables: Variable[]) {
+		this.variables = variables;
+	}
+
 	public async processCommand(input: string): Promise<void> {
 		// Try alias expansion
-		const expanded = await expandAlias(input, this.aliases);
+		const expanded = await expandAlias(input, this.aliases, this.variables);
 		const commands: Command[] = expanded
 			? expanded
 			: [{ type: 'command', content: input }];

@@ -1,4 +1,4 @@
-import type { Alias } from '../../types';
+import type { Alias, Variable } from '../../types';
 
 export interface Command {
 	type: 'command' | 'wait';
@@ -8,7 +8,8 @@ export interface Command {
 
 export async function expandAlias(
 	input: string,
-	aliases: Alias[]
+	aliases: Alias[],
+	variables: Variable[] = []
 ): Promise<Command[] | null> {
 	for (const alias of aliases) {
 		const regex = new RegExp(alias.pattern);
@@ -19,6 +20,12 @@ export async function expandAlias(
 			for (let i = 1; i < match.length; i++) {
 				const re = new RegExp(`\\$${i}`, 'g');
 				expanded = expanded.replace(re, match[i]);
+			}
+
+			// Replace @variable with their values
+			for (const variable of variables) {
+				const re = new RegExp(`@${variable.name}\\b`, 'g');
+				expanded = expanded.replace(re, variable.value);
 			}
 
 			// Process the expanded commands
