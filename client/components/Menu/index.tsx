@@ -3,7 +3,6 @@ import './styles.css';
 import type { Alias } from '../../types';
 import ConnectView, { type MudProfile } from '../ConnectView';
 import AliasView from '../AliasView';
-import { expandAlias } from '../../utils/AliasEngine/AliasEngine';
 
 type MenuButton = {
 	id: string;
