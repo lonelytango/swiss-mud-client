@@ -56,7 +56,6 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
 	const handleRemove = () => {
 		if (selectedIdx !== null) {
 			const newProfiles = profiles.filter((_, i) => i !== selectedIdx);
-			console.trace('setProfiles called from handleRemove');
 			setProfiles(newProfiles);
 			saveProfiles(newProfiles);
 			setSelectedIdx(null);
@@ -77,9 +76,6 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
 			// Update existing
 			newProfiles[idx] = inputs;
 		}
-		console.trace(
-			`setProfiles called from handleConnect: ${JSON.stringify(newProfiles)}`
-		);
 		setProfiles(newProfiles);
 		saveProfiles(newProfiles);
 		setSelectedIdx(idx);
@@ -89,7 +85,6 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
 	function loadProfiles(): MudProfile[] {
 		try {
 			const data = localStorage.getItem(STORAGE_KEY);
-			console.log(`Loading profiles: ${data}`);
 			return data ? JSON.parse(data) : [];
 		} catch (error) {
 			console.error('Error loading profiles', error);

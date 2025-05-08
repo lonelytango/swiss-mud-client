@@ -1,4 +1,3 @@
-import { isMockEnabled } from '../FeatureFlag';
 import type { MudProfile } from '../../components/ConnectView';
 
 export interface WebSocketManagerOptions {
@@ -26,12 +25,7 @@ export class WebSocketManager {
 		}
 
 		this.currentProfile = profile;
-		// let url = `ws://${window.location.host}/ws`;
-		let url = 'wss://swiss-mud-proxy.fly.dev';
-		// if (isMockEnabled()) {
-		// 	url = `ws://localhost:4000`;
-		// }
-
+		const url = import.meta.env.VITE_WS_URL || 'ws://localhost:4000';
 		this.ws = new WebSocket(url);
 		this.setupEventHandlers();
 	}
