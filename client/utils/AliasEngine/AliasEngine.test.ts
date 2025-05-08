@@ -1,6 +1,6 @@
 // Jest test file for aliasEngine
-import { expandAlias } from '.';
-import { Alias } from '.';
+import { expandAlias } from './AliasEngine';
+import type { Alias } from '../../types';
 
 describe('expandAlias', () => {
 	const aliases: Alias[] = [

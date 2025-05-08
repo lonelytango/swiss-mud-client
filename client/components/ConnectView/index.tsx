@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './styles.css';
 import classNames from 'classnames';
 
@@ -103,74 +103,68 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
 	}
 
 	return (
-		<div className='connect-modal-overlay'>
-			<div className='connect-modal'>
-				<div className='connect-modal-left'>
-					<div className='profile-list'>
-						{profiles.length === 0 ? (
-							<div className={'profile-list-empty'}>No saved profiles</div>
-						) : (
-							profiles.map((profile, idx) => (
-								<div
-									key={profile.name + idx}
-									className={classNames('profile-item', {
-										selected: idx === selectedIdx,
-									})}
-									onClick={() => handleSelect(idx)}
-								>
-									{profile.name}
-								</div>
-							))
-						)}
-					</div>
-					<div className={'button-row'}>
-						<button onClick={handleNew}>New</button>
-						<button onClick={handleRemove} disabled={selectedIdx === null}>
-							Remove
-						</button>
-					</div>
+		<div className='connect-modal'>
+			<div className='connect-modal-left'>
+				<div className='profile-list'>
+					{profiles.length === 0 ? (
+						<div className={'profile-list-empty'}>No saved profiles</div>
+					) : (
+						profiles.map((profile, idx) => (
+							<div
+								key={profile.name + idx}
+								className={classNames('profile-item', {
+									selected: idx === selectedIdx,
+								})}
+								onClick={() => handleSelect(idx)}
+							>
+								{profile.name}
+							</div>
+						))
+					)}
 				</div>
-				<div className='connect-modal-right'>
-					<h2 className='connect-title'>Connect to</h2>
-					<div className='input-row'>
-						<label>Profile Name</label>
-						<input
-							ref={nameInputRef}
-							name='name'
-							value={inputs.name}
-							onChange={handleInputChange}
-							autoFocus
-						/>
-					</div>
-					<div className='input-row'>
-						<label>Server Address</label>
-						<input
-							name='address'
-							value={inputs.address}
-							onChange={handleInputChange}
-						/>
-					</div>
-					<div className={'input-row'}>
-						<label>Port</label>
-						<input
-							name='port'
-							value={inputs.port}
-							onChange={handleInputChange}
-						/>
-					</div>
-					<div className={'button-row'}>
-						<button onClick={onCancel}>Cancel</button>
-						<button
-							onClick={handleConnect}
-							disabled={
-								!inputs.name.trim() ||
-								!inputs.address.trim() ||
-								!inputs.port.trim()
-							}
-						>
-							Connect
-						</button>
-					</div>
+				<div className={'button-row'}>
+					<button onClick={handleNew}>New</button>
+					<button onClick={handleRemove} disabled={selectedIdx === null}>
+						Remove
+					</button>
+				</div>
+			</div>
+			<div className='connect-modal-right'>
+				<h2 className='connect-title'>Connect to</h2>
+				<div className='input-row'>
+					<label>Profile Name</label>
+					<input
+						ref={nameInputRef}
+						name='name'
+						value={inputs.name}
+						onChange={handleInputChange}
+						autoFocus
+					/>
+				</div>
+				<div className='input-row'>
+					<label>Server Address</label>
+					<input
+						name='address'
+						value={inputs.address}
+						onChange={handleInputChange}
+					/>
+				</div>
+				<div className={'input-row'}>
+					<label>Port</label>
+					<input name='port' value={inputs.port} onChange={handleInputChange} />
+				</div>
+				<div className={'button-row'}>
+					<button onClick={onCancel}>Cancel</button>
+					<button
+						onClick={handleConnect}
+						disabled={
+							!inputs.name.trim() ||
+							!inputs.address.trim() ||
+							!inputs.port.trim()
+						}
+					>
+						Connect
+					</button>
 				</div>
 			</div>
 		</div>

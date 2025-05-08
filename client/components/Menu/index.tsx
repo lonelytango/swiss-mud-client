@@ -1,6 +1,9 @@
-import { useState } from 'react';
-import ConnectView, { type MudProfile } from '../ConnectView';
+import React, { useState } from 'react';
 import './styles.css';
+import type { Alias } from '../../types';
+import ConnectView, { type MudProfile } from '../ConnectView';
+import AliasView from '../AliasView';
+import { expandAlias } from '../../utils/AliasEngine/AliasEngine';
 
 type MenuButton = {
 	id: string;
@@ -43,31 +46,26 @@ function Popup({ isOpen, onClose, title, children }: PopupProps) {
 
 export function Menu({
 	onProfileConnect,
+	aliases,
+	setAliases,
 }: {
 	onProfileConnect?: (profile: MudProfile) => void;
+	aliases: Alias[];
+	setAliases: React.Dispatch<React.SetStateAction<Alias[]>>;
 }) {
 	const [activePopup, setActivePopup] = useState<string | null>(null);
-	const [showConnectView, setShowConnectView] = useState(false);
 
 	const handleButtonClick = (id: string) => {
-		if (id === 'connect') {
-			setShowConnectView(true);
-		} else {
-			setActivePopup(id);
-		}
+		setActivePopup(id);
 	};
 
 	const handleClose = () => {
 		setActivePopup(null);
 	};
 
-	const handleConnectViewCancel = () => {
-		setShowConnectView(false);
-	};
-
 	const handleProfileConnect = (profile: MudProfile) => {
-		setShowConnectView(false);
 		onProfileConnect?.(profile);
+		setActivePopup(null);
 	};
 
 	return (
@@ -83,12 +81,13 @@ export function Menu({
 				</button>
 			))}
 
-			{showConnectView && (
-				<ConnectView
-					onConnect={handleProfileConnect}
-					onCancel={handleConnectViewCancel}
-				/>
-			)}
+			<Popup
+				isOpen={activePopup === 'connect'}
+				onClose={handleClose}
+				title='Connect'
+			>
+				<ConnectView onConnect={handleProfileConnect} onCancel={handleClose} />
+			</Popup>
 
 			<Popup
 				isOpen={activePopup === 'triggers'}
@@ -103,7 +102,7 @@ export function Menu({
 				onClose={handleClose}
 				title='Aliases'
 			>
-				<p>Alias management will go here</p>
+				<AliasView aliases={aliases} onChange={setAliases} />
 			</Popup>
 
 			<Popup

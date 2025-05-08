@@ -1,15 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Menu } from './components/Menu';
 import type { MudProfile } from './components/ConnectView';
 import './App.css';
 import { isMockEnabled } from './utils/FeatureFlag';
 import classNames from 'classnames';
-
-export interface Alias {
-	name: string;
-	pattern: string; // regex string
-	command: string; // multi-line, can use $1, $2, ... for capture groups
-}
+import { expandAlias } from './utils/AliasEngine/AliasEngine';
+import { Alias } from './types';
 
 function App() {
 	const outputRef = useRef<HTMLDivElement>(null);
@@ -22,6 +18,12 @@ function App() {
 		null
 	);
 	const [canSend, setCanSend] = useState(false);
+	const [aliases, setAliases] = useState<Alias[]>([]);
+
+	useEffect(() => {
+		const stored = localStorage.getItem('mud_aliases');
+		if (stored) setAliases(JSON.parse(stored));
+	}, []);
 
 	useEffect(() => {
 		if (!selectedProfile) return;
@@ -88,12 +90,31 @@ function App() {
 		if (e.key === 'Enter') {
 			const command = e.currentTarget.value;
 			if (ws && ws.readyState === WebSocket.OPEN && canSend) {
-				ws.send(command + '\n');
+				// Try alias expansion
+				const expanded = expandAlias(command, aliases);
+				const toShow = expanded ? expanded : [command];
+				if (outputRef.current) {
+					outputRef.current.innerHTML +=
+						toShow
+							.map((cmd) => `<div class="user-cmd">&gt; ${cmd}</div>`)
+							.join('') + '<br/>';
+					outputRef.current.scrollTop = outputRef.current.scrollHeight;
+				}
+				if (expanded) {
+					expanded.forEach((cmd) => ws.send(cmd + '\n'));
+				} else {
+					ws.send(command + '\n');
+				}
 				if (command.trim()) {
 					setCommandHistory((prev) => [command, ...prev]);
 					setHistoryIndex(-1);
 				}
-				e.currentTarget.value = '';
+				// Keep the input value and select it for quick re-entry
+				setTimeout(() => {
+					if (inputRef.current) {
+						inputRef.current.select();
+					}
+				}, 0);
 			}
 		} else if (e.key === 'ArrowUp') {
 			e.preventDefault();
@@ -117,7 +138,11 @@ function App() {
 
 	return (
 		<div className='main'>
-			<Menu onProfileConnect={setSelectedProfile} />
+			<Menu
+				onProfileConnect={setSelectedProfile}
+				aliases={aliases}
+				setAliases={setAliases}
+			/>
 			<div
 				className={classNames('status', {
 					connected: status === 'Connected',
@@ -128,7 +153,11 @@ function App() {
 					: 'No profile selected'}
 			</div>
 			<div className='container'>
-				<div ref={outputRef} className='output' />
+				<div
+					ref={outputRef}
+					className='output'
+					onClick={() => inputRef.current?.focus()}
+				/>
 				<input
 					ref={inputRef}
 					type='text'

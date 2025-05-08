@@ -9,6 +9,7 @@
 		"esModuleInterop": true,
 		"rootDir": ".",
 		"outDir": "dist",
+		"moduleResolution": "bundler",
 
 		/* Bundler mode */
 		"allowImportingTsExtensions": true,

@@ -1,13 +1,5 @@
-export interface Alias {
-	name: string;
-	pattern: string; // regex string
-	command: string; // multi-line, can use $1, $2, ... for capture groups
-}
+import type { Alias } from '../../types';
 
-/**
- * Tries to match input against aliases. If matched, expands the command with capture groups.
- * Returns array of commands (split by newlines) or null if no match.
- */
 export function expandAlias(input: string, aliases: Alias[]): string[] | null {
 	for (const alias of aliases) {
 		const regex = new RegExp(alias.pattern);
