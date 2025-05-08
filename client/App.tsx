@@ -40,12 +40,14 @@ function App() {
 						}
 					},
 					onCommandSend: (command: string) => {
-						wsManager?.send(command + '\n');
+						if (wsManager?.isConnected()) {
+							wsManager.send(command + '\n');
+						}
 					},
 				})
 			);
 		}
-	}, []);
+	}, [wsManager]);
 
 	useEffect(() => {
 		if (commandEngine) {
