@@ -4,7 +4,7 @@ import type { MudProfile } from './components/ConnectView';
 import './App.css';
 import { isMockEnabled } from './utils/FeatureFlag';
 import classNames from 'classnames';
-import { expandAlias } from './utils/AliasEngine/AliasEngine';
+import { expandAlias, Command } from './utils/AliasEngine/AliasEngine';
 import { Alias } from './types';
 
 function App() {
@@ -86,25 +86,36 @@ function App() {
 		// eslint-disable-next-line
 	}, [selectedProfile]);
 
-	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+	const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === 'Enter') {
 			const command = e.currentTarget.value;
 			if (ws && ws.readyState === WebSocket.OPEN && canSend) {
 				// Try alias expansion
-				const expanded = expandAlias(command, aliases);
-				const toShow = expanded ? expanded : [command];
+				const expanded = await expandAlias(command, aliases);
+				const toShow: Command[] = expanded
+					? expanded
+					: [{ type: 'command', content: command }];
+
 				if (outputRef.current) {
-					outputRef.current.innerHTML +=
-						toShow
-							.map((cmd) => `<div class="user-cmd">&gt; ${cmd}</div>`)
-							.join('') + '<br/>';
+					outputRef.current.innerHTML += toShow.map(
+						(cmd) => `<div class="user-cmd">&gt; ${cmd.content}</div>`
+					);
 					outputRef.current.scrollTop = outputRef.current.scrollHeight;
 				}
+
 				if (expanded) {
-					expanded.forEach((cmd) => ws.send(cmd + '\n'));
+					// Process commands with waits
+					for (const cmd of expanded) {
+						if (cmd.type === 'wait') {
+							await new Promise((resolve) => setTimeout(resolve, cmd.waitTime));
+						} else {
+							ws.send(cmd.content + '\n');
+						}
+					}
 				} else {
 					ws.send(command + '\n');
 				}
+
 				if (command.trim()) {
 					setCommandHistory((prev) => [command, ...prev]);
 					setHistoryIndex(-1);

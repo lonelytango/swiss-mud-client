@@ -1,6 +1,15 @@
 import type { Alias } from '../../types';
 
-export function expandAlias(input: string, aliases: Alias[]): string[] | null {
+export interface Command {
+	type: 'command' | 'wait';
+	content: string;
+	waitTime?: number;
+}
+
+export async function expandAlias(
+	input: string,
+	aliases: Alias[]
+): Promise<Command[] | null> {
 	for (const alias of aliases) {
 		const regex = new RegExp(alias.pattern);
 		const match = input.match(regex);
@@ -11,11 +20,48 @@ export function expandAlias(input: string, aliases: Alias[]): string[] | null {
 				const re = new RegExp(`\\$${i}`, 'g');
 				expanded = expanded.replace(re, match[i]);
 			}
-			// Split by newlines, trim each line, filter out empty lines
-			return expanded
+
+			// Process the expanded commands
+			const commands: Command[] = [];
+			const lines = expanded
 				.split('\n')
 				.map((line) => line.trim())
 				.filter(Boolean);
+
+			for (const line of lines) {
+				// Handle wait command
+				const waitMatch = line.match(/^#wa\s+(\d+)$/);
+				if (waitMatch) {
+					commands.push({
+						type: 'wait',
+						content: line,
+						waitTime: parseInt(waitMatch[1], 10),
+					});
+					continue;
+				}
+
+				// Handle multiple commands
+				const repeatMatch = line.match(/^#(\d+)\s+(.+)$/);
+				if (repeatMatch) {
+					const count = parseInt(repeatMatch[1], 10);
+					const cmd = repeatMatch[2];
+					for (let i = 0; i < count; i++) {
+						commands.push({
+							type: 'command',
+							content: cmd,
+						});
+					}
+					continue;
+				}
+
+				// Regular command
+				commands.push({
+					type: 'command',
+					content: line,
+				});
+			}
+
+			return commands;
 		}
 	}
 	return null;
