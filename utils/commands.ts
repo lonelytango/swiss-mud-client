@@ -20,9 +20,6 @@ export function setWebSocketManager(manager: WebSocketManager): void {
  * @param command The command to send
  */
 export function send(command: string): void {
-	// Log the command for debugging purposes
-	console.log(`Sending command: ${command}`);
-
 	// Send the command if WebSocketManager is available
 	if (wsManager && wsManager.isConnected()) {
 		wsManager.send(command + '\n');
