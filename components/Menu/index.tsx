@@ -45,7 +45,7 @@ function Popup({
 				<div className='popup-header'>
 					<h3>{title}</h3>
 					<button className='close-button' onClick={onClose}>
-						×
+						<span className='button-icon'>✕</span>
 					</button>
 				</div>
 				<div className='popup-nav'>

@@ -14,73 +14,92 @@ type ConnectViewProps = {
 };
 
 const STORAGE_KEY = 'mud_profiles';
+const emptyProfile: MudProfile = { name: '', address: '', port: '' };
 
 export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
 	const [profiles, setProfiles] = useState<MudProfile[]>([]);
 	const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
-	const [inputs, setInputs] = useState<MudProfile>({
-		name: '',
-		address: '',
-		port: '',
-	});
+	const [editBuffer, setEditBuffer] = useState<MudProfile | null>(null);
 	const nameInputRef = useRef<HTMLInputElement>(null);
 
 	// Load profiles only once on mount
 	useEffect(() => {
 		const loadedProfiles = loadProfiles();
 		setProfiles(loadedProfiles);
+		if (loadedProfiles.length > 0) {
+			setSelectedIdx(0);
+		}
 	}, []);
 
+	// When selectedIdx changes, update editBuffer
 	useEffect(() => {
 		if (selectedIdx !== null && profiles[selectedIdx]) {
-			setInputs(profiles[selectedIdx]);
+			setEditBuffer({ ...profiles[selectedIdx] });
+		} else {
+			setEditBuffer(null);
 		}
-	}, [selectedIdx]);
+	}, [selectedIdx, profiles]);
 
 	// Action Handlers
 	const handleSelect = (idx: number) => {
 		setSelectedIdx(idx);
 	};
 
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (!editBuffer) return;
 		const { name, value } = e.target;
-		setInputs((prev) => ({ ...prev, [name]: value }));
+		setEditBuffer({ ...editBuffer, [name]: value });
 	};
 
-	const handleNew = () => {
-		setSelectedIdx(null);
-		setInputs({ name: '', address: '', port: '' });
+	const handleAdd = () => {
+		const newProfiles = [...profiles, { ...emptyProfile }];
+		setProfiles(newProfiles);
+		setEditBuffer({ ...emptyProfile });
+		setSelectedIdx(newProfiles.length - 1);
 		setTimeout(() => nameInputRef.current?.focus(), 0);
 	};
 
-	const handleRemove = () => {
-		if (selectedIdx !== null) {
-			const newProfiles = profiles.filter((_, i) => i !== selectedIdx);
-			setProfiles(newProfiles);
-			saveProfiles(newProfiles);
-			setSelectedIdx(null);
-			setInputs({ name: '', address: '', port: '' });
-		}
+	const handleDelete = () => {
+		if (selectedIdx === null) return;
+		if (!window.confirm('Delete this profile?')) return;
+		const newProfiles = profiles.filter((_, idx) => idx !== selectedIdx);
+		setProfiles(newProfiles);
+		saveProfiles(newProfiles);
+		setSelectedIdx(newProfiles.length > 0 ? 0 : null);
+	};
+
+	const handleSave = () => {
+		if (selectedIdx === null || !editBuffer) return;
+		if (
+			!editBuffer.name.trim() ||
+			!editBuffer.address.trim() ||
+			!editBuffer.port.trim()
+		)
+			return;
+
+		const updated = profiles.map((profile, idx) =>
+			idx === selectedIdx ? { ...editBuffer } : profile
+		);
+		setProfiles(updated);
+		saveProfiles(updated);
 	};
 
 	const handleConnect = () => {
-		if (!inputs.name.trim() || !inputs.address.trim() || !inputs.port.trim())
+		if (!editBuffer) return;
+		if (
+			!editBuffer.name.trim() ||
+			!editBuffer.address.trim() ||
+			!editBuffer.port.trim()
+		)
 			return;
-		let newProfiles = [...profiles];
-		let idx = selectedIdx;
-		if (idx === null) {
-			// Add new
-			newProfiles.push(inputs);
-			idx = newProfiles.length - 1;
-		} else {
-			// Update existing
-			newProfiles[idx] = inputs;
-		}
-		setProfiles(newProfiles);
-		saveProfiles(newProfiles);
-		setSelectedIdx(idx);
-		onConnect(inputs);
+		onConnect(editBuffer);
 	};
+
+	// Check if there are unsaved changes
+	const hasUnsaved =
+		selectedIdx !== null &&
+		editBuffer &&
+		JSON.stringify(editBuffer) !== JSON.stringify(profiles[selectedIdx]);
 
 	function loadProfiles(): MudProfile[] {
 		try {
@@ -98,69 +117,85 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
 	}
 
 	return (
-		<div className='connect-modal'>
-			<div className='connect-modal-left'>
-				<div className='profile-list'>
+		<div className='connect-view'>
+			<div className='connect-sidebar'>
+				<button onClick={handleAdd} title='Add Profile'>
+					＋
+				</button>
+				<ul>
 					{profiles.length === 0 ? (
-						<div className={'profile-list-empty'}>No saved profiles</div>
+						<li className='empty-message'>No saved profiles</li>
 					) : (
 						profiles.map((profile, idx) => (
-							<div
+							<li
 								key={profile.name + idx}
-								className={classNames('profile-item', {
-									selected: idx === selectedIdx,
-								})}
+								className={selectedIdx === idx ? 'selected' : ''}
 								onClick={() => handleSelect(idx)}
 							>
-								{profile.name}
-							</div>
+								{profile.name || (
+									<span style={{ color: '#aaa' }}>(unnamed)</span>
+								)}
+							</li>
 						))
 					)}
-				</div>
-				<div className={'button-row'}>
-					<button onClick={handleNew}>+</button>
-					<button onClick={handleRemove} disabled={selectedIdx === null}>
-						-
-					</button>
-				</div>
+				</ul>
 			</div>
-			<div className='connect-modal-right'>
-				<h3 className='connect-title'>Connect to</h3>
-				<div className='input-row'>
-					<label>Profile Name</label>
-					<input
-						ref={nameInputRef}
-						name='name'
-						value={inputs.name}
-						onChange={handleInputChange}
-						autoFocus
-					/>
-				</div>
-				<div className='input-row'>
-					<label>Server Address</label>
-					<input
-						name='address'
-						value={inputs.address}
-						onChange={handleInputChange}
-					/>
-				</div>
-				<div className={'input-row'}>
-					<label>Port</label>
-					<input name='port' value={inputs.port} onChange={handleInputChange} />
-				</div>
-				<div className={'button-row'}>
-					<button onClick={onCancel}>Cancel</button>
-					<button
-						onClick={handleConnect}
-						disabled={
-							!inputs.name.trim() ||
-							!inputs.address.trim() ||
-							!inputs.port.trim()
-						}
-					>
-						Connect
-					</button>
-				</div>
+			<div className='connect-details'>
+				{editBuffer ? (
+					<>
+						<label>
+							Profile Name
+							<input
+								ref={nameInputRef}
+								name='name'
+								value={editBuffer.name}
+								onChange={handleFieldChange}
+								autoFocus
+							/>
+						</label>
+						<label>
+							Server Address
+							<input
+								name='address'
+								value={editBuffer.address}
+								onChange={handleFieldChange}
+							/>
+						</label>
+						<label>
+							Port
+							<input
+								name='port'
+								value={editBuffer.port}
+								onChange={handleFieldChange}
+							/>
+						</label>
+						<div className='actions'>
+							<button
+								onClick={handleSave}
+								disabled={!hasUnsaved}
+								style={{ background: hasUnsaved ? '#1976d2' : '#aaa' }}
+							>
+								Save
+							</button>
+							<button onClick={handleDelete} style={{ background: '#c62828' }}>
+								Delete
+							</button>
+							<button
+								onClick={handleConnect}
+								disabled={
+									!editBuffer.name.trim() ||
+									!editBuffer.address.trim() ||
+									!editBuffer.port.trim()
+								}
+								style={{ background: '#2e7d32' }}
+							>
+								Connect
+							</button>
+						</div>
+					</>
+				) : (
+					<div style={{ color: '#888' }}>Select a profile to edit</div>
+				)}
 			</div>
 		</div>
 	);
