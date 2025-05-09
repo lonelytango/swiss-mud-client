@@ -25,6 +25,8 @@ function App() {
 	const [wsManager, setWsManager] = useState<WebSocketManager | null>(null);
 	const [commandHistory, setCommandHistory] = useState<string[]>([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
+	const [messages, setMessages] = useState<string[]>([]);
+	const [isLockedToBottom, setIsLockedToBottom] = useState(true);
 
 	useEffect(() => {
 		const storedAliases = localStorage.getItem('mud_aliases');
@@ -53,12 +55,15 @@ function App() {
 		setCommandEngine(
 			new CommandEngine(parsedAliases, parsedVariables, {
 				onCommandDisplay: (commands: Command[]) => {
-					if (outputRef.current) {
-						outputRef.current.innerHTML += commands
-							.map((cmd) => `<div class="user-cmd">&gt; ${cmd.content}</div>`)
-							.join('');
-						outputRef.current.scrollTop = outputRef.current.scrollHeight;
-					}
+					setMessages((prev) => {
+						const next = [
+							...prev,
+							...commands.map(
+								(cmd) => `<div class="user-cmd">&gt; ${cmd.content}</div>`
+							),
+						];
+						return next.length > 1000 ? next.slice(-1000) : next;
+					});
 				},
 				onCommandSend: (command: string) => {
 					if (wsManager?.isConnected()) {
@@ -96,10 +101,10 @@ function App() {
 			},
 			onError: () => setStatus('Error occurred'),
 			onMessage: (data: string) => {
-				if (outputRef.current) {
-					outputRef.current.innerHTML += data;
-					outputRef.current.scrollTop = outputRef.current.scrollHeight;
-				}
+				setMessages((prev) => {
+					const next = [...prev, data];
+					return next.length > 1000 ? next.slice(-1000) : next;
+				});
 			},
 			onConnected: () => setCanSend(true),
 		});
@@ -111,6 +116,25 @@ function App() {
 			manager.disconnect();
 		};
 	}, [selectedProfile]);
+
+	const handleOutputScroll = () => {
+		if (!outputRef.current) return;
+
+		const { scrollTop, scrollHeight, clientHeight } = outputRef.current;
+
+		// If the user is within 20px of the bottom, consider it locked
+		if (scrollHeight - scrollTop - clientHeight < 20) {
+			setIsLockedToBottom(true);
+		} else {
+			setIsLockedToBottom(false);
+		}
+	};
+
+	useEffect(() => {
+		if (isLockedToBottom && outputRef.current) {
+			outputRef.current.scrollTop = outputRef.current.scrollHeight;
+		}
+	}, [messages, isLockedToBottom]);
 
 	const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (!commandEngine || !wsManager) return;
@@ -133,6 +157,11 @@ function App() {
 		if (e.key === 'Enter') {
 			setTimeout(() => {
 				inputRef.current?.select();
+
+				// Snap to bottom when Enter is pressed
+				if (outputRef.current) {
+					outputRef.current.scrollTop = outputRef.current.scrollHeight;
+				}
 			}, 0);
 		}
 	};
@@ -160,7 +189,12 @@ function App() {
 					ref={outputRef}
 					className='output'
 					onClick={() => inputRef.current?.focus()}
-				/>
+					onScroll={handleOutputScroll}
+				>
+					{messages.map((msg, idx) => (
+						<div key={idx} dangerouslySetInnerHTML={{ __html: msg }} />
+					))}
+				</div>
 				<input
 					ref={inputRef}
 					type='text'
