@@ -1,4 +1,5 @@
 import type { Alias, Variable } from '../../types';
+import { parseSpeedwalk } from '../commands';
 
 export interface Command {
 	type: 'command' | 'wait';
@@ -31,6 +32,16 @@ export function expandAlias(
 				return Promise.resolve(); // Return a resolved promise for compatibility
 			};
 
+			const speedwalk = (actions: string[]) => {
+				const directionCommands = parseSpeedwalk(actions);
+				capturedCommands.push(
+					...directionCommands.map((command) => ({
+						type: 'command' as const,
+						content: command,
+					}))
+				);
+			};
+
 			// Process the expanded commands
 			const lines = alias.command
 				.split('\n')
@@ -42,6 +53,7 @@ export function expandAlias(
 				matches: match,
 				send,
 				wait,
+				speedwalk,
 			};
 
 			// Add existing variables to the sandbox as READ-ONLY properties
@@ -60,10 +72,10 @@ export function expandAlias(
 			const aliasFunction = new Function(
 				...Object.keys(sandbox),
 				`
-                // Add protection to prevent variable creation/modification
-                "use strict";
-                ${lines.join('\n')}
-                `
+					// Add protection to prevent variable creation/modification
+					"use strict";
+					${lines.join('\n')}
+					`
 			);
 
 			// Execute the function with our sandbox context
@@ -72,8 +84,12 @@ export function expandAlias(
 
 				// We don't check for or update variables anymore
 				// Variables are managed through the VariableView component
-			} catch (error) {
-				console.error('Error executing alias:', error);
+			} catch (error: unknown) {
+				if (error instanceof Error) {
+					console.error('Error executing alias:', error.message);
+				} else {
+					console.error('Error executing alias:', error);
+				}
 				return null; // Return null on error
 			}
 

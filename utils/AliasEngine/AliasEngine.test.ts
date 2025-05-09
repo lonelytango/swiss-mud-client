@@ -286,4 +286,77 @@ describe('expandAlias', () => {
 			content: 'attack goblin',
 		});
 	});
+
+	// ... existing code ...
+
+	describe('speedwalk', () => {
+		it('should handle basic directional commands', () => {
+			const aliases: Alias[] = [
+				{
+					name: 'speedwalk test',
+					pattern: '^sw$',
+					command: `
+                    speedwalk(["e", "w", "eu", "ne"])
+                `,
+				},
+			];
+
+			const variables: Variable[] = [];
+			const result = expandAlias('sw', aliases, variables);
+
+			expect(result).not.toBeNull();
+			expect(result).toHaveLength(4);
+			expect(result![0]).toEqual({ type: 'command', content: 'east' });
+			expect(result![1]).toEqual({ type: 'command', content: 'west' });
+			expect(result![2]).toEqual({ type: 'command', content: 'eastup' });
+			expect(result![3]).toEqual({ type: 'command', content: 'northeast' });
+		});
+
+		it('should handle repeated directional commands', () => {
+			const aliases: Alias[] = [
+				{
+					name: 'speedwalk repeat test',
+					pattern: '^swr$',
+					command: `
+                    speedwalk(["2e", "w", "eastup", "2northeast", "climb up"])
+                `,
+				},
+			];
+
+			const variables: Variable[] = [];
+			const result = expandAlias('swr', aliases, variables);
+
+			expect(result).not.toBeNull();
+			expect(result).toHaveLength(7);
+			expect(result![0]).toEqual({ type: 'command', content: 'east' });
+			expect(result![1]).toEqual({ type: 'command', content: 'east' });
+			expect(result![2]).toEqual({ type: 'command', content: 'west' });
+			expect(result![3]).toEqual({ type: 'command', content: 'eastup' });
+			expect(result![4]).toEqual({ type: 'command', content: 'northeast' });
+			expect(result![5]).toEqual({ type: 'command', content: 'northeast' });
+			expect(result![6]).toEqual({ type: 'command', content: 'climb up' });
+		});
+
+		it('should handle custom directional commands', () => {
+			const aliases: Alias[] = [
+				{
+					name: 'speedwalk custom test',
+					pattern: '^swc$',
+					command: `
+                    speedwalk(["2e", "climb ladder", "jump down"])
+                `,
+				},
+			];
+
+			const variables: Variable[] = [];
+			const result = expandAlias('swc', aliases, variables);
+
+			expect(result).not.toBeNull();
+			expect(result).toHaveLength(4);
+			expect(result![0]).toEqual({ type: 'command', content: 'east' });
+			expect(result![1]).toEqual({ type: 'command', content: 'east' });
+			expect(result![2]).toEqual({ type: 'command', content: 'climb ladder' });
+			expect(result![3]).toEqual({ type: 'command', content: 'jump down' });
+		});
+	});
 });
