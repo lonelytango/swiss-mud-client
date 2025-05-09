@@ -11,9 +11,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  width: 60px;
-  height: 60px;
+  gap: 6px;
+  width: 80px;
+  height: 80px;
   background-color: #1a1a1a;
   border: 1px solid #333;
   border-radius: 4px;
@@ -32,7 +32,8 @@
 }
 
 .button-label {
-  font-size: 10px;
+  font-size: 12px;
+  font-weight: bold;
 }
 
 .popup-overlay {

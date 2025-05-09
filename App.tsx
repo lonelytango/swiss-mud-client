@@ -139,10 +139,6 @@ function App() {
 	const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (!commandEngine || !wsManager) return;
 
-		// Add command history data to the input element
-		e.currentTarget.dataset.historyIndex = historyIndex.toString();
-		e.currentTarget.dataset.commandHistory = JSON.stringify(commandHistory);
-
 		handleCommandInput(e, {
 			commandEngine,
 			wsManager,
@@ -151,6 +147,8 @@ function App() {
 				setCommandHistory((prev) => [command, ...prev]);
 			},
 			onHistoryIndexUpdate: setHistoryIndex,
+			historyIndex,
+			commandHistory,
 		});
 
 		// After handling the command, re-focus/select the input if Enter was pressed

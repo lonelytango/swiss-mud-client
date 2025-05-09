@@ -11,7 +11,10 @@ export interface CommandInputOptions {
 
 export function handleCommandInput(
 	e: React.KeyboardEvent<HTMLInputElement>,
-	options: CommandInputOptions
+	options: CommandInputOptions & {
+		historyIndex: number;
+		commandHistory: string[];
+	}
 ): void {
 	const {
 		commandEngine,
@@ -19,6 +22,8 @@ export function handleCommandInput(
 		canSend,
 		onCommandHistoryUpdate,
 		onHistoryIndexUpdate,
+		historyIndex,
+		commandHistory,
 	} = options;
 
 	if (e.key === 'Enter') {
@@ -33,32 +38,18 @@ export function handleCommandInput(
 		}
 	} else if (e.key === 'ArrowUp') {
 		e.preventDefault();
-		const currentIndex = parseInt(
-			e.currentTarget.dataset.historyIndex || '-1',
-			10
-		);
-		const commandHistory = JSON.parse(
-			e.currentTarget.dataset.commandHistory || '[]'
-		);
-		if (currentIndex < commandHistory.length - 1) {
-			const newIndex = currentIndex + 1;
+		if (historyIndex < commandHistory.length - 1) {
+			const newIndex = historyIndex + 1;
 			onHistoryIndexUpdate(newIndex);
 			e.currentTarget.value = commandHistory[newIndex];
 		}
 	} else if (e.key === 'ArrowDown') {
 		e.preventDefault();
-		const currentIndex = parseInt(
-			e.currentTarget.dataset.historyIndex || '-1',
-			10
-		);
-		const commandHistory = JSON.parse(
-			e.currentTarget.dataset.commandHistory || '[]'
-		);
-		if (currentIndex > 0) {
-			const newIndex = currentIndex - 1;
+		if (historyIndex > 0) {
+			const newIndex = historyIndex - 1;
 			onHistoryIndexUpdate(newIndex);
 			e.currentTarget.value = commandHistory[newIndex];
-		} else if (currentIndex === 0) {
+		} else if (historyIndex === 0) {
 			onHistoryIndexUpdate(-1);
 			e.currentTarget.value = '';
 		}
