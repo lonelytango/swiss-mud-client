@@ -1,173 +1,289 @@
 // Jest test file for aliasEngine
-import { expandAlias } from './AliasEngine';
+import { expandAlias, Command } from './AliasEngine';
 import type { Alias, Variable } from '../../types';
 
 describe('expandAlias', () => {
-	const aliases: Alias[] = [
-		{
-			name: '给物品任务',
-			pattern: '^g (.+)$',
-			command: 'enter\ngive tianji $1',
-		},
-		{
-			name: '吃饭',
-			pattern: '^eat$',
-			command: 'get food\neat food',
-		},
-		{
-			name: '多参数',
-			pattern: '^foo (\\w+) (\\d+)$',
-			command: 'bar $1\nbaz $2',
-		},
-		{
-			name: '等待测试',
-			pattern: '^wait$',
-			command: 'w\n#wa 2000\ne',
-		},
-		{
-			name: '重复命令',
-			pattern: '^repeat$',
-			command: '#3 east',
-		},
-		{
-			name: '混合命令',
-			pattern: '^mixed$',
-			command: 'north\n#wa 1000\n#2 south',
-		},
-		{
-			name: '变量测试',
-			pattern: '^use (.+)$',
-			command: 'get @item\neat @item',
-		},
-		{
-			name: '多变量测试',
-			pattern: '^move$',
-			command: 'go @direction\ntake @item\ndrop @item',
-		},
-		{
-			name: '变量和参数混合',
-			pattern: '^give (.+)$',
-			command: 'get @item\ngive $1 @item',
-		},
-	];
-
-	const variables: Variable[] = [
-		{
-			name: 'item',
-			value: 'apple',
-			description: 'Current item to use',
-		},
-		{
-			name: 'direction',
-			value: 'north',
-			description: 'Current direction to move',
-		},
-		{
-			name: 'target',
-			value: 'tianji',
-			description: 'Target NPC',
-		},
-	];
-
-	it('expands single-argument alias', async () => {
-		expect(await expandAlias('g wineskin', aliases)).toEqual([
-			{ type: 'command', content: 'enter' },
-			{ type: 'command', content: 'give tianji wineskin' },
-		]);
+	beforeEach(() => {
+		jest.clearAllMocks();
 	});
 
-	it('expands no-argument alias', async () => {
-		expect(await expandAlias('eat', aliases)).toEqual([
-			{ type: 'command', content: 'get food' },
-			{ type: 'command', content: 'eat food' },
-		]);
-	});
-
-	it('expands multi-argument alias', async () => {
-		expect(await expandAlias('foo apple 42', aliases)).toEqual([
-			{ type: 'command', content: 'bar apple' },
-			{ type: 'command', content: 'baz 42' },
-		]);
-	});
-
-	it('handles wait commands', async () => {
-		expect(await expandAlias('wait', aliases)).toEqual([
-			{ type: 'command', content: 'w' },
-			{ type: 'wait', content: '#wa 2000', waitTime: 2000 },
-			{ type: 'command', content: 'e' },
-		]);
-	});
-
-	it('handles multiple command repetitions', async () => {
-		expect(await expandAlias('repeat', aliases)).toEqual([
-			{ type: 'command', content: 'east' },
-			{ type: 'command', content: 'east' },
-			{ type: 'command', content: 'east' },
-		]);
-	});
-
-	it('handles mixed commands with waits and repetitions', async () => {
-		expect(await expandAlias('mixed', aliases)).toEqual([
-			{ type: 'command', content: 'north' },
-			{ type: 'wait', content: '#wa 1000', waitTime: 1000 },
-			{ type: 'command', content: 'south' },
-			{ type: 'command', content: 'south' },
-		]);
-	});
-
-	it('returns null for no match', async () => {
-		expect(await expandAlias('hello', aliases)).toBeNull();
-		expect(await expandAlias('g', aliases)).toBeNull();
-		expect(await expandAlias('foo apple', aliases)).toBeNull();
-	});
-
-	// Variable substitution tests
-	it('substitutes single variable in alias command', async () => {
-		expect(await expandAlias('use apple', aliases, variables)).toEqual([
-			{ type: 'command', content: 'get apple' },
-			{ type: 'command', content: 'eat apple' },
-		]);
-	});
-
-	it('substitutes multiple variables in alias command', async () => {
-		expect(await expandAlias('move', aliases, variables)).toEqual([
-			{ type: 'command', content: 'go north' },
-			{ type: 'command', content: 'take apple' },
-			{ type: 'command', content: 'drop apple' },
-		]);
-	});
-
-	it('substitutes variables and capture groups together', async () => {
-		expect(await expandAlias('give tianji', aliases, variables)).toEqual([
-			{ type: 'command', content: 'get apple' },
-			{ type: 'command', content: 'give tianji apple' },
-		]);
-	});
-
-	it('handles variable substitution with no variables provided', async () => {
-		expect(await expandAlias('use apple', aliases)).toEqual([
-			{ type: 'command', content: 'get @item' },
-			{ type: 'command', content: 'eat @item' },
-		]);
-	});
-
-	it('handles variable substitution with empty variables array', async () => {
-		expect(await expandAlias('use apple', aliases, [])).toEqual([
-			{ type: 'command', content: 'get @item' },
-			{ type: 'command', content: 'eat @item' },
-		]);
-	});
-
-	it('preserves @ symbol when not followed by a variable name', async () => {
-		const aliasesWithAt: Alias[] = [
+	it('should return null when no alias matches', () => {
+		const aliases: Alias[] = [
 			{
-				name: 'at test',
-				pattern: '^at (.+)$',
-				command: 'say @$1',
+				name: 'test',
+				pattern: '^test$',
+				command: 'test command',
 			},
 		];
-		expect(await expandAlias('at hello', aliasesWithAt, variables)).toEqual([
-			{ type: 'command', content: 'say @hello' },
-		]);
+
+		const variables: Variable[] = [];
+		const result = expandAlias('nomatch', aliases, variables);
+		expect(result).toBeNull();
+	});
+
+	it('should handle simple JavaScript send command', () => {
+		const aliases: Alias[] = [
+			{
+				name: 'test',
+				pattern: '^t$',
+				command: 'send("test command")',
+			},
+		];
+
+		const variables: Variable[] = [];
+		const result = expandAlias('t', aliases, variables);
+
+		expect(result).not.toBeNull();
+		expect(result).toHaveLength(1);
+		expect(result![0]).toEqual({
+			type: 'command',
+			content: 'test command',
+		});
+	});
+
+	it('should handle JavaScript wait command', () => {
+		const aliases: Alias[] = [
+			{
+				name: 'wait',
+				pattern: '^w$',
+				command: 'wait(1000)',
+			},
+		];
+
+		const variables: Variable[] = [];
+		const result = expandAlias('w', aliases, variables);
+
+		expect(result).not.toBeNull();
+		expect(result).toHaveLength(1);
+		expect(result![0]).toEqual({
+			type: 'wait',
+			content: '',
+			waitTime: 1000,
+		});
+	});
+
+	it('should handle multiple JavaScript commands', () => {
+		const aliases: Alias[] = [
+			{
+				name: 'complex',
+				pattern: '^c$',
+				command: `
+            send("first")
+            wait(1000)
+            send("second")
+        `,
+			},
+		];
+
+		const variables: Variable[] = [];
+		const result = expandAlias('c', aliases, variables);
+
+		expect(result).not.toBeNull();
+		expect(result).toHaveLength(3);
+		expect(result![0]).toEqual({
+			type: 'command',
+			content: 'first',
+		});
+		expect(result![1]).toEqual({
+			type: 'wait',
+			content: '',
+			waitTime: 1000,
+		});
+		expect(result![2]).toEqual({
+			type: 'command',
+			content: 'second',
+		});
+	});
+
+	it('should use regex matches in commands', () => {
+		const aliases: Alias[] = [
+			{
+				name: 'wield weapon',
+				pattern: '^wa (.+)$',
+				command: `
+            const item = matches[1]
+            send(\`wield \${item}\`)
+        `,
+			},
+		];
+
+		const variables: Variable[] = [];
+		const result = expandAlias('wa sword', aliases, variables);
+
+		expect(result).not.toBeNull();
+		expect(result).toHaveLength(1);
+		expect(result![0]).toEqual({
+			type: 'command',
+			content: 'wield sword',
+		});
+	});
+
+	it('should handle read-only variables', () => {
+		const aliases: Alias[] = [
+			{
+				name: 'use weapon',
+				pattern: '^uw$',
+				command: `
+            send(\`wield \${_weapon}\`)
+        `,
+			},
+		];
+
+		const variables: Variable[] = [{ name: '_weapon', value: 'sword' }];
+		const result = expandAlias('uw', aliases, variables);
+
+		expect(result).not.toBeNull();
+		expect(result).toHaveLength(1);
+		expect(result![0]).toEqual({
+			type: 'command',
+			content: 'wield sword',
+		});
+	});
+
+	it('should handle complex command sequences', () => {
+		const aliases: Alias[] = [
+			{
+				name: 'combat sequence',
+				pattern: '^attack (.+)$',
+				command: `
+            const target = matches[1]
+            send(\`wield \${_weapon}\`)
+            wait(500)
+            send(\`cast 'armor' self\`)
+            wait(1000)
+            send(\`attack \${target}\`)
+            wait(500)
+            send(\`cast 'fireball' \${target}\`)
+        `,
+			},
+		];
+
+		const variables: Variable[] = [{ name: '_weapon', value: 'longsword' }];
+
+		const result = expandAlias('attack goblin', aliases, variables);
+
+		expect(result).not.toBeNull();
+		expect(result).toHaveLength(7);
+		expect(result![0]).toEqual({
+			type: 'command',
+			content: 'wield longsword',
+		});
+		expect(result![1]).toEqual({
+			type: 'wait',
+			content: '',
+			waitTime: 500,
+		});
+		expect(result![2]).toEqual({
+			type: 'command',
+			content: `cast 'armor' self`,
+		});
+		expect(result![3]).toEqual({
+			type: 'wait',
+			content: '',
+			waitTime: 1000,
+		});
+		expect(result![4]).toEqual({
+			type: 'command',
+			content: 'attack goblin',
+		});
+		expect(result![5]).toEqual({
+			type: 'wait',
+			content: '',
+			waitTime: 500,
+		});
+		expect(result![6]).toEqual({
+			type: 'command',
+			content: `cast 'fireball' goblin`,
+		});
+	});
+
+	it('should handle empty lines and whitespace', () => {
+		const aliases: Alias[] = [
+			{
+				name: 'whitespace',
+				pattern: '^w$',
+				command: `
+            send("first")
+            
+            send("second")
+            
+            
+            wait(1000)
+        `,
+			},
+		];
+
+		const variables: Variable[] = [];
+		const result = expandAlias('w', aliases, variables);
+
+		expect(result).not.toBeNull();
+		expect(result).toHaveLength(3);
+		expect(result![0]).toEqual({
+			type: 'command',
+			content: 'first',
+		});
+		expect(result![1]).toEqual({
+			type: 'command',
+			content: 'second',
+		});
+		expect(result![2]).toEqual({
+			type: 'wait',
+			content: '',
+			waitTime: 1000,
+		});
+	});
+
+	it('should not handle undefined variables', () => {
+		const aliases: Alias[] = [
+			{
+				name: 'undefined var',
+				pattern: '^uv$',
+				command: `
+            send(\`wield \${_nonexistent || 'default sword'}\`)
+        `,
+			},
+		];
+
+		const variables: Variable[] = [];
+		const result = expandAlias('uv', aliases, variables);
+
+		expect(result).toBeNull();
+	});
+
+	it('should handle conditional logic in alias commands', () => {
+		const aliases: Alias[] = [
+			{
+				name: 'conditional',
+				pattern: '^cond (.+)$',
+				command: `
+            const target = matches[1]
+            if (target === 'dragon') {
+              send('flee')
+            } else {
+              send(\`attack \${target}\`)
+            }
+        `,
+			},
+		];
+
+		const variables: Variable[] = [];
+
+		// Test the "if" branch
+		let result = expandAlias('cond dragon', aliases, variables);
+		expect(result).not.toBeNull();
+		expect(result).toHaveLength(1);
+		expect(result![0]).toEqual({
+			type: 'command',
+			content: 'flee',
+		});
+
+		// Test the "else" branch
+		result = expandAlias('cond goblin', aliases, variables);
+		expect(result).not.toBeNull();
+		expect(result).toHaveLength(1);
+		expect(result![0]).toEqual({
+			type: 'command',
+			content: 'attack goblin',
+		});
 	});
 });

@@ -3,11 +3,11 @@ import { Menu } from './components/Menu';
 import type { MudProfile } from './components/ConnectView';
 import './App.css';
 import classNames from 'classnames';
-import { Command } from './utils/AliasEngine/AliasEngine';
 import { CommandEngine } from './utils/CommandEngine/CommandEngine';
 import { WebSocketManager } from './utils/WebSocketManager/WebSocketManager';
 import { Alias, Variable } from './types';
 import { handleCommandInput } from './utils/CommandInput/CommandInput';
+import { setWebSocketManager, send } from './utils/commands';
 
 function App() {
 	const outputRef = useRef<HTMLDivElement>(null);
@@ -54,38 +54,60 @@ function App() {
 
 		setCommandEngine(
 			new CommandEngine(parsedAliases, parsedVariables, {
-				onCommandDisplay: (commands: Command[]) => {
+				onCommandDisplay: (commands) => {
+					// Optional: display the expanded commands in the UI if needed
+				},
+				onCommandSend: (command: string) => {
+					// Add command to output (visual feedback for user)
 					setMessages((prev) => {
 						const next = [
 							...prev,
-							...commands.map(
-								(cmd) => `<div class="user-cmd">&gt; ${cmd.content}</div>`
-							),
+							`<div class="user-cmd">&gt; ${command}</div>`,
 						];
 						return next.length > 1000 ? next.slice(-1000) : next;
 					});
-				},
-				onCommandSend: (command: string) => {
-					if (wsManager?.isConnected()) {
-						wsManager.send(command + '\n');
-					}
+
+					// Send the command to the MUD server through the commands.ts send function
+					// instead of directly using the WebSocketManager here
+					// This ensures consistent behavior whether commands come from aliases or direct input
+					send(command);
 				},
 			})
 		);
 	}, [wsManager]);
 
+	// Update the CommandEngine when aliases change
 	useEffect(() => {
 		if (commandEngine) {
 			commandEngine.setAliases(aliases);
 		}
 	}, [aliases, commandEngine]);
 
+	// Update the CommandEngine when variables change
 	useEffect(() => {
 		if (commandEngine) {
 			commandEngine.setVariables(variables);
 		}
 	}, [variables, commandEngine]);
 
+	// Update localStorage when aliases or variables change
+	useEffect(() => {
+		try {
+			localStorage.setItem('mud_aliases', JSON.stringify(aliases));
+		} catch (e) {
+			console.error('Failed to save aliases:', e);
+		}
+	}, [aliases]);
+
+	useEffect(() => {
+		try {
+			localStorage.setItem('mud_variables', JSON.stringify(variables));
+		} catch (e) {
+			console.error('Failed to save variables:', e);
+		}
+	}, [variables]);
+
+	// Setup WebSocket connection when a profile is selected
 	useEffect(() => {
 		if (!selectedProfile) return;
 
@@ -112,11 +134,15 @@ function App() {
 		manager.connect(selectedProfile);
 		setWsManager(manager);
 
+		// Set the WebSocketManager in commands.ts
+		setWebSocketManager(manager);
+
 		return () => {
 			manager.disconnect();
 		};
 	}, [selectedProfile]);
 
+	// Handle scrolling behavior
 	const handleOutputScroll = () => {
 		if (!outputRef.current) return;
 
@@ -130,12 +156,14 @@ function App() {
 		}
 	};
 
+	// Auto-scroll to bottom when messages update (if locked)
 	useEffect(() => {
 		if (isLockedToBottom && outputRef.current) {
 			outputRef.current.scrollTop = outputRef.current.scrollHeight;
 		}
 	}, [messages, isLockedToBottom]);
 
+	// Handle keyboard input
 	const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (!commandEngine || !wsManager) return;
 

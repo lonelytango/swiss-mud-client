@@ -6,70 +6,79 @@ export interface Command {
 	waitTime?: number;
 }
 
-export async function expandAlias(
+// This function expands an input string according to the defined aliases and variables
+export function expandAlias(
 	input: string,
 	aliases: Alias[],
-	variables: Variable[] = []
-): Promise<Command[] | null> {
+	variables: Variable[]
+): Command[] | null {
 	for (const alias of aliases) {
 		const regex = new RegExp(alias.pattern);
 		const match = input.match(regex);
 		if (match) {
-			// Replace $1, $2, ... in command with capture groups
-			let expanded = alias.command;
-			for (let i = 1; i < match.length; i++) {
-				const re = new RegExp(`\\$${i}`, 'g');
-				expanded = expanded.replace(re, match[i]);
-			}
+			// Collect commands that will be executed
+			const capturedCommands: Command[] = [];
 
-			// Replace @variable with their values
-			for (const variable of variables) {
-				const re = new RegExp(`@${variable.name}\\b`, 'g');
-				expanded = expanded.replace(re, variable.value);
-			}
+			// Create wrapper functions to capture the commands
+			const send = (command: string) => {
+				capturedCommands.push({ type: 'command', content: command });
+				// We don't actually execute the command here, just capture it
+			};
+
+			const wait = (ms: number) => {
+				capturedCommands.push({ type: 'wait', content: '', waitTime: ms });
+				// We don't actually wait here, just capture the wait instruction
+				return Promise.resolve(); // Return a resolved promise for compatibility
+			};
 
 			// Process the expanded commands
-			const commands: Command[] = [];
-			const lines = expanded
+			const lines = alias.command
 				.split('\n')
 				.map((line) => line.trim())
 				.filter(Boolean);
 
-			for (const line of lines) {
-				// Handle wait command
-				const waitMatch = line.match(/^#wa\s+(\d+)$/);
-				if (waitMatch) {
-					commands.push({
-						type: 'wait',
-						content: line,
-						waitTime: parseInt(waitMatch[1], 10),
+			// Create a sandbox environment with necessary context
+			const sandbox: any = {
+				matches: match,
+				send,
+				wait,
+			};
+
+			// Add existing variables to the sandbox as READ-ONLY properties
+			variables.forEach((variable) => {
+				if (variable.name) {
+					// Define the variable as a getter-only property to prevent modification
+					Object.defineProperty(sandbox, variable.name, {
+						get: () => variable.value,
+						enumerable: true,
+						configurable: false,
 					});
-					continue;
 				}
+			});
 
-				// Handle multiple commands
-				const repeatMatch = line.match(/^#(\d+)\s+(.+)$/);
-				if (repeatMatch) {
-					const count = parseInt(repeatMatch[1], 10);
-					const cmd = repeatMatch[2];
-					for (let i = 0; i < count; i++) {
-						commands.push({
-							type: 'command',
-							content: cmd,
-						});
-					}
-					continue;
-				}
+			// Create a function that executes the alias command code
+			const aliasFunction = new Function(
+				...Object.keys(sandbox),
+				`
+                // Add protection to prevent variable creation/modification
+                "use strict";
+                ${lines.join('\n')}
+                `
+			);
 
-				// Regular command
-				commands.push({
-					type: 'command',
-					content: line,
-				});
+			// Execute the function with our sandbox context
+			try {
+				aliasFunction(...Object.values(sandbox));
+
+				// We don't check for or update variables anymore
+				// Variables are managed through the VariableView component
+			} catch (error) {
+				console.error('Error executing alias:', error);
+				return null; // Return null on error
 			}
 
-			return commands;
+			return capturedCommands.length > 0 ? capturedCommands : null;
 		}
 	}
-	return null;
+	return null; // No matching alias found
 }
