@@ -21,7 +21,6 @@ body {
   height: 100vh;
   background-color: #1a1a1a;
   color: #ffffff;
-  font-family: 'Courier New', monospace;
   overflow: hidden;
 }
 
@@ -72,7 +71,6 @@ body {
   border: 1px solid #444444;
   border-radius: 0;
   color: #ffffff;
-  font-family: 'Courier New', monospace;
   font-size: 16px;
   font-weight: 700;
   outline: none;
@@ -111,5 +109,160 @@ body {
 .user-cmd {
   color: #1976d2;
   font-weight: bold;
-  font-family: monospace;
+}
+
+.terminal {
+  background-color: #1a1a1a;
+  color: #00ff00;
+  padding: 20px;
+  border-radius: 4px;
+  height: 100%;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.terminal-input {
+  background-color: #1a1a1a;
+  color: #00ff00;
+  border: none;
+  outline: none;
+  width: 100%;
+  padding: 8px;
+  margin-top: 8px;
+  border-top: 1px solid #333;
+}
+
+.terminal-input::placeholder {
+  color: #666;
+}
+
+.terminal-line {
+  margin: 0;
+  padding: 2px 0;
+}
+
+.terminal-line.error {
+  color: #ff4444;
+}
+
+.terminal-line.success {
+  color: #44ff44;
+}
+
+.terminal-line.info {
+  color: #4444ff;
+}
+
+.terminal-line.warning {
+  color: #ffff44;
+}
+
+.terminal-line.system {
+  color: #888;
+  font-style: italic;
+}
+
+.terminal-line.user {
+  color: #00ff00;
+  font-weight: bold;
+}
+
+.terminal-line.server {
+  color: #00ffff;
+}
+
+.terminal-line.whisper {
+  color: #ff00ff;
+}
+
+.terminal-line.tell {
+  color: #ff8800;
+}
+
+.terminal-line.chat {
+  color: #88ff88;
+}
+
+.terminal-line.combat {
+  color: #ff0000;
+}
+
+.terminal-line.death {
+  color: #ff0000;
+  font-weight: bold;
+}
+
+.terminal-line.level {
+  color: #ffff00;
+  font-weight: bold;
+}
+
+.terminal-line.quest {
+  color: #00ffff;
+  font-weight: bold;
+}
+
+.terminal-line.item {
+  color: #ff8800;
+}
+
+.terminal-line.gold {
+  color: #ffff00;
+}
+
+.terminal-line.exp {
+  color: #00ff00;
+}
+
+.terminal-line.hp {
+  color: #ff0000;
+}
+
+.terminal-line.mp {
+  color: #0000ff;
+}
+
+.terminal-line.sp {
+  color: #ff00ff;
+}
+
+.terminal-line.stats {
+  color: #00ffff;
+}
+
+.terminal-line.inventory {
+  color: #ff8800;
+}
+
+.terminal-line.equipment {
+  color: #ff8800;
+}
+
+.terminal-line.skills {
+  color: #00ffff;
+}
+
+.terminal-line.spells {
+  color: #00ffff;
+}
+
+.terminal-line.abilities {
+  color: #00ffff;
+}
+
+.terminal-line.quests {
+  color: #00ffff;
+}
+
+.terminal-line.map {
+  color: #00ff00;
+}
+
+.terminal-line.help {
+  color: #00ffff;
+}
+
+.terminal-line.command {
+  color: #00ff00;
 }

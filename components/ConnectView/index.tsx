@@ -118,14 +118,14 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
 					)}
 				</div>
 				<div className={'button-row'}>
-					<button onClick={handleNew}>New</button>
+					<button onClick={handleNew}>+</button>
 					<button onClick={handleRemove} disabled={selectedIdx === null}>
-						Remove
+						-
 					</button>
 				</div>
 			</div>
 			<div className='connect-modal-right'>
-				<h2 className='connect-title'>Connect to</h2>
+				<h3 className='connect-title'>Connect to</h3>
 				<div className='input-row'>
 					<label>Profile Name</label>
 					<input

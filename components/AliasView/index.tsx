@@ -128,7 +128,7 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
 				{selected ? (
 					<>
 						<label>
-							Name:
+							Name
 							<input
 								name='name'
 								value={selected.name}
@@ -137,7 +137,7 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
 							/>
 						</label>
 						<label>
-							Pattern:
+							Pattern
 							<input
 								name='pattern'
 								value={selected.pattern}
@@ -145,7 +145,7 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
 							/>
 						</label>
 						<label>
-							Command:
+							Command
 							<textarea
 								name='command'
 								value={selected.command}
@@ -167,9 +167,7 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
 						</div>
 					</>
 				) : (
-					<div style={{ color: '#888', marginTop: '40px' }}>
-						Select an alias to edit
-					</div>
+					<div style={{ color: '#888' }}>Select an alias to edit</div>
 				)}
 			</div>
 		</div>

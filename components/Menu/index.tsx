@@ -24,9 +24,16 @@ type PopupProps = {
 	onClose: () => void;
 	title: string;
 	children: React.ReactNode;
+	setActivePopup: (id: string) => void;
 };
 
-function Popup({ isOpen, onClose, title, children }: PopupProps) {
+function Popup({
+	isOpen,
+	onClose,
+	title,
+	children,
+	setActivePopup,
+}: PopupProps) {
 	if (!isOpen) return null;
 
 	return (
@@ -37,6 +44,18 @@ function Popup({ isOpen, onClose, title, children }: PopupProps) {
 					<button className='close-button' onClick={onClose}>
 						×
 					</button>
+				</div>
+				<div className='popup-nav'>
+					{menuButtons.map((button) => (
+						<button
+							key={button.id}
+							className='popup-nav-button'
+							onClick={() => setActivePopup(button.id)}
+						>
+							<span className='popup-nav-icon'>{button.icon}</span>
+							<span className='popup-nav-label'>{button.label}</span>
+						</button>
+					))}
 				</div>
 				<div className='popup-content'>{children}</div>
 			</div>
@@ -89,6 +108,7 @@ export function Menu({
 				isOpen={activePopup === 'connect'}
 				onClose={handleClose}
 				title='Connect'
+				setActivePopup={setActivePopup}
 			>
 				<ConnectView onConnect={handleProfileConnect} onCancel={handleClose} />
 			</Popup>
@@ -97,6 +117,7 @@ export function Menu({
 				isOpen={activePopup === 'triggers'}
 				onClose={handleClose}
 				title='Triggers'
+				setActivePopup={setActivePopup}
 			>
 				<p>Trigger management will go here</p>
 			</Popup>
@@ -105,6 +126,7 @@ export function Menu({
 				isOpen={activePopup === 'alias'}
 				onClose={handleClose}
 				title='Aliases'
+				setActivePopup={setActivePopup}
 			>
 				<AliasView aliases={aliases} onChange={setAliases} />
 			</Popup>
@@ -113,6 +135,7 @@ export function Menu({
 				isOpen={activePopup === 'scripts'}
 				onClose={handleClose}
 				title='Scripts'
+				setActivePopup={setActivePopup}
 			>
 				<p>Script management will go here</p>
 			</Popup>
@@ -121,6 +144,7 @@ export function Menu({
 				isOpen={activePopup === 'variables'}
 				onClose={handleClose}
 				title='Variables'
+				setActivePopup={setActivePopup}
 			>
 				<VariableView variables={variables} onChange={setVariables} />
 			</Popup>

@@ -130,7 +130,7 @@ const VariableView: React.FC<VariableViewProps> = ({ variables, onChange }) => {
 				{selected ? (
 					<>
 						<label>
-							Name:
+							Name
 							<input
 								name='name'
 								value={selected.name}
@@ -139,7 +139,7 @@ const VariableView: React.FC<VariableViewProps> = ({ variables, onChange }) => {
 							/>
 						</label>
 						<label>
-							Value:
+							Value
 							<input
 								name='value'
 								value={selected.value}
@@ -147,7 +147,7 @@ const VariableView: React.FC<VariableViewProps> = ({ variables, onChange }) => {
 							/>
 						</label>
 						<label>
-							Description:
+							Description
 							<textarea
 								name='description'
 								value={selected.description || ''}
@@ -169,9 +169,7 @@ const VariableView: React.FC<VariableViewProps> = ({ variables, onChange }) => {
 						</div>
 					</>
 				) : (
-					<div style={{ color: '#888', marginTop: '40px' }}>
-						Select a variable to edit
-					</div>
+					<div style={{ color: '#888' }}>Select a variable to edit</div>
 				)}
 			</div>
 		</div>
