@@ -5,6 +5,7 @@ import ConnectView, { type MudProfile } from '../ConnectView';
 import AliasView from '../AliasView';
 import VariableView from '../VariableView';
 import DataView from '../DataView';
+import { DataManager, type MudData } from '../../utils/DataManager';
 
 type MenuButton = {
 	id: string;
@@ -93,15 +94,9 @@ export function Menu({
 		setActivePopup(null);
 	};
 
-	const handleDataImport = (data: {
-		mud_profiles: any[];
-		mud_variables: any[];
-		mud_aliases: any[];
-	}) => {
-		// Update localStorage
-		localStorage.setItem('mud_profiles', JSON.stringify(data.mud_profiles));
-		localStorage.setItem('mud_variables', JSON.stringify(data.mud_variables));
-		localStorage.setItem('mud_aliases', JSON.stringify(data.mud_aliases));
+	const handleDataImport = (data: MudData) => {
+		// Save to localStorage using DataManager
+		DataManager.saveDataToStorage(data);
 
 		// Update state
 		setVariables(data.mud_variables);

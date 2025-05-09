@@ -1,85 +1,62 @@
 import React, { useState } from 'react';
 import './styles.css';
+import { DataManager, type MudData } from '../../utils/DataManager';
 
 interface DataViewProps {
-	onImport: (data: {
-		mud_profiles: any[];
-		mud_variables: any[];
-		mud_aliases: any[];
-	}) => void;
+	onImport: (data: MudData) => void;
 }
 
 const DataView: React.FC<DataViewProps> = ({ onImport }) => {
 	const [importText, setImportText] = useState('');
 
-	const handleExportToFile = () => {
-		const data = {
-			mud_profiles: JSON.parse(localStorage.getItem('mud_profiles') || '[]'),
-			mud_variables: JSON.parse(localStorage.getItem('mud_variables') || '[]'),
-			mud_aliases: JSON.parse(localStorage.getItem('mud_aliases') || '[]'),
-		};
-
-		const blob = new Blob([JSON.stringify(data, null, 2)], {
-			type: 'application/json',
-		});
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = 'mud-data.json';
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-		URL.revokeObjectURL(url);
+	const handleExportToFile = async () => {
+		try {
+			await DataManager.exportToFile();
+		} catch (err) {
+			console.error('Failed to export to file:', err);
+			alert('Failed to export data to file');
+		}
 	};
 
-	const handleExportToClipboard = () => {
-		const data = {
-			mud_profiles: JSON.parse(localStorage.getItem('mud_profiles') || '[]'),
-			mud_variables: JSON.parse(localStorage.getItem('mud_variables') || '[]'),
-			mud_aliases: JSON.parse(localStorage.getItem('mud_aliases') || '[]'),
-		};
-
-		navigator.clipboard
-			.writeText(JSON.stringify(data, null, 2))
-			.then(() => alert('Data copied to clipboard!'))
-			.catch((err) => console.error('Failed to copy data:', err));
+	const handleExportToClipboard = async () => {
+		try {
+			await DataManager.exportToClipboard();
+			alert('Data copied to clipboard!');
+		} catch (err) {
+			console.error('Failed to copy to clipboard:', err);
+			alert('Failed to copy data to clipboard');
+		}
 	};
 
-	const handleImportFromFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleImportFromFile = async (
+		e: React.ChangeEvent<HTMLInputElement>
+	) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
 
-		const reader = new FileReader();
-		reader.onload = (event) => {
-			try {
-				const data = JSON.parse(event.target?.result as string);
-				if (data.mud_profiles && data.mud_variables && data.mud_aliases) {
-					onImport(data);
-					alert('Data imported successfully!');
-				} else {
-					alert('Invalid data format!');
-				}
-			} catch (err) {
-				alert('Failed to parse JSON file!');
-				console.error(err);
-			}
-		};
-		reader.readAsText(file);
+		try {
+			const data = await DataManager.importFromFile(file);
+			onImport(data);
+			alert('Data imported successfully!');
+		} catch (err) {
+			console.error('Failed to import from file:', err);
+			alert(
+				err instanceof Error ? err.message : 'Failed to import data from file'
+			);
+		}
 	};
 
 	const handleImportFromText = () => {
 		try {
-			const data = JSON.parse(importText);
-			if (data.mud_profiles && data.mud_variables && data.mud_aliases) {
-				onImport(data);
-				setImportText('');
-				alert('Data imported successfully!');
-			} else {
-				alert('Invalid data format!');
-			}
+			const data = DataManager.importFromText(importText);
+			onImport(data);
+			setImportText('');
+			alert('Data imported successfully!');
 		} catch (err) {
-			alert('Failed to parse JSON text!');
-			console.error(err);
+			console.error('Failed to import from text:', err);
+			alert(
+				err instanceof Error ? err.message : 'Failed to import data from text'
+			);
 		}
 	};
 
