@@ -1,4 +1,4 @@
-import type { MudProfile } from '../../components/ConnectView';
+import type { MudProfile } from '../components/ConnectView';
 
 export interface WebSocketManagerOptions {
 	onOpen: () => void;

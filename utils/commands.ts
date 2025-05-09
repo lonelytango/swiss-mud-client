@@ -2,7 +2,7 @@
  * Sends a command to the MUD server
  * @param command The command to send
  */
-import { WebSocketManager } from './WebSocketManager/WebSocketManager';
+import { WebSocketManager } from './WebSocketManager';
 
 // Store WebSocketManager instance
 let wsManager: WebSocketManager | null = null;

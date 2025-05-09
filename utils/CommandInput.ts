@@ -1,5 +1,5 @@
-import { CommandEngine } from '../CommandEngine/CommandEngine';
-import { WebSocketManager } from '../WebSocketManager/WebSocketManager';
+import { CommandEngine } from './CommandEngine';
+import { WebSocketManager } from './WebSocketManager';
 
 export interface CommandInputOptions {
 	commandEngine: CommandEngine;

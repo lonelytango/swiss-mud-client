@@ -1,5 +1,5 @@
-import type { Alias, Variable } from '../../types';
-import { parseSpeedwalk } from '../commands';
+import type { Alias, Variable } from '../types';
+import { parseSpeedwalk } from './commands';
 
 export interface Command {
 	type: 'command' | 'wait';

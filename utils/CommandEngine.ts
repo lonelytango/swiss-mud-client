@@ -1,5 +1,5 @@
-import { expandAlias } from '../AliasEngine/AliasEngine';
-import type { Alias, Variable } from '../../types';
+import { expandAlias } from './AliasEngine';
+import type { Alias, Variable } from '../types';
 
 export interface CommandEngineOptions {
 	onCommandSend: (command: string) => void;

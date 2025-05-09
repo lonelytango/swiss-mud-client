@@ -3,10 +3,10 @@ import { Menu } from './components/Menu';
 import type { MudProfile } from './components/ConnectView';
 import './App.css';
 import classNames from 'classnames';
-import { CommandEngine } from './utils/CommandEngine/CommandEngine';
-import { WebSocketManager } from './utils/WebSocketManager/WebSocketManager';
+import { CommandEngine } from './utils/CommandEngine';
+import { WebSocketManager } from './utils/WebSocketManager';
 import { Alias, Variable } from './types';
-import { handleCommandInput } from './utils/CommandInput/CommandInput';
+import { handleCommandInput } from './utils/CommandInput';
 import { setWebSocketManager, send } from './utils/commands';
 
 function App() {
