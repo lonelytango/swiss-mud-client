@@ -1,5 +1,5 @@
 // Jest test file for aliasEngine
-import { expandAlias, Command } from './AliasEngine';
+import { expandAlias } from './AliasEngine';
 import type { Alias, Variable } from '../../types';
 
 describe('expandAlias', () => {

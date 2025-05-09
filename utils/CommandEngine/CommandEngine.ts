@@ -2,7 +2,7 @@ import { Command, expandAlias } from '../AliasEngine/AliasEngine';
 import type { Alias, Variable } from '../../types';
 
 export interface CommandEngineOptions {
-	onCommandDisplay?: (commands: Command[]) => void;
+	// onCommandDisplay?: (commands: Command[]) => void;
 	onCommandSend: (command: string) => void;
 }
 
@@ -34,14 +34,10 @@ export class CommandEngine {
 		if (!input.match(/^\s*$/)) {
 			// Try alias expansion
 			const expanded = expandAlias(input, this.aliases, this.variables);
-
-			console.log('Expanded:', expanded);
-
 			// Notify about expanded commands if callback is provided
-			if (expanded && this.options.onCommandDisplay) {
-				this.options.onCommandDisplay(expanded);
-			}
-
+			// if (expanded && this.options.onCommandDisplay) {
+			// 	this.options.onCommandDisplay(expanded);
+			// }
 			// Execute commands
 			if (expanded) {
 				// Process commands with waits
