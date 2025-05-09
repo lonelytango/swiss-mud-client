@@ -296,7 +296,7 @@ describe('expandAlias', () => {
 					name: 'speedwalk test',
 					pattern: '^sw$',
 					command: `
-                    speedwalk(["e", "w", "eu", "ne"])
+                    speedwalk("e,w,eu,ne")
                 `,
 				},
 			];
@@ -318,7 +318,7 @@ describe('expandAlias', () => {
 					name: 'speedwalk repeat test',
 					pattern: '^swr$',
 					command: `
-                    speedwalk(["2e", "w", "eastup", "2northeast", "climb up"])
+                    speedwalk("2e,w,eastup,2northeast,climb up")
                 `,
 				},
 			];
@@ -343,7 +343,7 @@ describe('expandAlias', () => {
 					name: 'speedwalk custom test',
 					pattern: '^swc$',
 					command: `
-                    speedwalk(["2e", "climb ladder", "jump down"])
+                    speedwalk("2e,climb ladder,jump down")
                 `,
 				},
 			];

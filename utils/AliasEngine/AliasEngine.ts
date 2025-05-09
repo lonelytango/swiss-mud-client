@@ -32,7 +32,7 @@ export function expandAlias(
 				return Promise.resolve(); // Return a resolved promise for compatibility
 			};
 
-			const speedwalk = (actions: string[]) => {
+			const speedwalk = (actions: string) => {
 				const directionCommands = parseSpeedwalk(actions);
 				capturedCommands.push(
 					...directionCommands.map((command) => ({

@@ -73,12 +73,14 @@ function parseDirection(input: string): { count: number; direction: string } {
 }
 
 /**
- * Executes a series of directional commands
- * @param actions Array of directional actions (e.g. ["2e", "w", "eu", "ne", "climb up"])
+ * Executes a series of directional commands from a comma-delimited string
+ * @param actions Comma-delimited string of directional actions (e.g. "2e,w,eu,ne,climb up")
  */
-export function parseSpeedwalk(actions: string[]): string[] {
+export function parseSpeedwalk(actions: string): string[] {
 	const directionCommands: string[] = [];
-	for (const action of actions) {
+	const actionArray = actions.split(',').map((action) => action.trim());
+
+	for (const action of actionArray) {
 		const { count, direction } = parseDirection(action);
 		const fullDirection = DIRECTION_MAP[direction.toLowerCase()] || direction;
 
