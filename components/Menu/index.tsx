@@ -4,6 +4,7 @@ import type { Alias, Variable } from '../../types';
 import ConnectView, { type MudProfile } from '../ConnectView';
 import AliasView from '../AliasView';
 import VariableView from '../VariableView';
+import DataView from '../DataView';
 
 type MenuButton = {
 	id: string;
@@ -17,6 +18,7 @@ const menuButtons: MenuButton[] = [
 	{ id: 'alias', label: 'Alias', icon: '📝' },
 	{ id: 'scripts', label: 'Scripts', icon: '📜' },
 	{ id: 'variables', label: 'Variables', icon: '📊' },
+	{ id: 'data', label: 'Data', icon: '💾' },
 ];
 
 type PopupProps = {
@@ -91,6 +93,21 @@ export function Menu({
 		setActivePopup(null);
 	};
 
+	const handleDataImport = (data: {
+		mud_profiles: any[];
+		mud_variables: any[];
+		mud_aliases: any[];
+	}) => {
+		// Update localStorage
+		localStorage.setItem('mud_profiles', JSON.stringify(data.mud_profiles));
+		localStorage.setItem('mud_variables', JSON.stringify(data.mud_variables));
+		localStorage.setItem('mud_aliases', JSON.stringify(data.mud_aliases));
+
+		// Update state
+		setVariables(data.mud_variables);
+		setAliases(data.mud_aliases);
+	};
+
 	return (
 		<div className='menu'>
 			{menuButtons.map((button) => (
@@ -147,6 +164,15 @@ export function Menu({
 				setActivePopup={setActivePopup}
 			>
 				<VariableView variables={variables} onChange={setVariables} />
+			</Popup>
+
+			<Popup
+				isOpen={activePopup === 'data'}
+				onClose={handleClose}
+				title='Data Management'
+				setActivePopup={setActivePopup}
+			>
+				<DataView onImport={handleDataImport} />
 			</Popup>
 		</div>
 	);
