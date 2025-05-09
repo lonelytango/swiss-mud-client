@@ -54,9 +54,6 @@ function App() {
 
 		setCommandEngine(
 			new CommandEngine(parsedAliases, parsedVariables, {
-				onCommandDisplay: (commands) => {
-					// Optional: display the expanded commands in the UI if needed
-				},
 				onCommandSend: (command: string) => {
 					// Add command to output (visual feedback for user)
 					setMessages((prev) => {
@@ -89,23 +86,6 @@ function App() {
 			commandEngine.setVariables(variables);
 		}
 	}, [variables, commandEngine]);
-
-	// Update localStorage when aliases or variables change
-	useEffect(() => {
-		try {
-			localStorage.setItem('mud_aliases', JSON.stringify(aliases));
-		} catch (e) {
-			console.error('Failed to save aliases:', e);
-		}
-	}, [aliases]);
-
-	useEffect(() => {
-		try {
-			localStorage.setItem('mud_variables', JSON.stringify(variables));
-		} catch (e) {
-			console.error('Failed to save variables:', e);
-		}
-	}, [variables]);
 
 	// Setup WebSocket connection when a profile is selected
 	useEffect(() => {
