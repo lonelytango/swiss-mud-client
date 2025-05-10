@@ -1,6 +1,6 @@
 import { expandAlias } from './AliasEngine';
 import { processTriggers } from './TriggerEngine';
-import type { Alias, Variable, Trigger, Command } from '../types';
+import type { Alias, Variable, Trigger } from '../types';
 
 export interface CommandEngineOptions {
 	onCommandSend: (command: string) => void;

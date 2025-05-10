@@ -1,4 +1,4 @@
-import type { Alias, Variable } from '../types';
+import type { Alias, Variable, Command } from '../types';
 import { parseSendCommands, parseSpeedwalk } from './CommandUtils';
 
 // This function expands an input string according to the defined aliases and variables
