@@ -6,8 +6,8 @@ import classNames from 'classnames';
 import { CommandEngine } from './engines/CommandEngine';
 import { WebSocketManager } from './managers/WebSocketManager';
 import { Alias, Trigger } from './types';
-import { handleCommandInput } from './utils/CommandInput';
-import { setWebSocketManager, send } from './utils/CommandHandler';
+import { handleCommandInput } from './utils/CommandHandler';
+import { setWebSocketManager, send } from './utils/CommandAction';
 import { useVariables } from './contexts/VariablesContext';
 import { stripHtmlTags } from './utils/TextUtils';
 
