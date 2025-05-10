@@ -131,7 +131,7 @@ export function Menu({
 				title='Triggers'
 				setActivePopup={setActivePopup}
 			>
-				<p>Trigger management will go here</p>
+				<p>Trigger management coming soon</p>
 			</Popup>
 
 			<Popup
@@ -149,7 +149,7 @@ export function Menu({
 				title='Scripts'
 				setActivePopup={setActivePopup}
 			>
-				<p>Script management will go here</p>
+				<p>Script management coming soon</p>
 			</Popup>
 
 			<Popup

@@ -124,12 +124,12 @@ describe('expandAlias', () => {
 				name: 'use weapon',
 				pattern: '^uw$',
 				command: `
-            send(\`wield \${_weapon}\`)
+            send(\`wield \${weapon}\`)
         `,
 			},
 		];
 
-		const variables: Variable[] = [{ name: '_weapon', value: 'sword' }];
+		const variables: Variable[] = [{ name: 'weapon', value: 'sword' }];
 		const result = expandAlias('uw', aliases, variables);
 
 		expect(result).not.toBeNull();
@@ -147,7 +147,7 @@ describe('expandAlias', () => {
 				pattern: '^attack (.+)$',
 				command: `
             const target = matches[1]
-            send(\`wield \${_weapon}\`)
+            send(\`wield \${weapon}\`)
             wait(500)
             send(\`cast 'armor' self\`)
             wait(1000)
@@ -158,7 +158,7 @@ describe('expandAlias', () => {
 			},
 		];
 
-		const variables: Variable[] = [{ name: '_weapon', value: 'longsword' }];
+		const variables: Variable[] = [{ name: 'weapon', value: 'longsword' }];
 
 		const result = expandAlias('attack goblin', aliases, variables);
 
@@ -239,7 +239,7 @@ describe('expandAlias', () => {
 				name: 'undefined var',
 				pattern: '^uv$',
 				command: `
-            send(\`wield \${_nonexistent || 'default sword'}\`)
+            send(\`wield \${nonexistent}\`)
         `,
 			},
 		];
