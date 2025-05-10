@@ -1,10 +1,12 @@
 import type { Trigger, Command } from '../types';
+import { parseSpeedwalk } from '../utils/CommandUtils';
 
 export function processTriggers(
   line: string,
   triggers: Trigger[],
   send: (command: string) => void,
-  setVariable?: (name: string, value: string) => void
+  setVariable?: (name: string, value: string) => void,
+  variables?: { name: string; value: string }[]
 ) {
   // Clean the line by removing carriage returns, newlines, and trailing prompts
   const cleanLine = line.replace(/\r\n> $/, '').trim();
@@ -18,35 +20,32 @@ export function processTriggers(
       const matches = cleanLine.match(regex);
 
       if (matches) {
-        // Check if this is a JavaScript command
-        if (trigger.command.includes('matches[')) {
-          try {
-            // Create a function from the command string
-            const commandFn = new Function(
-              'matches',
-              'send',
-              'setVariable',
-              trigger.command
-            );
-            // Execute the function with the matches and send function
-            commandFn(matches, send, setVariable || (() => {}));
-          } catch (e) {
-            console.error(`Error executing trigger "${trigger.name}":`, e);
-          }
-        } else {
-          // Regular command with $1, $2, etc. replacement
-          let command = trigger.command;
-          for (let i = 1; i < matches.length; i++) {
-            command = command.replace(
-              new RegExp(`\\$${i}`, 'gu'),
-              matches[i] || ''
-            );
-          }
-
-          capturedCommands.push({
-            type: 'command',
-            content: command,
-          });
+        try {
+          // Always execute as JavaScript
+          const variableNames = variables?.map(v => v.name) || [];
+          const variableValues = variables?.map(v => v.value) || [];
+          // Add speedwalk helper
+          const speedwalk = (actions: string) => {
+            const directionCommands = parseSpeedwalk(actions);
+            directionCommands.forEach(cmd => send(cmd));
+          };
+          const commandFn = new Function(
+            'matches',
+            'send',
+            'setVariable',
+            'speedwalk',
+            ...variableNames,
+            trigger.command
+          );
+          commandFn(
+            matches,
+            send,
+            setVariable || (() => {}),
+            speedwalk,
+            ...variableValues
+          );
+        } catch (e) {
+          console.error(`Error executing trigger "${trigger.name}":`, e);
         }
       }
     } catch (e) {

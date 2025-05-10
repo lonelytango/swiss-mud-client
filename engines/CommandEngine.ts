@@ -70,7 +70,8 @@ export class CommandEngine {
       line,
       this.triggers,
       this.options.onCommandSend,
-      this.options.onVariableSet
+      this.options.onVariableSet,
+      this.variables
     );
     if (commands) {
       commands.forEach(command => {
