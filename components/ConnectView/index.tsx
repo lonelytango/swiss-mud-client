@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './styles.css';
-import classNames from 'classnames';
 
 export type MudProfile = {
 	name: string;
@@ -16,7 +15,7 @@ type ConnectViewProps = {
 const STORAGE_KEY = 'mud_profiles';
 const emptyProfile: MudProfile = { name: '', address: '', port: '' };
 
-export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
+export default function ConnectView({ onConnect }: ConnectViewProps) {
 	const [profiles, setProfiles] = useState<MudProfile[]>([]);
 	const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
 	const [editBuffer, setEditBuffer] = useState<MudProfile | null>(null);

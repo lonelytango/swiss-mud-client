@@ -1,5 +1,5 @@
 import type { Alias, Variable } from '../types';
-import { parseSpeedwalk } from './commands';
+import { parseSendCommands, parseSpeedwalk } from './CommandUtils';
 
 export interface Command {
 	type: 'command' | 'wait';
@@ -22,7 +22,13 @@ export function expandAlias(
 
 			// Create wrapper functions to capture the commands
 			const send = (command: string) => {
-				capturedCommands.push({ type: 'command', content: command });
+				const sendCommands = parseSendCommands(command);
+				capturedCommands.push(
+					...sendCommands.map((command) => ({
+						type: 'command' as const,
+						content: command,
+					}))
+				);
 				// We don't actually execute the command here, just capture it
 			};
 

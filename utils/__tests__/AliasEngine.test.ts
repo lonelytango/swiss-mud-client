@@ -287,7 +287,123 @@ describe('expandAlias', () => {
 		});
 	});
 
-	// ... existing code ...
+	it('should handle multiple commands on the same line', () => {
+		const aliases: Alias[] = [
+			{
+				name: 'multi-command',
+				pattern: '^mc$',
+				command: `
+					send("north, east, south, west")
+				`,
+			},
+		];
+
+		const variables: Variable[] = [];
+		const result = expandAlias('mc', aliases, variables);
+
+		expect(result).not.toBeNull();
+		expect(result).toHaveLength(4);
+		expect(result![0]).toEqual({ type: 'command', content: 'north' });
+		expect(result![1]).toEqual({ type: 'command', content: 'east' });
+		expect(result![2]).toEqual({ type: 'command', content: 'south' });
+		expect(result![3]).toEqual({ type: 'command', content: 'west' });
+	});
+
+	it('should handle multiple commands with variables', () => {
+		const aliases: Alias[] = [
+			{
+				name: 'multi-command with vars',
+				pattern: '^mcv$',
+				command: `
+					send(\`wield \${weapon}, attack \${target}, cast 'fireball' \${target}\`)
+				`,
+			},
+		];
+
+		const variables: Variable[] = [
+			{ name: 'weapon', value: 'sword' },
+			{ name: 'target', value: 'goblin' },
+		];
+		const result = expandAlias('mcv', aliases, variables);
+
+		expect(result).not.toBeNull();
+		expect(result).toHaveLength(3);
+		expect(result![0]).toEqual({ type: 'command', content: 'wield sword' });
+		expect(result![1]).toEqual({ type: 'command', content: 'attack goblin' });
+		expect(result![2]).toEqual({
+			type: 'command',
+			content: "cast 'fireball' goblin",
+		});
+	});
+
+	it('should handle multiple commands with mixed types', () => {
+		const aliases: Alias[] = [
+			{
+				name: 'mixed commands',
+				pattern: '^mix$',
+				command: `
+					send("north, east")
+					wait(500)
+					send("south, west, climb up")
+				`,
+			},
+		];
+
+		const variables: Variable[] = [];
+		const result = expandAlias('mix', aliases, variables);
+
+		expect(result).not.toBeNull();
+		expect(result).toHaveLength(6);
+		expect(result![0]).toEqual({ type: 'command', content: 'north' });
+		expect(result![1]).toEqual({ type: 'command', content: 'east' });
+		expect(result![2]).toEqual({ type: 'wait', content: '', waitTime: 500 });
+		expect(result![3]).toEqual({ type: 'command', content: 'south' });
+		expect(result![4]).toEqual({ type: 'command', content: 'west' });
+		expect(result![5]).toEqual({ type: 'command', content: 'climb up' });
+	});
+
+	it('should handle empty commands in comma-separated list', () => {
+		const aliases: Alias[] = [
+			{
+				name: 'empty commands',
+				pattern: '^ec$',
+				command: `
+					send("north, , east, , south")
+				`,
+			},
+		];
+
+		const variables: Variable[] = [];
+		const result = expandAlias('ec', aliases, variables);
+
+		expect(result).not.toBeNull();
+		expect(result).toHaveLength(3);
+		expect(result![0]).toEqual({ type: 'command', content: 'north' });
+		expect(result![1]).toEqual({ type: 'command', content: 'east' });
+		expect(result![2]).toEqual({ type: 'command', content: 'south' });
+	});
+
+	it('should handle whitespace in comma-separated commands', () => {
+		const aliases: Alias[] = [
+			{
+				name: 'whitespace commands',
+				pattern: '^wc$',
+				command: `
+					send("north , east , south , west")
+				`,
+			},
+		];
+
+		const variables: Variable[] = [];
+		const result = expandAlias('wc', aliases, variables);
+
+		expect(result).not.toBeNull();
+		expect(result).toHaveLength(4);
+		expect(result![0]).toEqual({ type: 'command', content: 'north' });
+		expect(result![1]).toEqual({ type: 'command', content: 'east' });
+		expect(result![2]).toEqual({ type: 'command', content: 'south' });
+		expect(result![3]).toEqual({ type: 'command', content: 'west' });
+	});
 
 	describe('speedwalk', () => {
 		it('should handle basic directional commands', () => {
