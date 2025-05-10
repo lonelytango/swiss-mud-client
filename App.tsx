@@ -21,7 +21,7 @@ function App() {
   const [canSend, setCanSend] = useState(false);
   const [aliases, setAliases] = useState<Alias[]>([]);
   const [triggers, setTriggers] = useState<Trigger[]>([]);
-  const { variables } = useVariables();
+  const { variables, setVariables } = useVariables();
   const [commandEngine, setCommandEngine] = useState<CommandEngine | null>(
     null
   );
@@ -74,6 +74,21 @@ function App() {
           // instead of directly using the WebSocketManager here
           // This ensures consistent behavior whether commands come from aliases or direct input
           send(command);
+        },
+        onVariableSet: (name: string, value: string) => {
+          setVariables(prev => {
+            // Check if variable already exists
+            const existingIndex = prev.findIndex(v => v.name === name);
+            if (existingIndex >= 0) {
+              // Update existing variable
+              const updated = [...prev];
+              updated[existingIndex] = { ...updated[existingIndex], value };
+              return updated;
+            } else {
+              // Add new variable
+              return [...prev, { name, value, description: '' }];
+            }
+          });
         },
       })
     );

@@ -476,19 +476,19 @@ describe('processAliases', () => {
     });
   });
 
-  it('should track last line in _line variable', () => {
+  it('should track last line in line variable', () => {
     const aliases: Alias[] = [
       {
         name: 'check last line',
         pattern: '^cl$',
         command: `
-					send(\`echo Last line was: \${_line}\`)
+					send(\`echo Last line was: \${line}\`)
 				`,
       },
     ];
 
     const variables: Variable[] = [
-      { name: '_line', value: 'A goblin appears!' },
+      { name: 'line', value: 'A goblin appears!' },
     ];
     const result = processAliases('cl', aliases, variables);
 
@@ -500,13 +500,13 @@ describe('processAliases', () => {
     });
   });
 
-  it('should handle undefined _line variable', () => {
+  it('should handle undefined line variable', () => {
     const aliases: Alias[] = [
       {
         name: 'check undefined line',
         pattern: '^cul$',
         command: `
-					send(\`echo Last line was: \${_line}\`)
+					send(\`echo Last line was: \${line}\`)
 				`,
       },
     ];
@@ -514,7 +514,7 @@ describe('processAliases', () => {
     const variables: Variable[] = [];
     const result = processAliases('cul', aliases, variables);
 
-    expect(result).toBeNull(); // Should return null when _line is undefined
+    expect(result).toBeNull(); // Should return null when line is undefined
   });
 
   describe('variable setting', () => {
@@ -546,6 +546,32 @@ describe('processAliases', () => {
         content: 'echo Set weapon to sword',
       });
       expect(mockSetVariable).toHaveBeenCalledWith('weapon', 'sword');
+    });
+
+    it('should handle setting multiple variables with fixed values', () => {
+      const aliases: Alias[] = [
+        {
+          name: 'set fixed variables',
+          pattern: '^tjcx$',
+          command: `
+            setVariable('treeDirection', "北")
+            setVariable('destination', 'hello')
+          `,
+        },
+      ];
+
+      const variables: Variable[] = [];
+      const mockSetVariable = jest.fn();
+      const result = processAliases(
+        'tjcx',
+        aliases,
+        variables,
+        mockSetVariable
+      );
+
+      expect(result).not.toBeNull();
+      expect(mockSetVariable).toHaveBeenCalledWith('treeDirection', '北');
+      expect(mockSetVariable).toHaveBeenCalledWith('destination', 'hello');
     });
 
     it('should handle multiple variable sets in one alias', () => {
