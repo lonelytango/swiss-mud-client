@@ -4,7 +4,7 @@
  * @param value The value to save
  */
 export function saveValueToLocalStorage(key: string, value: any) {
-	localStorage.setItem(key, JSON.stringify(value));
+  localStorage.setItem(key, JSON.stringify(value));
 }
 
 /**
@@ -13,7 +13,7 @@ export function saveValueToLocalStorage(key: string, value: any) {
  * @returns The value from localStorage
  */
 export function getValueFromLocalStorage(key: string) {
-	return JSON.parse(localStorage.getItem(key) || '{}');
+  return JSON.parse(localStorage.getItem(key) || '{}');
 }
 
 /**
@@ -22,7 +22,7 @@ export function getValueFromLocalStorage(key: string) {
  * @param value The value to save
  */
 export function saveValueToSessionStorage(key: string, value: any) {
-	sessionStorage.setItem(key, JSON.stringify(value));
+  sessionStorage.setItem(key, JSON.stringify(value));
 }
 
 /**
@@ -31,5 +31,5 @@ export function saveValueToSessionStorage(key: string, value: any) {
  * @returns The value from sessionStorage
  */
 export function getValueFromSessionStorage(key: string) {
-	return JSON.parse(sessionStorage.getItem(key) || '{}');
+  return JSON.parse(sessionStorage.getItem(key) || '{}');
 }

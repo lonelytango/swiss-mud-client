@@ -2,7 +2,7 @@
  * Sends a command to the MUD server
  * @param command The command to send
  */
-import { WebSocketManager } from './WebSocketManager';
+import { WebSocketManager } from '../managers/WebSocketManager';
 
 // Store WebSocketManager instance
 let wsManager: WebSocketManager | null = null;
@@ -12,7 +12,7 @@ let wsManager: WebSocketManager | null = null;
  * @param manager The WebSocketManager instance
  */
 export function setWebSocketManager(manager: WebSocketManager): void {
-	wsManager = manager;
+  wsManager = manager;
 }
 
 /**
@@ -20,12 +20,12 @@ export function setWebSocketManager(manager: WebSocketManager): void {
  * @param command The command to send
  */
 export function send(command: string): void {
-	// Send the command if WebSocketManager is available
-	if (wsManager && wsManager.isConnected()) {
-		wsManager.send(command + '\n');
-	} else {
-		console.warn('WebSocketManager not available or not connected');
-	}
+  // Send the command if WebSocketManager is available
+  if (wsManager && wsManager.isConnected()) {
+    wsManager.send(command + '\n');
+  } else {
+    console.warn('WebSocketManager not available or not connected');
+  }
 }
 
 /**
@@ -33,5 +33,5 @@ export function send(command: string): void {
  * @param ms Number of milliseconds to wait
  */
 export function wait(ms: number): Promise<void> {
-	return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
