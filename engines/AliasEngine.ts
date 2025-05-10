@@ -5,7 +5,8 @@ import { parseSendCommands, parseSpeedwalk } from '../utils/CommandUtils';
 export function processAliases(
   input: string,
   aliases: Alias[],
-  variables: Variable[]
+  variables: Variable[],
+  setVariable?: (name: string, value: string) => void
 ): Command[] | null {
   for (const alias of aliases) {
     const regex = new RegExp(alias.pattern);
@@ -54,6 +55,7 @@ export function processAliases(
         send,
         wait,
         speedwalk,
+        setVariable: setVariable || (() => {}), // Add setVariable to sandbox
       };
 
       // Add existing variables to the sandbox as READ-ONLY properties

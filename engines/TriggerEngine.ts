@@ -3,7 +3,8 @@ import type { Trigger, Command } from '../types';
 export function processTriggers(
   line: string,
   triggers: Trigger[],
-  send: (command: string) => void
+  send: (command: string) => void,
+  setVariable?: (name: string, value: string) => void
 ) {
   // Clean the line by removing carriage returns, newlines, and trailing prompts
   const cleanLine = line.replace(/\r\n> $/, '').trim();
@@ -21,9 +22,14 @@ export function processTriggers(
         if (trigger.command.includes('matches[')) {
           try {
             // Create a function from the command string
-            const commandFn = new Function('matches', 'send', trigger.command);
+            const commandFn = new Function(
+              'matches',
+              'send',
+              'setVariable',
+              trigger.command
+            );
             // Execute the function with the matches and send function
-            commandFn(matches, send);
+            commandFn(matches, send, setVariable || (() => {}));
           } catch (e) {
             console.error(`Error executing trigger "${trigger.name}":`, e);
           }

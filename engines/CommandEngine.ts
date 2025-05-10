@@ -4,6 +4,7 @@ import type { Alias, Variable, Trigger } from '../types';
 
 export interface CommandEngineOptions {
   onCommandSend: (command: string) => void;
+  onVariableSet?: (name: string, value: string) => void;
 }
 
 export class CommandEngine {
@@ -40,7 +41,12 @@ export class CommandEngine {
     // Skip processing if input is empty or just whitespace
     if (!input.match(/^\s*$/)) {
       // Try alias expansion
-      const expanded = processAliases(input, this.aliases, this.variables);
+      const expanded = processAliases(
+        input,
+        this.aliases,
+        this.variables,
+        this.options.onVariableSet
+      );
 
       // Execute commands
       if (expanded) {
@@ -63,7 +69,8 @@ export class CommandEngine {
     const commands = processTriggers(
       line,
       this.triggers,
-      this.options.onCommandSend
+      this.options.onCommandSend,
+      this.options.onVariableSet
     );
     if (commands) {
       commands.forEach(command => {

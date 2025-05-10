@@ -112,4 +112,89 @@ describe('processTriggers', () => {
 		processTriggers('test hello', [jsTrigger], mockSend);
 		expect(mockSend).toHaveBeenCalledWith('echo hello');
 	});
+
+	describe('variable setting', () => {
+    it('should set variables from trigger commands', () => {
+      const jsTrigger: Trigger = {
+        name: 'Set Variable',
+        pattern: '^You see (.+)$',
+        command:
+          'setVariable("target", matches[1]); send(`echo Target set to ${matches[1]}`);',
+      };
+
+      const mockSetVariable = jest.fn();
+      processTriggers(
+        'You see a goblin',
+        [jsTrigger],
+        mockSend,
+        mockSetVariable
+      );
+
+      expect(mockSetVariable).toHaveBeenCalledWith('target', 'a goblin');
+      expect(mockSend).toHaveBeenCalledWith('echo Target set to a goblin');
+    });
+
+    it('should handle multiple variable sets in one trigger', () => {
+      const jsTrigger: Trigger = {
+        name: 'Set Multiple Variables',
+        pattern: '^You are (.+) and (.+)$',
+        command: `
+					setVariable("status1", matches[1]);
+					setVariable("status2", matches[2]);
+					send(\`echo Status: \${matches[1]} and \${matches[2]}\`);
+				`,
+      };
+
+      const mockSetVariable = jest.fn();
+      processTriggers(
+        'You are hungry and thirsty',
+        [jsTrigger],
+        mockSend,
+        mockSetVariable
+      );
+
+      expect(mockSetVariable).toHaveBeenCalledWith('status1', 'hungry');
+      expect(mockSetVariable).toHaveBeenCalledWith('status2', 'thirsty');
+      expect(mockSend).toHaveBeenCalledWith('echo Status: hungry and thirsty');
+    });
+
+    it('should handle conditional variable setting in triggers', () => {
+      const jsTrigger: Trigger = {
+        name: 'Conditional Variable Set',
+        pattern: '^(.+) appears!$',
+        command: `
+					const enemy = matches[1];
+					if (enemy.includes('dragon')) {
+						setVariable('weapon', 'dragonbane');
+					} else {
+						setVariable('weapon', 'sword');
+					}
+					send(\`echo Preparing for \${enemy}\`);
+				`,
+      };
+
+      const mockSetVariable = jest.fn();
+
+      // Test dragon case
+      processTriggers(
+        'A red dragon appears!',
+        [jsTrigger],
+        mockSend,
+        mockSetVariable
+      );
+      expect(mockSetVariable).toHaveBeenCalledWith('weapon', 'dragonbane');
+
+      mockSetVariable.mockClear();
+      mockSend.mockClear();
+
+      // Test non-dragon case
+      processTriggers(
+        'A goblin appears!',
+        [jsTrigger],
+        mockSend,
+        mockSetVariable
+      );
+      expect(mockSetVariable).toHaveBeenCalledWith('weapon', 'sword');
+    });
+  });
 });

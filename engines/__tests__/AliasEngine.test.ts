@@ -516,4 +516,106 @@ describe('processAliases', () => {
 
     expect(result).toBeNull(); // Should return null when _line is undefined
   });
+
+  describe('variable setting', () => {
+    it('should set variables from alias commands', () => {
+      const aliases: Alias[] = [
+        {
+          name: 'set variable',
+          pattern: '^sv (.+) (.+)$',
+          command: `
+            setVariable(matches[1], matches[2])
+            send(\`echo Set \${matches[1]} to \${matches[2]}\`)
+          `,
+        },
+      ];
+
+      const variables: Variable[] = [];
+      const mockSetVariable = jest.fn();
+      const result = processAliases(
+        'sv weapon sword',
+        aliases,
+        variables,
+        mockSetVariable
+      );
+
+      expect(result).not.toBeNull();
+      expect(result).toHaveLength(1);
+      expect(result![0]).toEqual({
+        type: 'command',
+        content: 'echo Set weapon to sword',
+      });
+      expect(mockSetVariable).toHaveBeenCalledWith('weapon', 'sword');
+    });
+
+    it('should handle multiple variable sets in one alias', () => {
+      const aliases: Alias[] = [
+        {
+          name: 'set multiple variables',
+          pattern: '^smv$',
+          command: `
+            setVariable('weapon', 'sword')
+            setVariable('armor', 'plate')
+            send('echo Variables set')
+          `,
+        },
+      ];
+
+      const variables: Variable[] = [];
+      const mockSetVariable = jest.fn();
+      const result = processAliases('smv', aliases, variables, mockSetVariable);
+
+      expect(result).not.toBeNull();
+      expect(result).toHaveLength(1);
+      expect(result![0]).toEqual({
+        type: 'command',
+        content: 'echo Variables set',
+      });
+      expect(mockSetVariable).toHaveBeenCalledWith('weapon', 'sword');
+      expect(mockSetVariable).toHaveBeenCalledWith('armor', 'plate');
+    });
+
+    it('should handle variable setting with conditional logic', () => {
+      const aliases: Alias[] = [
+        {
+          name: 'conditional variable set',
+          pattern: '^cvs (.+)$',
+          command: `
+            const target = matches[1]
+            if (target === 'dragon') {
+              setVariable('weapon', 'dragonbane')
+            } else {
+              setVariable('weapon', 'sword')
+            }
+            send(\`echo Set weapon for \${target}\`)
+          `,
+        },
+      ];
+
+      const variables: Variable[] = [];
+      const mockSetVariable = jest.fn();
+
+      // Test dragon case
+      let result = processAliases(
+        'cvs dragon',
+        aliases,
+        variables,
+        mockSetVariable
+      );
+      expect(result).not.toBeNull();
+      expect(mockSetVariable).toHaveBeenCalledWith('weapon', 'dragonbane');
+
+      mockSetVariable.mockClear();
+
+      // Test non-dragon case
+      result = processAliases(
+        'cvs goblin',
+        aliases,
+        variables,
+        mockSetVariable
+      );
+      expect(result).not.toBeNull();
+      expect(mockSetVariable).toHaveBeenCalledWith('weapon', 'sword');
+    });
+  });
 });
