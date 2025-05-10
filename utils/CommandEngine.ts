@@ -1,5 +1,6 @@
 import { expandAlias } from './AliasEngine';
-import type { Alias, Variable } from '../types';
+import { processTriggers } from './TriggerEngine';
+import type { Alias, Variable, Trigger, Command } from '../types';
 
 export interface CommandEngineOptions {
 	onCommandSend: (command: string) => void;
@@ -8,15 +9,18 @@ export interface CommandEngineOptions {
 export class CommandEngine {
 	private aliases: Alias[];
 	private variables: Variable[];
+	private triggers: Trigger[];
 	private options: CommandEngineOptions;
 
 	constructor(
 		aliases: Alias[],
 		variables: Variable[],
+		triggers: Trigger[],
 		options: CommandEngineOptions
 	) {
 		this.aliases = aliases;
 		this.variables = variables;
+		this.triggers = triggers;
 		this.options = options;
 	}
 
@@ -26,6 +30,10 @@ export class CommandEngine {
 
 	public setVariables(variables: Variable[]) {
 		this.variables = variables;
+	}
+
+	public setTriggers(triggers: Trigger[]) {
+		this.triggers = triggers;
 	}
 
 	public async processCommand(input: string): Promise<void> {
@@ -48,6 +56,19 @@ export class CommandEngine {
 				// No alias matched, send the raw input
 				this.options.onCommandSend(input);
 			}
+		}
+	}
+
+	public processLine(line: string): void {
+		const commands = processTriggers(
+			line,
+			this.triggers,
+			this.options.onCommandSend
+		);
+		if (commands) {
+			commands.forEach((command) => {
+				this.options.onCommandSend(command.content);
+			});
 		}
 	}
 }

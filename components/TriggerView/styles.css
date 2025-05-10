@@ -1,0 +1,92 @@
+.trigger-view {
+  display: flex;
+  height: 400px;
+  min-width: 600px;
+}
+
+.trigger-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 180px;
+  background: #222;
+  color: #fff;
+  padding: 8px;
+  border-radius: 8px 0 0 8px;
+}
+
+.trigger-sidebar button {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 0;
+  font-size: 1.2em;
+  cursor: pointer;
+}
+
+.trigger-sidebar ul {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.trigger-sidebar li {
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.trigger-sidebar li.selected,
+.trigger-sidebar li:hover {
+  background: #444;
+}
+
+.trigger-details {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  background: #222;
+  border-radius: 0 8px 8px 0;
+  padding: 24px;
+}
+
+.trigger-details label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-weight: 500;
+}
+
+.trigger-details input,
+.trigger-details textarea {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1em;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.trigger-details .actions {
+  display: flex;
+  gap: 8px;
+}
+
+.trigger-details button {
+  padding: 4px 12px;
+  border: none;
+  border-radius: 4px;
+  background: #1976d2;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+} 

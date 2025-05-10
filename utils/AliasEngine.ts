@@ -1,12 +1,6 @@
 import type { Alias, Variable } from '../types';
 import { parseSendCommands, parseSpeedwalk } from './CommandUtils';
 
-export interface Command {
-	type: 'command' | 'wait';
-	content: string;
-	waitTime?: number;
-}
-
 // This function expands an input string according to the defined aliases and variables
 export function expandAlias(
 	input: string,

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import './styles.css';
-import type { Alias } from '../../types';
+import type { Alias, Trigger } from '../../types';
 import ConnectView, { type MudProfile } from '../ConnectView';
 import AliasView from '../AliasView';
+import TriggerView from '../TriggerView';
 import VariableView from '../VariableView';
 import DataView from '../DataView';
 import { DataManager, type MudData } from '../../utils/DataManager';
@@ -71,10 +72,14 @@ export function Menu({
 	onProfileConnect,
 	aliases,
 	setAliases,
+	triggers,
+	setTriggers,
 }: {
 	onProfileConnect?: (profile: MudProfile) => void;
 	aliases: Alias[];
 	setAliases: React.Dispatch<React.SetStateAction<Alias[]>>;
+	triggers: Trigger[];
+	setTriggers: React.Dispatch<React.SetStateAction<Trigger[]>>;
 }) {
 	const [activePopup, setActivePopup] = useState<string | null>(null);
 	const { setVariables } = useVariables();
@@ -99,6 +104,9 @@ export function Menu({
 		// Update state
 		setVariables(data.mud_variables);
 		setAliases(data.mud_aliases);
+		if (data.mud_triggers) {
+			setTriggers(data.mud_triggers);
+		}
 	};
 
 	return (
@@ -129,7 +137,7 @@ export function Menu({
 				title='Triggers'
 				setActivePopup={setActivePopup}
 			>
-				<p>Trigger management coming soon</p>
+				<TriggerView triggers={triggers} onChange={setTriggers} />
 			</Popup>
 
 			<Popup

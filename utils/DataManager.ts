@@ -2,6 +2,7 @@ export interface MudData {
 	mud_profiles: any[];
 	mud_variables: any[];
 	mud_aliases: any[];
+	mud_triggers: any[];
 }
 
 export class DataManager {
@@ -58,6 +59,7 @@ export class DataManager {
 			mud_profiles: JSON.parse(localStorage.getItem('mud_profiles') || '[]'),
 			mud_variables: JSON.parse(localStorage.getItem('mud_variables') || '[]'),
 			mud_aliases: JSON.parse(localStorage.getItem('mud_aliases') || '[]'),
+			mud_triggers: JSON.parse(localStorage.getItem('mud_triggers') || '[]'),
 		};
 	}
 
@@ -65,6 +67,7 @@ export class DataManager {
 		localStorage.setItem('mud_profiles', JSON.stringify(data.mud_profiles));
 		localStorage.setItem('mud_variables', JSON.stringify(data.mud_variables));
 		localStorage.setItem('mud_aliases', JSON.stringify(data.mud_aliases));
+		localStorage.setItem('mud_triggers', JSON.stringify(data.mud_triggers));
 	}
 
 	private static validateData(data: any): data is MudData {
@@ -72,7 +75,8 @@ export class DataManager {
 			data &&
 			Array.isArray(data.mud_profiles) &&
 			Array.isArray(data.mud_variables) &&
-			Array.isArray(data.mud_aliases)
+			Array.isArray(data.mud_aliases) &&
+			Array.isArray(data.mud_triggers)
 		);
 	}
 }

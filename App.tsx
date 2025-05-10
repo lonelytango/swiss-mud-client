@@ -5,10 +5,11 @@ import './App.css';
 import classNames from 'classnames';
 import { CommandEngine } from './utils/CommandEngine';
 import { WebSocketManager } from './utils/WebSocketManager';
-import { Alias } from './types';
+import { Alias, Trigger } from './types';
 import { handleCommandInput } from './utils/CommandInput';
 import { setWebSocketManager, send } from './utils/commands';
 import { useVariables } from './contexts/VariablesContext';
+import { stripHtmlTags } from './utils/TextUtils';
 
 function App() {
 	const outputRef = useRef<HTMLDivElement>(null);
@@ -19,6 +20,7 @@ function App() {
 	);
 	const [canSend, setCanSend] = useState(false);
 	const [aliases, setAliases] = useState<Alias[]>([]);
+	const [triggers, setTriggers] = useState<Trigger[]>([]);
 	const { variables } = useVariables();
 	const [commandEngine, setCommandEngine] = useState<CommandEngine | null>(
 		null
@@ -29,9 +31,14 @@ function App() {
 	const [messages, setMessages] = useState<string[]>([]);
 	const [isLockedToBottom, setIsLockedToBottom] = useState(true);
 
+	// For Triggering Commands
+	const [line, setLine] = useState<string>('');
+
 	useEffect(() => {
 		const storedAliases = localStorage.getItem('mud_aliases');
+		const storedTriggers = localStorage.getItem('mud_triggers');
 		let parsedAliases: Alias[] = [];
+		let parsedTriggers: Trigger[] = [];
 
 		if (storedAliases) {
 			try {
@@ -42,8 +49,17 @@ function App() {
 			}
 		}
 
+		if (storedTriggers) {
+			try {
+				parsedTriggers = JSON.parse(storedTriggers);
+				setTriggers(parsedTriggers);
+			} catch (e) {
+				console.error('Failed to parse triggers:', e);
+			}
+		}
+
 		setCommandEngine(
-			new CommandEngine(parsedAliases, variables, {
+			new CommandEngine(parsedAliases, variables, parsedTriggers, {
 				onCommandSend: (command: string) => {
 					// Add command to output (visual feedback for user)
 					setMessages((prev) => {
@@ -77,6 +93,20 @@ function App() {
 		}
 	}, [variables, commandEngine]);
 
+	// Update the CommandEngine when triggers change
+	useEffect(() => {
+		if (commandEngine) {
+			commandEngine.setTriggers(triggers);
+		}
+	}, [triggers, commandEngine]);
+
+	// Process incoming line with triggers
+	useEffect(() => {
+		if (line && commandEngine) {
+			commandEngine.processLine(line);
+		}
+	}, [line, commandEngine]);
+
 	// Setup WebSocket connection when a profile is selected
 	useEffect(() => {
 		if (!selectedProfile) return;
@@ -97,6 +127,9 @@ function App() {
 					const next = [...prev, data];
 					return next.length > 1000 ? next.slice(-1000) : next;
 				});
+
+				const msgData = stripHtmlTags(data);
+				setLine(msgData);
 			},
 			onConnected: () => setCanSend(true),
 		});
@@ -168,6 +201,8 @@ function App() {
 				onProfileConnect={setSelectedProfile}
 				aliases={aliases}
 				setAliases={setAliases}
+				triggers={triggers}
+				setTriggers={setTriggers}
 			/>
 			<div
 				className={classNames('status', {
