@@ -1,63 +1,30 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Variable } from '../../types';
+import { useVariables } from '../../contexts/VariablesContext';
 import './styles.css';
 
-interface VariableViewProps {
-	variables: Variable[];
-	onChange: (variables: Variable[]) => void;
-}
-
 const emptyVariable: Variable = { name: '', value: '', description: '' };
-const STORAGE_KEY = 'mud_variables';
 
-const VariableView: React.FC<VariableViewProps> = ({ variables, onChange }) => {
+const VariableView: React.FC = () => {
+	const { variables, setVariables } = useVariables();
 	const [selectedIdx, setSelectedIdx] = useState<number | null>(
 		variables.length > 0 ? 0 : null
 	);
 	const [editBuffer, setEditBuffer] = useState<Variable | null>(null);
-	const [localVariables, setLocalVariables] = useState<Variable[]>(variables);
-	const initialLoad = useRef(true);
-
-	// Load from localStorage on mount
-	useEffect(() => {
-		const stored = localStorage.getItem(STORAGE_KEY);
-		if (stored) {
-			try {
-				const parsed = JSON.parse(stored);
-				if (Array.isArray(parsed)) {
-					setLocalVariables(parsed);
-					onChange(parsed);
-					setSelectedIdx(parsed.length > 0 ? 0 : null);
-				}
-			} catch (e) {
-				console.error(e);
-			}
-		}
-		// eslint-disable-next-line
-	}, []);
-
-	// Keep localVariables in sync with parent variables (except on initial load)
-	useEffect(() => {
-		if (!initialLoad.current) {
-			setLocalVariables(variables);
-		} else {
-			initialLoad.current = false;
-		}
-	}, [variables]);
 
 	// When selectedIdx changes, update editBuffer
 	useEffect(() => {
-		if (selectedIdx !== null && localVariables[selectedIdx]) {
-			setEditBuffer({ ...localVariables[selectedIdx] });
+		if (selectedIdx !== null && variables[selectedIdx]) {
+			setEditBuffer({ ...variables[selectedIdx] });
 		} else {
 			setEditBuffer(null);
 		}
-	}, [selectedIdx, localVariables]);
+	}, [selectedIdx, variables]);
 
 	// Add new variable and select it
 	const handleAdd = () => {
-		const newVariables = [...localVariables, { ...emptyVariable }];
-		setLocalVariables(newVariables);
+		const newVariables = [...variables, { ...emptyVariable }];
+		setVariables(newVariables);
 		setEditBuffer({ ...emptyVariable });
 		setSelectedIdx(newVariables.length - 1);
 	};
@@ -74,22 +41,18 @@ const VariableView: React.FC<VariableViewProps> = ({ variables, onChange }) => {
 	// Save changes to selected variable
 	const handleSave = () => {
 		if (selectedIdx === null || !editBuffer) return;
-		const updated = localVariables.map((variable, idx) =>
+		const updated = variables.map((variable, idx) =>
 			idx === selectedIdx ? { ...editBuffer } : variable
 		);
-		setLocalVariables(updated);
-		onChange(updated);
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+		setVariables(updated);
 	};
 
 	// Delete selected variable
 	const handleDelete = () => {
 		if (selectedIdx === null) return;
 		if (!window.confirm('Delete this variable?')) return;
-		const newVariables = localVariables.filter((_, idx) => idx !== selectedIdx);
-		setLocalVariables(newVariables);
-		onChange(newVariables);
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(newVariables));
+		const newVariables = variables.filter((_, idx) => idx !== selectedIdx);
+		setVariables(newVariables);
 		setSelectedIdx(newVariables.length > 0 ? 0 : null);
 	};
 
@@ -102,7 +65,7 @@ const VariableView: React.FC<VariableViewProps> = ({ variables, onChange }) => {
 	const hasUnsaved =
 		selectedIdx !== null &&
 		editBuffer &&
-		JSON.stringify(editBuffer) !== JSON.stringify(localVariables[selectedIdx]);
+		JSON.stringify(editBuffer) !== JSON.stringify(variables[selectedIdx]);
 
 	const selected = editBuffer;
 
@@ -113,7 +76,7 @@ const VariableView: React.FC<VariableViewProps> = ({ variables, onChange }) => {
 					＋
 				</button>
 				<ul>
-					{localVariables.map((variable, idx) => (
+					{variables.map((variable, idx) => (
 						<li
 							key={idx}
 							className={selectedIdx === idx ? 'selected' : ''}

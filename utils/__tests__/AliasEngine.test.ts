@@ -475,4 +475,45 @@ describe('expandAlias', () => {
 			expect(result![3]).toEqual({ type: 'command', content: 'jump down' });
 		});
 	});
+
+	it('should track last line in _line variable', () => {
+		const aliases: Alias[] = [
+			{
+				name: 'check last line',
+				pattern: '^cl$',
+				command: `
+					send(\`echo Last line was: \${_line}\`)
+				`,
+			},
+		];
+
+		const variables: Variable[] = [
+			{ name: '_line', value: 'A goblin appears!' },
+		];
+		const result = expandAlias('cl', aliases, variables);
+
+		expect(result).not.toBeNull();
+		expect(result).toHaveLength(1);
+		expect(result![0]).toEqual({
+			type: 'command',
+			content: 'echo Last line was: A goblin appears!',
+		});
+	});
+
+	it('should handle undefined _line variable', () => {
+		const aliases: Alias[] = [
+			{
+				name: 'check undefined line',
+				pattern: '^cul$',
+				command: `
+					send(\`echo Last line was: \${_line}\`)
+				`,
+			},
+		];
+
+		const variables: Variable[] = [];
+		const result = expandAlias('cul', aliases, variables);
+
+		expect(result).toBeNull(); // Should return null when _line is undefined
+	});
 });

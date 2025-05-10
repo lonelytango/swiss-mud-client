@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import './styles.css';
-import type { Alias, Variable } from '../../types';
+import type { Alias } from '../../types';
 import ConnectView, { type MudProfile } from '../ConnectView';
 import AliasView from '../AliasView';
 import VariableView from '../VariableView';
 import DataView from '../DataView';
 import { DataManager, type MudData } from '../../utils/DataManager';
+import { useVariables } from '../../contexts/VariablesContext';
 
 type MenuButton = {
 	id: string;
@@ -70,16 +71,13 @@ export function Menu({
 	onProfileConnect,
 	aliases,
 	setAliases,
-	variables,
-	setVariables,
 }: {
 	onProfileConnect?: (profile: MudProfile) => void;
 	aliases: Alias[];
 	setAliases: React.Dispatch<React.SetStateAction<Alias[]>>;
-	variables: Variable[];
-	setVariables: React.Dispatch<React.SetStateAction<Variable[]>>;
 }) {
 	const [activePopup, setActivePopup] = useState<string | null>(null);
+	const { setVariables } = useVariables();
 
 	const handleButtonClick = (id: string) => {
 		setActivePopup(id);
@@ -158,7 +156,7 @@ export function Menu({
 				title='Variables'
 				setActivePopup={setActivePopup}
 			>
-				<VariableView variables={variables} onChange={setVariables} />
+				<VariableView />
 			</Popup>
 
 			<Popup

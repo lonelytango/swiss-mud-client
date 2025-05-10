@@ -5,9 +5,10 @@ import './App.css';
 import classNames from 'classnames';
 import { CommandEngine } from './utils/CommandEngine';
 import { WebSocketManager } from './utils/WebSocketManager';
-import { Alias, Variable } from './types';
+import { Alias } from './types';
 import { handleCommandInput } from './utils/CommandInput';
 import { setWebSocketManager, send } from './utils/commands';
+import { useVariables } from './contexts/VariablesContext';
 
 function App() {
 	const outputRef = useRef<HTMLDivElement>(null);
@@ -18,7 +19,7 @@ function App() {
 	);
 	const [canSend, setCanSend] = useState(false);
 	const [aliases, setAliases] = useState<Alias[]>([]);
-	const [variables, setVariables] = useState<Variable[]>([]);
+	const { variables } = useVariables();
 	const [commandEngine, setCommandEngine] = useState<CommandEngine | null>(
 		null
 	);
@@ -30,9 +31,7 @@ function App() {
 
 	useEffect(() => {
 		const storedAliases = localStorage.getItem('mud_aliases');
-		const storedVariables = localStorage.getItem('mud_variables');
 		let parsedAliases: Alias[] = [];
-		let parsedVariables: Variable[] = [];
 
 		if (storedAliases) {
 			try {
@@ -43,17 +42,8 @@ function App() {
 			}
 		}
 
-		if (storedVariables) {
-			try {
-				parsedVariables = JSON.parse(storedVariables);
-				setVariables(parsedVariables);
-			} catch (e) {
-				console.error('Failed to parse variables:', e);
-			}
-		}
-
 		setCommandEngine(
-			new CommandEngine(parsedAliases, parsedVariables, {
+			new CommandEngine(parsedAliases, variables, {
 				onCommandSend: (command: string) => {
 					// Add command to output (visual feedback for user)
 					setMessages((prev) => {
@@ -71,7 +61,7 @@ function App() {
 				},
 			})
 		);
-	}, [wsManager]);
+	}, [wsManager, variables]);
 
 	// Update the CommandEngine when aliases change
 	useEffect(() => {
@@ -178,8 +168,6 @@ function App() {
 				onProfileConnect={setSelectedProfile}
 				aliases={aliases}
 				setAliases={setAliases}
-				variables={variables}
-				setVariables={setVariables}
 			/>
 			<div
 				className={classNames('status', {

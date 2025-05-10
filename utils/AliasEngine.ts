@@ -102,5 +102,6 @@ export function expandAlias(
 			return capturedCommands.length > 0 ? capturedCommands : null;
 		}
 	}
+
 	return null; // No matching alias found
 }
