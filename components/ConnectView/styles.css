@@ -1,7 +1,6 @@
 .connect-view {
   display: flex;
-  height: 400px;
-  min-width: 600px;
+	height: 60vh;
 }
 
 .connect-sidebar {

@@ -11,9 +11,8 @@ export interface Trigger {
 }
 
 export interface Variable {
-	name: string;
-	value: string;
-	description?: string;
+  name: string;
+  value: string;
 }
 
 export interface Command {

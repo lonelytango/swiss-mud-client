@@ -1,7 +1,6 @@
 .variable-view {
 	display: flex;
-	height: 400px;
-	min-width: 600px;
+	height: 60vh;
 }
 
 .variable-sidebar {
@@ -56,6 +55,8 @@
 	background: #222;
 	border-radius: 0 8px 8px 0;
 	padding: 24px;
+	box-sizing: border-box;
+	height: 100%;
 }
 
 .variable-details label {
@@ -65,8 +66,7 @@
 	font-weight: 500;
 }
 
-.variable-details input,
-.variable-details textarea {
+.variable-details input {
 	width: 100%;
 	padding: 6px 8px;
 	border: 1px solid #ccc;

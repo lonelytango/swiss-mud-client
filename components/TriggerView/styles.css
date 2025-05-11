@@ -1,7 +1,6 @@
 .trigger-view {
   display: flex;
-  height: 400px;
-  min-width: 600px;
+	height: 60vh;
 }
 
 .trigger-sidebar {
@@ -56,6 +55,8 @@
   background: #222;
   border-radius: 0 8px 8px 0;
   padding: 24px;
+  box-sizing: border-box;
+  height: 100%;
 }
 
 .trigger-details label {
@@ -65,8 +66,7 @@
   font-weight: 500;
 }
 
-.trigger-details input,
-.trigger-details textarea {
+.trigger-details input {
   width: 100%;
   padding: 6px 8px;
   border: 1px solid #ccc;
@@ -74,6 +74,22 @@
   font-size: 1em;
   font-family: inherit;
   box-sizing: border-box;
+}
+
+.trigger-details textarea {
+  flex: 1 1 auto;
+  min-height: 300px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  font-family: inherit;
+  box-sizing: border-box;
+  resize: vertical;
+  line-height: 1.5;
+  background: #222;
+  color: #fff;
 }
 
 .trigger-details .actions {
