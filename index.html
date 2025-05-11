@@ -3,8 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/client/assets/react.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Updated viewport meta tag for iOS Safari compatibility -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0" />
+    <!-- iOS-specific meta tags for fullscreen-like experience -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>Swiss Mud Client</title>
+    <!-- Add a simple fix for iOS height calculation -->
+    <style>
+      html, body {
+        height: 100%;
+        overflow: hidden;
+      }
+      
+      /* Fix for iOS Safari */
+      @supports (-webkit-touch-callout: none) {
+        html, body {
+          height: -webkit-fill-available;
+        }
+        body {
+          /* Prevent iOS Safari bounce effect */
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          overflow: hidden;
+        }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
