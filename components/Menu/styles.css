@@ -140,4 +140,16 @@
   overflow-y: auto;
   color: #00ff00;
   min-height: 200px;
-} 
+}
+
+/* Mobile responsive styles for screens smaller than 430px */
+@media only screen and (max-width: 430px) {
+  .popup {
+    height: 100vh;
+    max-height: unset;
+    max-width: unset;
+    min-height: unset;
+    min-width: unset;
+    width: 100%;
+  }
+}
