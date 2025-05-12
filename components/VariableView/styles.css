@@ -89,4 +89,31 @@
 	color: #fff;
 	cursor: pointer;
 	transition: background 0.2s;
+}
+
+.variable-item-content {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.drag-handle {
+	cursor: grab;
+	color: #666;
+	font-size: 1.2em;
+	padding: 0 4px;
+	user-select: none;
+}
+
+.drag-handle:active {
+	cursor: grabbing;
+}
+
+.variable-sidebar li.dragging {
+	opacity: 0.5;
+	background: #444;
+}
+
+.variable-sidebar li.drag-over {
+	border-top: 2px solid #1976d2;
 } 

@@ -15,6 +15,40 @@ const VariableView: React.FC = () => {
     'description'
   > | null>(null);
 
+  // Drag and drop handlers
+  const handleDragStart = (e: React.DragEvent<HTMLLIElement>, idx: number) => {
+    e.dataTransfer.setData('text/plain', idx.toString());
+    e.currentTarget.classList.add('dragging');
+  };
+
+  const handleDragEnd = (e: React.DragEvent<HTMLLIElement>) => {
+    e.currentTarget.classList.remove('dragging');
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLLIElement>) => {
+    e.preventDefault();
+    e.currentTarget.classList.add('drag-over');
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLLIElement>) => {
+    e.currentTarget.classList.remove('drag-over');
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLLIElement>, targetIdx: number) => {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+
+    const sourceIdx = parseInt(e.dataTransfer.getData('text/plain'));
+    if (sourceIdx === targetIdx) return;
+
+    const updated = [...variables];
+    const [movedItem] = updated.splice(sourceIdx, 1);
+    updated.splice(targetIdx, 0, movedItem);
+
+    setVariables(updated);
+    setSelectedIdx(targetIdx);
+  };
+
   // When selectedIdx changes, update editBuffer
   useEffect(() => {
     if (selectedIdx !== null && variables[selectedIdx]) {
@@ -87,10 +121,23 @@ const VariableView: React.FC = () => {
               key={idx}
               className={selectedIdx === idx ? 'selected' : ''}
               onClick={() => handleSelect(idx)}
+              draggable
+              onDragStart={e => handleDragStart(e, idx)}
+              onDragEnd={handleDragEnd}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={e => handleDrop(e, idx)}
             >
-              {variable.name || (
-                <span style={{ color: '#aaa' }}>(unnamed)</span>
-              )}
+              <div className='variable-item-content'>
+                <div className='drag-handle' title='Drag to reorder'>
+                  ⋮⋮
+                </div>
+                <span>
+                  {variable.name || (
+                    <span style={{ color: '#aaa' }}>(unnamed)</span>
+                  )}
+                </span>
+              </div>
             </li>
           ))}
         </ul>

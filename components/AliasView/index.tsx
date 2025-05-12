@@ -113,6 +113,40 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
 
   const selected = editBuffer;
 
+  // Drag and drop handlers
+  const handleDragStart = (e: React.DragEvent<HTMLLIElement>, idx: number) => {
+    e.dataTransfer.setData('text/plain', idx.toString());
+    e.currentTarget.classList.add('dragging');
+  };
+
+  const handleDragEnd = (e: React.DragEvent<HTMLLIElement>) => {
+    e.currentTarget.classList.remove('dragging');
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLLIElement>) => {
+    e.preventDefault();
+    e.currentTarget.classList.add('drag-over');
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLLIElement>) => {
+    e.currentTarget.classList.remove('drag-over');
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLLIElement>, targetIdx: number) => {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+
+    const sourceIdx = parseInt(e.dataTransfer.getData('text/plain'));
+    if (sourceIdx === targetIdx) return;
+
+    const updated = [...localAliases];
+    const [movedItem] = updated.splice(sourceIdx, 1);
+    updated.splice(targetIdx, 0, movedItem);
+
+    saveAliases(updated);
+    setSelectedIdx(targetIdx);
+  };
+
   return (
     <div className='alias-view' role='form' aria-label='Alias management'>
       <div className='alias-sidebar' role='navigation' aria-label='Alias list'>
@@ -131,8 +165,17 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
               onClick={() => handleSelect(idx)}
               role='listitem'
               aria-selected={selectedIdx === idx}
+              draggable
+              onDragStart={e => handleDragStart(e, idx)}
+              onDragEnd={handleDragEnd}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={e => handleDrop(e, idx)}
             >
               <div className='alias-item-content'>
+                <div className='drag-handle' title='Drag to reorder'>
+                  ⋮⋮
+                </div>
                 <input
                   type='checkbox'
                   checked={alias.enabled}

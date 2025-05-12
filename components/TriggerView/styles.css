@@ -131,4 +131,25 @@
   width: 16px;
   height: 16px;
   cursor: pointer;
+}
+
+.drag-handle {
+  cursor: grab;
+  color: #666;
+  font-size: 1.2em;
+  padding: 0 4px;
+  user-select: none;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.trigger-sidebar li.dragging {
+  opacity: 0.5;
+  background: #444;
+}
+
+.trigger-sidebar li.drag-over {
+  border-top: 2px solid #1976d2;
 } 
