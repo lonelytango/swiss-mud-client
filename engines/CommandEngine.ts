@@ -38,30 +38,27 @@ export class CommandEngine {
   }
 
   public async processCommand(input: string): Promise<void> {
-    // Skip processing if input is empty or just whitespace
-    if (!input.match(/^\s*$/)) {
-      // Try alias expansion
-      const expanded = processAliases(
-        input,
-        this.aliases,
-        this.variables,
-        this.options.onVariableSet
-      );
+    // Try alias expansion
+    const expanded = processAliases(
+      input,
+      this.aliases,
+      this.variables,
+      this.options.onVariableSet
+    );
 
-      // Execute commands
-      if (expanded) {
-        // Process commands with waits
-        for (const cmd of expanded) {
-          if (cmd.type === 'wait' && cmd.waitTime) {
-            await new Promise(resolve => setTimeout(resolve, cmd.waitTime));
-          } else if (cmd.type === 'command') {
-            this.options.onCommandSend(cmd.content);
-          }
+    // Execute commands
+    if (expanded) {
+      // Process commands with waits
+      for (const cmd of expanded) {
+        if (cmd.type === 'wait' && cmd.waitTime) {
+          await new Promise(resolve => setTimeout(resolve, cmd.waitTime));
+        } else if (cmd.type === 'command') {
+          this.options.onCommandSend(cmd.content);
         }
-      } else {
-        // No alias matched, send the raw input
-        this.options.onCommandSend(input);
       }
+    } else {
+      // No alias matched, send the raw input
+      this.options.onCommandSend(input);
     }
   }
 
