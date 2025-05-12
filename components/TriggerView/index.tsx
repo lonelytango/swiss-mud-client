@@ -23,6 +23,13 @@ const TriggerView: React.FC<TriggerViewProps> = ({ triggers, onChange }) => {
   const [localTriggers, setLocalTriggers] = useState<Trigger[]>(triggers);
   const initialLoad = useRef(true);
 
+  // Helper function to save triggers
+  const saveTriggers = (updated: Trigger[]) => {
+    setLocalTriggers(updated);
+    onChange(updated);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  };
+
   // Load from localStorage on mount
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -35,8 +42,7 @@ const TriggerView: React.FC<TriggerViewProps> = ({ triggers, onChange }) => {
             ...trigger,
             enabled: trigger.enabled ?? true,
           }));
-          setLocalTriggers(triggersWithEnabled);
-          onChange(triggersWithEnabled);
+          saveTriggers(triggersWithEnabled);
           setSelectedIdx(triggersWithEnabled.length > 0 ? 0 : null);
         }
       } catch (e) {
@@ -87,9 +93,7 @@ const TriggerView: React.FC<TriggerViewProps> = ({ triggers, onChange }) => {
     const updated = localTriggers.map((trigger, idx) =>
       idx === selectedIdx ? { ...editBuffer } : trigger
     );
-    setLocalTriggers(updated);
-    onChange(updated);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    saveTriggers(updated);
   };
 
   // Delete selected trigger
@@ -97,9 +101,7 @@ const TriggerView: React.FC<TriggerViewProps> = ({ triggers, onChange }) => {
     if (selectedIdx === null) return;
     if (!window.confirm('Delete this trigger?')) return;
     const newTriggers = localTriggers.filter((_, idx) => idx !== selectedIdx);
-    setLocalTriggers(newTriggers);
-    onChange(newTriggers);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newTriggers));
+    saveTriggers(newTriggers);
     setSelectedIdx(newTriggers.length > 0 ? 0 : null);
   };
 
@@ -148,9 +150,7 @@ const TriggerView: React.FC<TriggerViewProps> = ({ triggers, onChange }) => {
                     const updated = localTriggers.map((t, i) =>
                       i === idx ? { ...t, enabled: e.target.checked } : t
                     );
-                    setLocalTriggers(updated);
-                    onChange(updated);
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                    saveTriggers(updated);
                   }}
                   aria-label={`${
                     trigger.enabled ? 'Disable' : 'Enable'

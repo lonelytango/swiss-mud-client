@@ -18,6 +18,13 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
   const [localAliases, setLocalAliases] = useState<Alias[]>(aliases);
   const initialLoad = useRef(true);
 
+  // Helper function to save aliases
+  const saveAliases = (updated: Alias[]) => {
+    setLocalAliases(updated);
+    onChange(updated);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  };
+
   // Load from localStorage on mount
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -30,8 +37,7 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
             ...alias,
             enabled: alias.enabled ?? true,
           }));
-          setLocalAliases(aliasesWithEnabled);
-          onChange(aliasesWithEnabled);
+          saveAliases(aliasesWithEnabled);
           setSelectedIdx(aliasesWithEnabled.length > 0 ? 0 : null);
         }
       } catch (e) {
@@ -82,9 +88,7 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
     const updated = localAliases.map((alias, idx) =>
       idx === selectedIdx ? { ...editBuffer } : alias
     );
-    setLocalAliases(updated);
-    onChange(updated);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    saveAliases(updated);
   };
 
   // Delete selected alias
@@ -92,9 +96,7 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
     if (selectedIdx === null) return;
     if (!window.confirm('Delete this alias?')) return;
     const newAliases = localAliases.filter((_, idx) => idx !== selectedIdx);
-    setLocalAliases(newAliases);
-    onChange(newAliases);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newAliases));
+    saveAliases(newAliases);
     setSelectedIdx(newAliases.length > 0 ? 0 : null);
   };
 
@@ -139,9 +141,7 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
                     const updated = localAliases.map((a, i) =>
                       i === idx ? { ...a, enabled: e.target.checked } : a
                     );
-                    setLocalAliases(updated);
-                    onChange(updated);
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                    saveAliases(updated);
                   }}
                   aria-label={`${alias.enabled ? 'Disable' : 'Enable'} alias ${
                     alias.name || '(unnamed)'
