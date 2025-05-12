@@ -3,6 +3,10 @@ export interface MudData {
   mud_variables: any[];
   mud_aliases: any[];
   mud_triggers: any[];
+  mud_settings: {
+    highlightInputOnCommand: boolean;
+    showCommandInOutput: boolean;
+  };
 }
 
 export class DataManager {
@@ -60,6 +64,13 @@ export class DataManager {
       mud_variables: JSON.parse(localStorage.getItem('mud_variables') || '[]'),
       mud_aliases: JSON.parse(localStorage.getItem('mud_aliases') || '[]'),
       mud_triggers: JSON.parse(localStorage.getItem('mud_triggers') || '[]'),
+      mud_settings: JSON.parse(
+        localStorage.getItem('mud_settings') ||
+          JSON.stringify({
+            highlightInputOnCommand: true,
+            showCommandInOutput: true,
+          })
+      ),
     };
   }
 
@@ -68,6 +79,7 @@ export class DataManager {
     localStorage.setItem('mud_variables', JSON.stringify(data.mud_variables));
     localStorage.setItem('mud_aliases', JSON.stringify(data.mud_aliases));
     localStorage.setItem('mud_triggers', JSON.stringify(data.mud_triggers));
+    localStorage.setItem('mud_settings', JSON.stringify(data.mud_settings));
   }
 
   private static validateData(data: any): data is MudData {
@@ -76,7 +88,10 @@ export class DataManager {
       Array.isArray(data.mud_profiles) &&
       Array.isArray(data.mud_variables) &&
       Array.isArray(data.mud_aliases) &&
-      Array.isArray(data.mud_triggers)
+      Array.isArray(data.mud_triggers) &&
+      typeof data.mud_settings === 'object' &&
+      typeof data.mud_settings.highlightInputOnCommand === 'boolean' &&
+      typeof data.mud_settings.showCommandInOutput === 'boolean'
     );
   }
 }

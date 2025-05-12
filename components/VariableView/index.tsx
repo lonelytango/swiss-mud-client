@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import type { Variable } from '../../types';
-import { useVariables } from '../../contexts/VariablesContext';
+import { useAppContext } from '../../contexts/AppContext';
 import './styles.css';
 
 const emptyVariable: Variable = { name: '', value: '' };
 
 const VariableView: React.FC = () => {
-  const { variables, setVariables } = useVariables();
+  const { variables, setVariables } = useAppContext();
   const [selectedIdx, setSelectedIdx] = useState<number | null>(
     variables.length > 0 ? 0 : null
   );

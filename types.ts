@@ -20,3 +20,8 @@ export interface Command {
 	content: string;
 	waitTime?: number;
 }
+
+export interface Settings {
+  highlightInputOnCommand: boolean;
+  showCommandInOutput: boolean;
+}

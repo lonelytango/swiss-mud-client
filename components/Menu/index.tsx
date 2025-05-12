@@ -6,8 +6,9 @@ import AliasView from '../AliasView';
 import TriggerView from '../TriggerView';
 import VariableView from '../VariableView';
 import DataView from '../DataView';
+import { Settings, SettingsView } from '../SettingsView';
 import { DataManager, type MudData } from '../../managers/DataManager';
-import { useVariables } from '../../contexts/VariablesContext';
+import { useAppContext } from '../../contexts/AppContext';
 
 type MenuButton = {
   id: string;
@@ -22,6 +23,7 @@ const menuButtons: MenuButton[] = [
   { id: 'scripts', label: 'Scripts', icon: '📜' },
   { id: 'variables', label: 'Variables', icon: '📊' },
   { id: 'data', label: 'Data', icon: '💾' },
+  { id: 'settings', label: 'Settings', icon: '⚙️' },
 ];
 
 type PopupProps = {
@@ -107,7 +109,7 @@ export function Menu({
   setTriggers: React.Dispatch<React.SetStateAction<Trigger[]>>;
 }) {
   const [activePopup, setActivePopup] = useState<string | null>(null);
-  const { setVariables } = useVariables();
+  const { setVariables, settings, setSettings } = useAppContext();
 
   const handleButtonClick = (id: string) => {
     setActivePopup(id);
@@ -209,6 +211,16 @@ export function Menu({
         activePopup={activePopup}
       >
         <DataView onImport={handleDataImport} />
+      </Popup>
+
+      <Popup
+        isOpen={activePopup === 'settings'}
+        onClose={handleClose}
+        title='Settings'
+        setActivePopup={setActivePopup}
+        activePopup={activePopup}
+      >
+        <SettingsView settings={settings} onSettingsChange={setSettings} />
       </Popup>
     </div>
   );
