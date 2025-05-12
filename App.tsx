@@ -5,7 +5,7 @@ import './App.css';
 import classNames from 'classnames';
 import { CommandEngine } from './engines/CommandEngine';
 import { WebSocketManager } from './managers/WebSocketManager';
-import { Alias, Trigger } from './types';
+import { Alias, Trigger, Settings } from './types';
 import { handleCommandInput } from './utils/CommandHandler';
 import { setWebSocketManager, send } from './utils/CommandAction';
 import { useAppContext } from './contexts/AppContext';
@@ -112,10 +112,8 @@ function App() {
     }
 
     setCommandEngine(
-      new CommandEngine(parsedAliases, variables, parsedTriggers, {
-        onCommandSend: (command: string) => {
-          // Add command to output if enabled
-          console.log('Show command in output:', settings.showCommandInOutput);
+      new CommandEngine(parsedAliases, variables, parsedTriggers, settings, {
+        onCommandSend: (command: string, settings: Settings) => {
           if (settings.showCommandInOutput) {
             setMessages(prev => {
               const next = [
@@ -165,6 +163,12 @@ function App() {
       commandEngine.setTriggers(triggers);
     }
   }, [triggers]);
+
+  useEffect(() => {
+    if (commandEngine) {
+      commandEngine.setSettings(settings);
+    }
+  }, [settings]);
 
   // Process incoming line with triggers
   useEffect(() => {
