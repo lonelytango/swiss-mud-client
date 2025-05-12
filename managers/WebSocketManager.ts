@@ -65,6 +65,7 @@ export class WebSocketManager {
           JSON.stringify({
             address: this.currentProfile.address,
             port: this.currentProfile.port,
+            encoding: this.currentProfile.encoding || 'utf8',
           })
         );
       }

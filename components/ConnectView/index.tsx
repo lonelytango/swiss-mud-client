@@ -2,120 +2,134 @@ import React, { useEffect, useRef, useState } from 'react';
 import './styles.css';
 
 export type MudProfile = {
-	name: string;
-	address: string;
-	port: string;
+  name: string;
+  address: string;
+  port: string;
+  encoding?: string;
 };
 
 type ConnectViewProps = {
-	onConnect: (profile: MudProfile) => void;
-	onCancel: () => void;
+  onConnect: (profile: MudProfile) => void;
+  onCancel: () => void;
 };
 
 const STORAGE_KEY = 'mud_profiles';
-const emptyProfile: MudProfile = { name: '', address: '', port: '' };
+const ENCODINGS = [
+  { value: 'utf8', label: 'UTF-8 (default)' },
+  { value: 'ascii', label: 'ASCII' },
+  { value: 'gbk', label: 'GBK' },
+  { value: 'big5', label: 'Big5' },
+];
+const emptyProfile: MudProfile = {
+  name: '',
+  address: '',
+  port: '',
+  encoding: 'utf8',
+};
 
 export default function ConnectView({ onConnect }: ConnectViewProps) {
-	const [profiles, setProfiles] = useState<MudProfile[]>([]);
-	const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
-	const [editBuffer, setEditBuffer] = useState<MudProfile | null>(null);
-	const nameInputRef = useRef<HTMLInputElement>(null);
+  const [profiles, setProfiles] = useState<MudProfile[]>([]);
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const [editBuffer, setEditBuffer] = useState<MudProfile | null>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
-	// Load profiles only once on mount
-	useEffect(() => {
-		const loadedProfiles = loadProfiles();
-		setProfiles(loadedProfiles);
-		if (loadedProfiles.length > 0) {
-			setSelectedIdx(0);
-		}
-	}, []);
+  // Load profiles only once on mount
+  useEffect(() => {
+    const loadedProfiles = loadProfiles();
+    setProfiles(loadedProfiles);
+    if (loadedProfiles.length > 0) {
+      setSelectedIdx(0);
+    }
+  }, []);
 
-	// When selectedIdx changes, update editBuffer
-	useEffect(() => {
-		if (selectedIdx !== null && profiles[selectedIdx]) {
-			setEditBuffer({ ...profiles[selectedIdx] });
-		} else {
-			setEditBuffer(null);
-		}
-	}, [selectedIdx, profiles]);
+  // When selectedIdx changes, update editBuffer
+  useEffect(() => {
+    if (selectedIdx !== null && profiles[selectedIdx]) {
+      setEditBuffer({ ...profiles[selectedIdx] });
+    } else {
+      setEditBuffer(null);
+    }
+  }, [selectedIdx, profiles]);
 
-	// Action Handlers
-	const handleSelect = (idx: number) => {
-		setSelectedIdx(idx);
-	};
+  // Action Handlers
+  const handleSelect = (idx: number) => {
+    setSelectedIdx(idx);
+  };
 
-	const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (!editBuffer) return;
-		const { name, value } = e.target;
-		setEditBuffer({ ...editBuffer, [name]: value });
-	};
+  const handleFieldChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    if (!editBuffer) return;
+    const { name, value } = e.target;
+    setEditBuffer({ ...editBuffer, [name]: value });
+  };
 
-	const handleAdd = () => {
-		const newProfiles = [...profiles, { ...emptyProfile }];
-		setProfiles(newProfiles);
-		setEditBuffer({ ...emptyProfile });
-		setSelectedIdx(newProfiles.length - 1);
-		setTimeout(() => nameInputRef.current?.focus(), 0);
-	};
+  const handleAdd = () => {
+    const newProfiles = [...profiles, { ...emptyProfile }];
+    setProfiles(newProfiles);
+    setEditBuffer({ ...emptyProfile });
+    setSelectedIdx(newProfiles.length - 1);
+    setTimeout(() => nameInputRef.current?.focus(), 0);
+  };
 
-	const handleDelete = () => {
-		if (selectedIdx === null) return;
-		if (!window.confirm('Delete this profile?')) return;
-		const newProfiles = profiles.filter((_, idx) => idx !== selectedIdx);
-		setProfiles(newProfiles);
-		saveProfiles(newProfiles);
-		setSelectedIdx(newProfiles.length > 0 ? 0 : null);
-	};
+  const handleDelete = () => {
+    if (selectedIdx === null) return;
+    if (!window.confirm('Delete this profile?')) return;
+    const newProfiles = profiles.filter((_, idx) => idx !== selectedIdx);
+    setProfiles(newProfiles);
+    saveProfiles(newProfiles);
+    setSelectedIdx(newProfiles.length > 0 ? 0 : null);
+  };
 
-	const handleSave = () => {
-		if (selectedIdx === null || !editBuffer) return;
-		if (
-			!editBuffer.name.trim() ||
-			!editBuffer.address.trim() ||
-			!editBuffer.port.trim()
-		)
-			return;
+  const handleSave = () => {
+    if (selectedIdx === null || !editBuffer) return;
+    if (
+      !editBuffer.name.trim() ||
+      !editBuffer.address.trim() ||
+      !editBuffer.port.trim()
+    )
+      return;
 
-		const updated = profiles.map((profile, idx) =>
-			idx === selectedIdx ? { ...editBuffer } : profile
-		);
-		setProfiles(updated);
-		saveProfiles(updated);
-	};
+    const updated = profiles.map((profile, idx) =>
+      idx === selectedIdx ? { ...editBuffer } : profile
+    );
+    setProfiles(updated);
+    saveProfiles(updated);
+  };
 
-	const handleConnect = () => {
-		if (!editBuffer) return;
-		if (
-			!editBuffer.name.trim() ||
-			!editBuffer.address.trim() ||
-			!editBuffer.port.trim()
-		)
-			return;
-		onConnect(editBuffer);
-	};
+  const handleConnect = () => {
+    if (!editBuffer) return;
+    if (
+      !editBuffer.name.trim() ||
+      !editBuffer.address.trim() ||
+      !editBuffer.port.trim()
+    )
+      return;
+    onConnect(editBuffer);
+  };
 
-	// Check if there are unsaved changes
-	const hasUnsaved =
-		selectedIdx !== null &&
-		editBuffer &&
-		JSON.stringify(editBuffer) !== JSON.stringify(profiles[selectedIdx]);
+  // Check if there are unsaved changes
+  const hasUnsaved =
+    selectedIdx !== null &&
+    editBuffer &&
+    JSON.stringify(editBuffer) !== JSON.stringify(profiles[selectedIdx]);
 
-	function loadProfiles(): MudProfile[] {
-		try {
-			const data = localStorage.getItem(STORAGE_KEY);
-			return data ? JSON.parse(data) : [];
-		} catch (error) {
-			console.error('Error loading profiles', error);
-			return [];
-		}
-	}
+  function loadProfiles(): MudProfile[] {
+    try {
+      const data = localStorage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    } catch (error) {
+      console.error('Error loading profiles', error);
+      return [];
+    }
+  }
 
-	function saveProfiles(profiles: MudProfile[]) {
-		const profilesJsonStr = JSON.stringify(profiles);
-		localStorage.setItem(STORAGE_KEY, profilesJsonStr);
-	}
+  function saveProfiles(profiles: MudProfile[]) {
+    const profilesJsonStr = JSON.stringify(profiles);
+    localStorage.setItem(STORAGE_KEY, profilesJsonStr);
+  }
 
-	return (
+  return (
     <div className='connect-view' role='form' aria-label='Connection settings'>
       <div
         className='connect-sidebar'
@@ -185,6 +199,21 @@ export default function ConnectView({ onConnect }: ConnectViewProps) {
                 aria-label='Server port'
                 aria-required='true'
               />
+            </label>
+            <label>
+              Encoding
+              <select
+                name='encoding'
+                value={editBuffer.encoding || 'utf8'}
+                onChange={handleFieldChange}
+                aria-label='Encoding'
+              >
+                {ENCODINGS.map(enc => (
+                  <option key={enc.value} value={enc.value}>
+                    {enc.label}
+                  </option>
+                ))}
+              </select>
             </label>
             <div
               className='actions'

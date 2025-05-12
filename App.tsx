@@ -11,7 +11,7 @@ import { setWebSocketManager, send } from './utils/CommandAction';
 import { useVariables } from './contexts/VariablesContext';
 import { stripHtmlTags } from './utils/TextUtils';
 
-let messageCounter = 0;
+// let messageCounter = 0;
 
 function App() {
   const outputRef = useRef<HTMLDivElement>(null);
@@ -167,7 +167,7 @@ function App() {
 
   // Process incoming line with triggers
   useEffect(() => {
-    console.debug(`${messageCounter} - Line: ${line}`);
+    // console.debug(`${messageCounter} - Line: ${line}`);
     if (line && commandEngine) {
       commandEngine.processLine(line);
     }
@@ -195,8 +195,7 @@ function App() {
         });
 
         const msgData = stripHtmlTags(data);
-        messageCounter = messageCounter + 1;
-        console.debug(`Counter: ${messageCounter}`);
+        // messageCounter = messageCounter + 1;
         setLine(msgData);
       },
       onConnected: () => setCanSend(true),
