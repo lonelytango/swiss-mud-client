@@ -6,7 +6,7 @@ import AliasView from '../AliasView';
 import TriggerView from '../TriggerView';
 import VariableView from '../VariableView';
 import DataView from '../DataView';
-import { Settings, SettingsView } from '../SettingsView';
+import { SettingsView } from '../SettingsView';
 import { DataManager, type MudData } from '../../managers/DataManager';
 import { useAppContext } from '../../contexts/AppContext';
 
