@@ -27,6 +27,10 @@ RUN bun install
 # Copy application code
 COPY . .
 
+# Pass the build secret to the build process
+ARG VITE_WS_URL
+ENV VITE_WS_URL=$VITE_WS_URL
+
 # Build application
 RUN bun run build
 
