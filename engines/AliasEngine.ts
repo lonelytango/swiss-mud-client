@@ -10,6 +10,9 @@ export function processAliases(
   setVariable?: (name: string, value: string) => void
 ): Command[] | null {
   for (const alias of aliases) {
+    // Skip disabled aliases
+    if (!alias.enabled) continue;
+
     const regex = new RegExp(alias.pattern);
     const match = input.match(regex);
     if (match) {

@@ -7,106 +7,116 @@ interface TriggerViewProps {
 	onChange: (triggers: Trigger[]) => void;
 }
 
-const emptyTrigger: Trigger = { name: '', pattern: '', command: '' };
+const emptyTrigger: Trigger = {
+  name: '',
+  pattern: '',
+  command: '',
+  enabled: true,
+};
 const STORAGE_KEY = 'mud_triggers';
 
 const TriggerView: React.FC<TriggerViewProps> = ({ triggers, onChange }) => {
-	const [selectedIdx, setSelectedIdx] = useState<number | null>(
-		triggers.length > 0 ? 0 : null
-	);
-	const [editBuffer, setEditBuffer] = useState<Trigger | null>(null);
-	const [localTriggers, setLocalTriggers] = useState<Trigger[]>(triggers);
-	const initialLoad = useRef(true);
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(
+    triggers.length > 0 ? 0 : null
+  );
+  const [editBuffer, setEditBuffer] = useState<Trigger | null>(null);
+  const [localTriggers, setLocalTriggers] = useState<Trigger[]>(triggers);
+  const initialLoad = useRef(true);
 
-	// Load from localStorage on mount
-	useEffect(() => {
-		const stored = localStorage.getItem(STORAGE_KEY);
-		if (stored) {
-			try {
-				const parsed = JSON.parse(stored);
-				if (Array.isArray(parsed)) {
-					setLocalTriggers(parsed);
-					onChange(parsed);
-					setSelectedIdx(parsed.length > 0 ? 0 : null);
-				}
-			} catch (e) {
-				console.error(e);
-			}
-		}
-		// eslint-disable-next-line
-	}, []);
+  // Load from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          // Ensure all triggers have enabled set to true by default
+          const triggersWithEnabled = parsed.map(trigger => ({
+            ...trigger,
+            enabled: trigger.enabled ?? true,
+          }));
+          setLocalTriggers(triggersWithEnabled);
+          onChange(triggersWithEnabled);
+          setSelectedIdx(triggersWithEnabled.length > 0 ? 0 : null);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    // eslint-disable-next-line
+  }, []);
 
-	// Keep localTriggers in sync with parent triggers (except on initial load)
-	useEffect(() => {
-		if (!initialLoad.current) {
-			setLocalTriggers(triggers);
-		} else {
-			initialLoad.current = false;
-		}
-	}, [triggers]);
+  // Keep localTriggers in sync with parent triggers (except on initial load)
+  useEffect(() => {
+    if (!initialLoad.current) {
+      setLocalTriggers(triggers);
+    } else {
+      initialLoad.current = false;
+    }
+  }, [triggers]);
 
-	// When selectedIdx changes, update editBuffer
-	useEffect(() => {
-		if (selectedIdx !== null && localTriggers[selectedIdx]) {
-			setEditBuffer({ ...localTriggers[selectedIdx] });
-		} else {
-			setEditBuffer(null);
-		}
-	}, [selectedIdx, localTriggers]);
+  // When selectedIdx changes, update editBuffer
+  useEffect(() => {
+    if (selectedIdx !== null && localTriggers[selectedIdx]) {
+      setEditBuffer({ ...localTriggers[selectedIdx] });
+    } else {
+      setEditBuffer(null);
+    }
+  }, [selectedIdx, localTriggers]);
 
-	// Add new trigger and select it
-	const handleAdd = () => {
-		const newTriggers = [...localTriggers, { ...emptyTrigger }];
-		setLocalTriggers(newTriggers);
-		setEditBuffer({ ...emptyTrigger });
-		setSelectedIdx(newTriggers.length - 1);
-	};
+  // Add new trigger and select it
+  const handleAdd = () => {
+    const newTriggers = [...localTriggers, { ...emptyTrigger }];
+    setLocalTriggers(newTriggers);
+    setEditBuffer({ ...emptyTrigger });
+    setSelectedIdx(newTriggers.length - 1);
+  };
 
-	// Update edit buffer inline
-	const handleFieldChange = (
-		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-	) => {
-		if (!editBuffer) return;
-		const { name, value } = e.target;
-		setEditBuffer({ ...editBuffer, [name]: value });
-	};
+  // Update edit buffer inline
+  const handleFieldChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    if (!editBuffer) return;
+    const { name, value } = e.target;
+    setEditBuffer({ ...editBuffer, [name]: value });
+  };
 
-	// Save changes to selected trigger
-	const handleSave = () => {
-		if (selectedIdx === null || !editBuffer) return;
-		const updated = localTriggers.map((trigger, idx) =>
-			idx === selectedIdx ? { ...editBuffer } : trigger
-		);
-		setLocalTriggers(updated);
-		onChange(updated);
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-	};
+  // Save changes to selected trigger
+  const handleSave = () => {
+    if (selectedIdx === null || !editBuffer) return;
+    const updated = localTriggers.map((trigger, idx) =>
+      idx === selectedIdx ? { ...editBuffer } : trigger
+    );
+    setLocalTriggers(updated);
+    onChange(updated);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  };
 
-	// Delete selected trigger
-	const handleDelete = () => {
-		if (selectedIdx === null) return;
-		if (!window.confirm('Delete this trigger?')) return;
-		const newTriggers = localTriggers.filter((_, idx) => idx !== selectedIdx);
-		setLocalTriggers(newTriggers);
-		onChange(newTriggers);
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(newTriggers));
-		setSelectedIdx(newTriggers.length > 0 ? 0 : null);
-	};
+  // Delete selected trigger
+  const handleDelete = () => {
+    if (selectedIdx === null) return;
+    if (!window.confirm('Delete this trigger?')) return;
+    const newTriggers = localTriggers.filter((_, idx) => idx !== selectedIdx);
+    setLocalTriggers(newTriggers);
+    onChange(newTriggers);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newTriggers));
+    setSelectedIdx(newTriggers.length > 0 ? 0 : null);
+  };
 
-	// Select trigger
-	const handleSelect = (idx: number) => {
-		setSelectedIdx(idx);
-	};
+  // Select trigger
+  const handleSelect = (idx: number) => {
+    setSelectedIdx(idx);
+  };
 
-	// Check if there are unsaved changes
-	const hasUnsaved =
-		selectedIdx !== null &&
-		editBuffer &&
-		JSON.stringify(editBuffer) !== JSON.stringify(localTriggers[selectedIdx]);
+  // Check if there are unsaved changes
+  const hasUnsaved =
+    selectedIdx !== null &&
+    editBuffer &&
+    JSON.stringify(editBuffer) !== JSON.stringify(localTriggers[selectedIdx]);
 
-	const selected = editBuffer;
+  const selected = editBuffer;
 
-	return (
+  return (
     <div className='trigger-view' role='form' aria-label='Trigger management'>
       <div
         className='trigger-sidebar'
@@ -129,7 +139,29 @@ const TriggerView: React.FC<TriggerViewProps> = ({ triggers, onChange }) => {
               role='listitem'
               aria-selected={selectedIdx === idx}
             >
-              {trigger.name || <span style={{ color: '#aaa' }}>(unnamed)</span>}
+              <div className='trigger-item-content'>
+                <input
+                  type='checkbox'
+                  checked={trigger.enabled}
+                  onChange={e => {
+                    e.stopPropagation();
+                    const updated = localTriggers.map((t, i) =>
+                      i === idx ? { ...t, enabled: e.target.checked } : t
+                    );
+                    setLocalTriggers(updated);
+                    onChange(updated);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                  }}
+                  aria-label={`${
+                    trigger.enabled ? 'Disable' : 'Enable'
+                  } trigger ${trigger.name || '(unnamed)'}`}
+                />
+                <span>
+                  {trigger.name || (
+                    <span style={{ color: '#aaa' }}>(unnamed)</span>
+                  )}
+                </span>
+              </div>
             </li>
           ))}
         </ul>

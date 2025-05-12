@@ -16,6 +16,9 @@ export function processTriggers(
   const capturedCommands: Command[] = [];
 
   for (const trigger of triggers) {
+    // Skip disabled triggers
+    if (!trigger.enabled) continue;
+
     try {
       const regex = new RegExp(trigger.pattern, 'u');
       const matches = cleanLine.match(regex);
