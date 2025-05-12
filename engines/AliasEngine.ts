@@ -1,5 +1,6 @@
 import type { Alias, Variable, Command } from '../types';
 import { parseSendCommands, parseSpeedwalk } from '../utils/CommandUtils';
+import { alert } from '../utils/CommandAction';
 
 // This function expands an input string according to the defined aliases and variables
 export function processAliases(
@@ -55,6 +56,7 @@ export function processAliases(
         send,
         wait,
         speedwalk,
+        alert,
         setVariable: setVariable || (() => {}), // Add setVariable to sandbox
       };
 

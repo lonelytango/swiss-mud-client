@@ -1,5 +1,6 @@
 import type { Trigger, Command } from '../types';
 import { parseSpeedwalk } from '../utils/CommandUtils';
+import { alert } from '../utils/CommandAction';
 
 export function processTriggers(
   line: string,
@@ -34,6 +35,7 @@ export function processTriggers(
             'send',
             'setVariable',
             'speedwalk',
+            'alert',
             ...variableNames,
             trigger.command
           );
@@ -42,6 +44,7 @@ export function processTriggers(
             send,
             setVariable || (() => {}),
             speedwalk,
+            alert,
             ...variableValues
           );
         } catch (e) {

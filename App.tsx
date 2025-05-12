@@ -169,6 +169,7 @@ function App() {
   useEffect(() => {
     // console.debug(`${messageCounter} - Line: ${line}`);
     if (line && commandEngine) {
+      // console.debug(`Line: ${line}`);
       commandEngine.processLine(line);
     }
   }, [line]);
