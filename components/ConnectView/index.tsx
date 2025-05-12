@@ -116,86 +116,122 @@ export default function ConnectView({ onConnect }: ConnectViewProps) {
 	}
 
 	return (
-		<div className='connect-view'>
-			<div className='connect-sidebar'>
-				<button onClick={handleAdd} title='Add Profile'>
-					＋
-				</button>
-				<ul>
-					{profiles.length === 0 ? (
-						<li className='empty-message'>No saved profiles</li>
-					) : (
-						profiles.map((profile, idx) => (
-							<li
-								key={profile.name + idx}
-								className={selectedIdx === idx ? 'selected' : ''}
-								onClick={() => handleSelect(idx)}
-							>
-								{profile.name || (
-									<span style={{ color: '#aaa' }}>(unnamed)</span>
-								)}
-							</li>
-						))
-					)}
-				</ul>
-			</div>
-			<div className='connect-details'>
-				{editBuffer ? (
-					<>
-						<label>
-							Profile Name
-							<input
-								ref={nameInputRef}
-								name='name'
-								value={editBuffer.name}
-								onChange={handleFieldChange}
-								autoFocus
-							/>
-						</label>
-						<label>
-							Server Address
-							<input
-								name='address'
-								value={editBuffer.address}
-								onChange={handleFieldChange}
-							/>
-						</label>
-						<label>
-							Port
-							<input
-								name='port'
-								value={editBuffer.port}
-								onChange={handleFieldChange}
-							/>
-						</label>
-						<div className='actions'>
-							<button
-								onClick={handleSave}
-								disabled={!hasUnsaved}
-								style={{ background: hasUnsaved ? '#1976d2' : '#aaa' }}
-							>
-								Save
-							</button>
-							<button onClick={handleDelete} style={{ background: '#c62828' }}>
-								Delete
-							</button>
-							<button
-								onClick={handleConnect}
-								disabled={
-									!editBuffer.name.trim() ||
-									!editBuffer.address.trim() ||
-									!editBuffer.port.trim()
-								}
-								style={{ background: '#2e7d32' }}
-							>
-								Connect
-							</button>
-						</div>
-					</>
-				) : (
-					<div style={{ color: '#888' }}>Select a profile to edit</div>
-				)}
-			</div>
-		</div>
-	);
+    <div className='connect-view' role='form' aria-label='Connection settings'>
+      <div
+        className='connect-sidebar'
+        role='navigation'
+        aria-label='Profile list'
+      >
+        <button
+          onClick={handleAdd}
+          title='Add Profile'
+          aria-label='Add new profile'
+        >
+          ＋
+        </button>
+        <ul role='list'>
+          {profiles.length === 0 ? (
+            <li className='empty-message' role='listitem'>
+              No saved profiles
+            </li>
+          ) : (
+            profiles.map((profile, idx) => (
+              <li
+                key={profile.name + idx}
+                className={selectedIdx === idx ? 'selected' : ''}
+                onClick={() => handleSelect(idx)}
+                role='listitem'
+                aria-selected={selectedIdx === idx}
+              >
+                {profile.name || (
+                  <span style={{ color: '#aaa' }}>(unnamed)</span>
+                )}
+              </li>
+            ))
+          )}
+        </ul>
+      </div>
+      <div className='connect-details' role='form' aria-label='Profile details'>
+        {editBuffer ? (
+          <>
+            <label>
+              Profile Name
+              <input
+                ref={nameInputRef}
+                name='name'
+                value={editBuffer.name}
+                onChange={handleFieldChange}
+                autoFocus
+                aria-label='Profile name'
+                aria-required='true'
+              />
+            </label>
+            <label>
+              Server Address
+              <input
+                name='address'
+                value={editBuffer.address}
+                onChange={handleFieldChange}
+                aria-label='Server address'
+                aria-required='true'
+              />
+            </label>
+            <label>
+              Port
+              <input
+                name='port'
+                value={editBuffer.port}
+                onChange={handleFieldChange}
+                aria-label='Server port'
+                aria-required='true'
+              />
+            </label>
+            <div
+              className='actions'
+              role='toolbar'
+              aria-label='Profile actions'
+            >
+              <button
+                onClick={handleSave}
+                disabled={!hasUnsaved}
+                style={{ background: hasUnsaved ? '#1976d2' : '#aaa' }}
+                aria-label='Save profile'
+                aria-disabled={!hasUnsaved}
+              >
+                Save
+              </button>
+              <button
+                onClick={handleDelete}
+                style={{ background: '#c62828' }}
+                aria-label='Delete profile'
+              >
+                Delete
+              </button>
+              <button
+                onClick={handleConnect}
+                disabled={
+                  !editBuffer.name.trim() ||
+                  !editBuffer.address.trim() ||
+                  !editBuffer.port.trim()
+                }
+                style={{ background: '#2e7d32' }}
+                aria-label='Connect to server'
+                aria-disabled={
+                  !editBuffer.name.trim() ||
+                  !editBuffer.address.trim() ||
+                  !editBuffer.port.trim()
+                }
+              >
+                Connect
+              </button>
+            </div>
+          </>
+        ) : (
+          <div style={{ color: '#888' }} role='status'>
+            Select a profile to edit
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

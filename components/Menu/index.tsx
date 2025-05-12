@@ -30,6 +30,7 @@ type PopupProps = {
   title: string;
   children: React.ReactNode;
   setActivePopup: (id: string) => void;
+  activePopup: string | null;
 };
 
 function Popup({
@@ -38,31 +39,55 @@ function Popup({
   title,
   children,
   setActivePopup,
+  activePopup,
 }: PopupProps) {
   if (!isOpen) return null;
 
   return (
-    <div className='popup-overlay'>
+    <div
+      className='popup-overlay'
+      role='dialog'
+      aria-modal='true'
+      aria-labelledby='popup-title'
+    >
       <div className='popup'>
         <div className='popup-header'>
-          <h3>{title}</h3>
-          <button className='close-button' onClick={onClose}>
-            <span className='button-icon'>✕</span>
+          <h3 id='popup-title'>{title}</h3>
+          <button
+            className='close-button'
+            onClick={onClose}
+            aria-label='Close dialog'
+          >
+            <span className='button-icon' aria-hidden='true'>
+              ✕
+            </span>
           </button>
         </div>
-        <div className='popup-nav'>
+        <div className='popup-nav' role='tablist'>
           {menuButtons.map(button => (
             <button
               key={button.id}
               className='popup-nav-button'
               onClick={() => setActivePopup(button.id)}
+              role='tab'
+              aria-selected={activePopup === button.id}
+              aria-controls={`${button.id}-panel`}
             >
-              <span className='popup-nav-icon'>{button.icon}</span>
+              <span className='popup-nav-icon' aria-hidden='true'>
+                {button.icon}
+              </span>
               <span className='popup-nav-label'>{button.label}</span>
             </button>
           ))}
         </div>
-        <div className='popup-content'>{children}</div>
+        <div
+          className='popup-content'
+          role='tabpanel'
+          id={`${activePopup}-panel`}
+          aria-labelledby={`${activePopup}-tab`}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -110,14 +135,18 @@ export function Menu({
   };
 
   return (
-    <div className='menu'>
+    <div className='menu' role='navigation' aria-label='Main menu'>
       {menuButtons.map(button => (
         <button
           key={button.id}
           className='menu-button'
           onClick={() => handleButtonClick(button.id)}
+          aria-label={button.label}
+          aria-haspopup='dialog'
         >
-          <span className='button-icon'>{button.icon}</span>
+          <span className='button-icon' aria-hidden='true'>
+            {button.icon}
+          </span>
           <span className='button-label'>{button.label}</span>
         </button>
       ))}
@@ -127,6 +156,7 @@ export function Menu({
         onClose={handleClose}
         title='Connect'
         setActivePopup={setActivePopup}
+        activePopup={activePopup}
       >
         <ConnectView onConnect={handleProfileConnect} onCancel={handleClose} />
       </Popup>
@@ -136,6 +166,7 @@ export function Menu({
         onClose={handleClose}
         title='Triggers'
         setActivePopup={setActivePopup}
+        activePopup={activePopup}
       >
         <TriggerView triggers={triggers} onChange={setTriggers} />
       </Popup>
@@ -145,6 +176,7 @@ export function Menu({
         onClose={handleClose}
         title='Aliases'
         setActivePopup={setActivePopup}
+        activePopup={activePopup}
       >
         <AliasView aliases={aliases} onChange={setAliases} />
       </Popup>
@@ -154,6 +186,7 @@ export function Menu({
         onClose={handleClose}
         title='Scripts'
         setActivePopup={setActivePopup}
+        activePopup={activePopup}
       >
         <p>Script management coming soon</p>
       </Popup>
@@ -163,6 +196,7 @@ export function Menu({
         onClose={handleClose}
         title='Variables'
         setActivePopup={setActivePopup}
+        activePopup={activePopup}
       >
         <VariableView />
       </Popup>
@@ -172,6 +206,7 @@ export function Menu({
         onClose={handleClose}
         title='Data Management'
         setActivePopup={setActivePopup}
+        activePopup={activePopup}
       >
         <DataView onImport={handleDataImport} />
       </Popup>

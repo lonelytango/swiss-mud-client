@@ -107,71 +107,90 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
 	const selected = editBuffer;
 
 	return (
-		<div className='alias-view'>
-			<div className='alias-sidebar'>
-				<button onClick={handleAdd} title='Add Alias'>
-					＋
-				</button>
-				<ul>
-					{localAliases.map((alias, idx) => (
-						<li
-							key={idx}
-							className={selectedIdx === idx ? 'selected' : ''}
-							onClick={() => handleSelect(idx)}
-						>
-							{alias.name || <span style={{ color: '#aaa' }}>(unnamed)</span>}
-						</li>
-					))}
-				</ul>
-			</div>
-			<div className='alias-details'>
-				{selected ? (
-					<>
-						<label>
-							Name
-							<input
-								name='name'
-								value={selected.name}
-								onChange={handleFieldChange}
-								autoFocus
-							/>
-						</label>
-						<label>
-							Pattern
-							<input
-								name='pattern'
-								value={selected.pattern}
-								onChange={handleFieldChange}
-							/>
-						</label>
-						<label>
-							Command
-							<textarea
-								name='command'
-								value={selected.command}
-								onChange={handleFieldChange}
-								rows={4}
-							/>
-						</label>
-						<div className='actions'>
-							<button
-								onClick={handleSave}
-								disabled={!hasUnsaved}
-								style={{ background: hasUnsaved ? '#1976d2' : '#aaa' }}
-							>
-								Save
-							</button>
-							<button onClick={handleDelete} style={{ background: '#c62828' }}>
-								Delete
-							</button>
-						</div>
-					</>
-				) : (
-					<div style={{ color: '#888' }}>Select an alias to edit</div>
-				)}
-			</div>
-		</div>
-	);
+    <div className='alias-view' role='form' aria-label='Alias management'>
+      <div className='alias-sidebar' role='navigation' aria-label='Alias list'>
+        <button
+          onClick={handleAdd}
+          title='Add Alias'
+          aria-label='Add new alias'
+        >
+          ＋
+        </button>
+        <ul role='list'>
+          {localAliases.map((alias, idx) => (
+            <li
+              key={idx}
+              className={selectedIdx === idx ? 'selected' : ''}
+              onClick={() => handleSelect(idx)}
+              role='listitem'
+              aria-selected={selectedIdx === idx}
+            >
+              {alias.name || <span style={{ color: '#aaa' }}>(unnamed)</span>}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className='alias-details' role='form' aria-label='Alias details'>
+        {selected ? (
+          <>
+            <label>
+              Name
+              <input
+                name='name'
+                value={selected.name}
+                onChange={handleFieldChange}
+                autoFocus
+                aria-label='Alias name'
+              />
+            </label>
+            <label>
+              Pattern
+              <input
+                name='pattern'
+                value={selected.pattern}
+                onChange={handleFieldChange}
+                aria-label='Alias pattern'
+                aria-required='true'
+              />
+            </label>
+            <label>
+              Command
+              <textarea
+                name='command'
+                value={selected.command}
+                onChange={handleFieldChange}
+                rows={4}
+                aria-label='Alias command'
+                aria-required='true'
+              />
+            </label>
+            <div className='actions' role='toolbar' aria-label='Alias actions'>
+              <button
+                onClick={handleSave}
+                disabled={!hasUnsaved}
+                style={{ background: hasUnsaved ? '#1976d2' : '#aaa' }}
+                aria-label='Save alias'
+                aria-disabled={!hasUnsaved}
+              >
+                Save
+              </button>
+              <button
+                onClick={handleDelete}
+                style={{ background: '#c62828' }}
+                aria-label='Delete alias'
+              >
+                Delete
+              </button>
+            </div>
+          </>
+        ) : (
+          <div style={{ color: '#888' }} role='status'>
+            Select an alias to edit
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default AliasView;

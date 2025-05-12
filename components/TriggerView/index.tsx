@@ -107,71 +107,98 @@ const TriggerView: React.FC<TriggerViewProps> = ({ triggers, onChange }) => {
 	const selected = editBuffer;
 
 	return (
-		<div className='trigger-view'>
-			<div className='trigger-sidebar'>
-				<button onClick={handleAdd} title='Add Trigger'>
-					＋
-				</button>
-				<ul>
-					{localTriggers.map((trigger, idx) => (
-						<li
-							key={idx}
-							className={selectedIdx === idx ? 'selected' : ''}
-							onClick={() => handleSelect(idx)}
-						>
-							{trigger.name || <span style={{ color: '#aaa' }}>(unnamed)</span>}
-						</li>
-					))}
-				</ul>
-			</div>
-			<div className='trigger-details'>
-				{selected ? (
-					<>
-						<label>
-							Name
-							<input
-								name='name'
-								value={selected.name}
-								onChange={handleFieldChange}
-								autoFocus
-							/>
-						</label>
-						<label>
-							Pattern
-							<input
-								name='pattern'
-								value={selected.pattern}
-								onChange={handleFieldChange}
-							/>
-						</label>
-						<label>
-							Command
-							<textarea
-								name='command'
-								value={selected.command}
-								onChange={handleFieldChange}
-								rows={4}
-							/>
-						</label>
-						<div className='actions'>
-							<button
-								onClick={handleSave}
-								disabled={!hasUnsaved}
-								style={{ background: hasUnsaved ? '#1976d2' : '#aaa' }}
-							>
-								Save
-							</button>
-							<button onClick={handleDelete} style={{ background: '#c62828' }}>
-								Delete
-							</button>
-						</div>
-					</>
-				) : (
-					<div style={{ color: '#888' }}>Select a trigger to edit</div>
-				)}
-			</div>
-		</div>
-	);
+    <div className='trigger-view' role='form' aria-label='Trigger management'>
+      <div
+        className='trigger-sidebar'
+        role='navigation'
+        aria-label='Trigger list'
+      >
+        <button
+          onClick={handleAdd}
+          title='Add Trigger'
+          aria-label='Add new trigger'
+        >
+          ＋
+        </button>
+        <ul role='list'>
+          {localTriggers.map((trigger, idx) => (
+            <li
+              key={idx}
+              className={selectedIdx === idx ? 'selected' : ''}
+              onClick={() => handleSelect(idx)}
+              role='listitem'
+              aria-selected={selectedIdx === idx}
+            >
+              {trigger.name || <span style={{ color: '#aaa' }}>(unnamed)</span>}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className='trigger-details' role='form' aria-label='Trigger details'>
+        {selected ? (
+          <>
+            <label>
+              Name
+              <input
+                name='name'
+                value={selected.name}
+                onChange={handleFieldChange}
+                autoFocus
+                aria-label='Trigger name'
+              />
+            </label>
+            <label>
+              Pattern
+              <input
+                name='pattern'
+                value={selected.pattern}
+                onChange={handleFieldChange}
+                aria-label='Trigger pattern'
+                aria-required='true'
+              />
+            </label>
+            <label>
+              Command
+              <textarea
+                name='command'
+                value={selected.command}
+                onChange={handleFieldChange}
+                rows={4}
+                aria-label='Trigger command'
+                aria-required='true'
+              />
+            </label>
+            <div
+              className='actions'
+              role='toolbar'
+              aria-label='Trigger actions'
+            >
+              <button
+                onClick={handleSave}
+                disabled={!hasUnsaved}
+                style={{ background: hasUnsaved ? '#1976d2' : '#aaa' }}
+                aria-label='Save trigger'
+                aria-disabled={!hasUnsaved}
+              >
+                Save
+              </button>
+              <button
+                onClick={handleDelete}
+                style={{ background: '#c62828' }}
+                aria-label='Delete trigger'
+              >
+                Delete
+              </button>
+            </div>
+          </>
+        ) : (
+          <div style={{ color: '#888' }} role='status'>
+            Select a trigger to edit
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default TriggerView;

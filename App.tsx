@@ -264,7 +264,12 @@ function App() {
   };
 
   return (
-    <div className='main' style={{ height: `${viewportHeight}px` }}>
+    <div
+      className='main'
+      style={{ height: `${viewportHeight}px` }}
+      role='application'
+      aria-label='Swiss Mud Client'
+    >
       <Menu
         onProfileConnect={setSelectedProfile}
         aliases={aliases}
@@ -276,17 +281,22 @@ function App() {
         className={classNames('status', {
           connected: status === 'Connected',
         })}
+        role='status'
       >
         {selectedProfile
           ? `${status} (${selectedProfile.name})`
           : 'No profile selected'}
       </div>
-      <div className='container'>
+      <div className='container' role='main'>
         <div
           ref={outputRef}
           className='output'
           onClick={() => inputRef.current?.focus()}
           onScroll={handleOutputScroll}
+          role='log'
+          aria-label='Game output'
+          aria-live='polite'
+          tabIndex={0}
         >
           {messages.map((msg, idx) => (
             <div key={idx} dangerouslySetInnerHTML={{ __html: msg }} />
@@ -299,6 +309,8 @@ function App() {
           placeholder='Type your command here...'
           onKeyDown={handleKeyDown}
           disabled={!canSend}
+          aria-label='Command input'
+          aria-disabled={!canSend}
         />
       </div>
     </div>
