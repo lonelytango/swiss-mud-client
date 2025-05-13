@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { Alias } from '../../types';
-import './styles.css';
+import commonStyles from '../../styles/common.module.css';
+import classNames from 'classnames';
 
 interface AliasViewProps {
-	aliases: Alias[];
-	onChange: (aliases: Alias[]) => void;
+  aliases: Alias[];
+  onChange: (aliases: Alias[]) => void;
 }
 
 const emptyAlias: Alias = { name: '', pattern: '', command: '', enabled: true };
@@ -123,13 +124,9 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
     e.currentTarget.classList.remove('dragging');
   };
 
-  const handleDragOver = (e: React.DragEvent<HTMLLIElement>) => {
+  const handleDragOver = (e: React.DragEvent<HTMLLIElement>, idx: number) => {
     e.preventDefault();
     e.currentTarget.classList.add('drag-over');
-  };
-
-  const handleDragLeave = (e: React.DragEvent<HTMLLIElement>) => {
-    e.currentTarget.classList.remove('drag-over');
   };
 
   const handleDrop = (e: React.DragEvent<HTMLLIElement>, targetIdx: number) => {
@@ -148,117 +145,81 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
   };
 
   return (
-    <div className='alias-view' role='form' aria-label='Alias management'>
-      <div className='alias-sidebar' role='navigation' aria-label='Alias list'>
-        <button
-          onClick={handleAdd}
-          title='Add Alias'
-          aria-label='Add new alias'
-        >
-          ＋
-        </button>
-        <ul role='list'>
-          {localAliases.map((alias, idx) => (
+    <div className={commonStyles.viewContainer}>
+      <div className={commonStyles.sidebar}>
+        <button onClick={handleAdd}>Add Alias</button>
+        <ul>
+          {localAliases.map((alias, index) => (
             <li
-              key={idx}
-              className={selectedIdx === idx ? 'selected' : ''}
-              onClick={() => handleSelect(idx)}
-              role='listitem'
-              aria-selected={selectedIdx === idx}
+              key={index}
+              className={classNames({
+                [commonStyles.selected]: selectedIdx === index,
+                [commonStyles.dragging]: false,
+                [commonStyles.dragOver]: false,
+              })}
+              onClick={() => handleSelect(index)}
               draggable
-              onDragStart={e => handleDragStart(e, idx)}
+              onDragStart={e => handleDragStart(e, index)}
+              onDragOver={e => handleDragOver(e, index)}
+              onDrop={e => handleDrop(e, index)}
               onDragEnd={handleDragEnd}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={e => handleDrop(e, idx)}
             >
-              <div className='alias-item-content'>
-                <div className='drag-handle' title='Drag to reorder'>
-                  ⋮⋮
-                </div>
+              <div className={commonStyles.itemContent}>
+                <span className={commonStyles.dragHandle}>⋮</span>
                 <input
                   type='checkbox'
                   checked={alias.enabled}
                   onChange={e => {
                     e.stopPropagation();
                     const updated = localAliases.map((a, i) =>
-                      i === idx ? { ...a, enabled: e.target.checked } : a
+                      i === index ? { ...a, enabled: e.target.checked } : a
                     );
                     saveAliases(updated);
                   }}
-                  aria-label={`${alias.enabled ? 'Disable' : 'Enable'} alias ${
-                    alias.name || '(unnamed)'
-                  }`}
+                  onClick={e => e.stopPropagation()}
                 />
-                <span>
-                  {alias.name || (
-                    <span style={{ color: '#aaa' }}>(unnamed)</span>
-                  )}
-                </span>
+                <span>{alias.name}</span>
               </div>
             </li>
           ))}
         </ul>
       </div>
-      <div className='alias-details' role='form' aria-label='Alias details'>
-        {selected ? (
-          <>
-            <label>
-              Name
-              <input
-                name='name'
-                value={selected.name}
-                onChange={handleFieldChange}
-                autoFocus
-                aria-label='Alias name'
-              />
-            </label>
-            <label>
-              Pattern
-              <input
-                name='pattern'
-                value={selected.pattern}
-                onChange={handleFieldChange}
-                aria-label='Alias pattern'
-                aria-required='true'
-              />
-            </label>
-            <label>
-              Command
-              <textarea
-                name='command'
-                value={selected.command}
-                onChange={handleFieldChange}
-                rows={4}
-                aria-label='Alias command'
-                aria-required='true'
-              />
-            </label>
-            <div className='actions' role='toolbar' aria-label='Alias actions'>
-              <button
-                onClick={handleSave}
-                disabled={!hasUnsaved}
-                style={{ background: hasUnsaved ? '#1976d2' : '#aaa' }}
-                aria-label='Save alias'
-                aria-disabled={!hasUnsaved}
-              >
-                Save
-              </button>
-              <button
-                onClick={handleDelete}
-                style={{ background: '#c62828' }}
-                aria-label='Delete alias'
-              >
-                Delete
-              </button>
-            </div>
-          </>
-        ) : (
-          <div style={{ color: '#888' }} role='status'>
-            Select an alias to edit
+      {selected && (
+        <div className={commonStyles.detailsPanel}>
+          <label>
+            Name
+            <input
+              type='text'
+              value={selected.name}
+              onChange={handleFieldChange}
+            />
+          </label>
+          <label>
+            Pattern
+            <input
+              type='text'
+              value={selected.pattern}
+              onChange={handleFieldChange}
+            />
+          </label>
+          <label>
+            Command
+            <textarea value={selected.command} onChange={handleFieldChange} />
+          </label>
+          <div className={commonStyles.actions}>
+            <button
+              onClick={handleSave}
+              disabled={!hasUnsaved}
+              style={{ background: hasUnsaved ? '#1976d2' : '#aaa' }}
+            >
+              Save
+            </button>
+            <button onClick={handleDelete} style={{ background: '#c62828' }}>
+              Delete
+            </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

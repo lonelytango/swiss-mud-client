@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Menu } from './components/Menu';
 import type { MudProfile } from './components/ConnectView';
-import './App.css';
+import styles from './App.module.css';
 import classNames from 'classnames';
 import { CommandEngine } from './engines/CommandEngine';
 import { WebSocketManager } from './managers/WebSocketManager';
@@ -276,7 +276,7 @@ function App() {
 
   return (
     <div
-      className='main'
+      className={styles.main}
       style={{ height: `${viewportHeight}px` }}
       role='application'
       aria-label='Swiss Mud Client'
@@ -289,8 +289,8 @@ function App() {
         setTriggers={setTriggers}
       />
       <div
-        className={classNames('status', {
-          connected: status === 'Connected',
+        className={classNames(styles.status, {
+          [styles.statusConnected]: status === 'Connected',
         })}
         role='status'
       >
@@ -298,10 +298,10 @@ function App() {
           ? `${status} (${selectedProfile.name})`
           : 'No profile selected'}
       </div>
-      <div className='container' role='main'>
+      <div className={styles.container} role='main'>
         <div
           ref={outputRef}
-          className='output'
+          className={styles.output}
           onClick={() => inputRef.current?.focus()}
           onScroll={handleOutputScroll}
           role='log'
@@ -316,7 +316,7 @@ function App() {
         <input
           ref={inputRef}
           type='text'
-          className='input'
+          className={styles.input}
           placeholder='Type your command here...'
           onKeyDown={handleKeyDown}
           disabled={!canSend}

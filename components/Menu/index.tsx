@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './styles.css';
+import styles from './styles.module.css';
 import type { Alias, Trigger } from '../../types';
 import ConnectView, { type MudProfile } from '../ConnectView';
 import AliasView from '../AliasView';
@@ -47,43 +47,43 @@ function Popup({
 
   return (
     <div
-      className='popup-overlay'
+      className={styles.popupOverlay}
       role='dialog'
       aria-modal='true'
       aria-labelledby='popup-title'
     >
-      <div className='popup'>
-        <div className='popup-header'>
+      <div className={styles.popup}>
+        <div className={styles.popupHeader}>
           <h3 id='popup-title'>{title}</h3>
           <button
-            className='close-button'
+            className={styles.closeButton}
             onClick={onClose}
             aria-label='Close dialog'
           >
-            <span className='button-icon' aria-hidden='true'>
+            <span className={styles.buttonIcon} aria-hidden='true'>
               ✕
             </span>
           </button>
         </div>
-        <div className='popup-nav' role='tablist'>
+        <div className={styles.popupNav} role='tablist'>
           {menuButtons.map(button => (
             <button
               key={button.id}
-              className='popup-nav-button'
+              className={styles.popupNavButton}
               onClick={() => setActivePopup(button.id)}
               role='tab'
               aria-selected={activePopup === button.id}
               aria-controls={`${button.id}-panel`}
             >
-              <span className='popup-nav-icon' aria-hidden='true'>
+              <span className={styles.popupNavIcon} aria-hidden='true'>
                 {button.icon}
               </span>
-              <span className='popup-nav-label'>{button.label}</span>
+              <span className={styles.popupNavLabel}>{button.label}</span>
             </button>
           ))}
         </div>
         <div
-          className='popup-content'
+          className={styles.popupContent}
           role='tabpanel'
           id={`${activePopup}-panel`}
           aria-labelledby={`${activePopup}-tab`}
@@ -137,19 +137,17 @@ export function Menu({
   };
 
   return (
-    <div className='menu' role='navigation' aria-label='Main menu'>
+    <div className={styles.menu} role='navigation' aria-label='Main menu'>
       {menuButtons.map(button => (
         <button
           key={button.id}
-          className='menu-button'
+          className={styles.menuButton}
           onClick={() => handleButtonClick(button.id)}
           aria-label={button.label}
           aria-haspopup='dialog'
         >
-          <span className='button-icon' aria-hidden='true'>
-            {button.icon}
-          </span>
-          <span className='button-label'>{button.label}</span>
+          <span className={styles.buttonIcon}>{button.icon}</span>
+          <span className={styles.buttonLabel}>{button.label}</span>
         </button>
       ))}
 
@@ -220,7 +218,7 @@ export function Menu({
         setActivePopup={setActivePopup}
         activePopup={activePopup}
       >
-        <SettingsView settings={settings} onSettingsChange={setSettings} />
+        <SettingsView settings={settings} onChange={setSettings} />
       </Popup>
     </div>
   );

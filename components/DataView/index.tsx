@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './styles.css';
+import styles from './styles.module.css';
 import { DataManager, type MudData } from '../../managers/DataManager';
 
 interface DataViewProps {
@@ -8,6 +8,10 @@ interface DataViewProps {
 
 const DataView: React.FC<DataViewProps> = ({ onImport }) => {
   const [importText, setImportText] = useState('');
+  const [status, setStatus] = useState<{
+    type: 'error' | 'success';
+    message: string;
+  } | null>(null);
 
   const handleExportToFile = async () => {
     try {
@@ -51,48 +55,50 @@ const DataView: React.FC<DataViewProps> = ({ onImport }) => {
       const data = DataManager.importFromText(importText);
       onImport(data);
       setImportText('');
-      alert('Data imported successfully!');
+      setStatus({ type: 'success', message: 'Data imported successfully!' });
     } catch (err) {
       console.error('Failed to import from text:', err);
-      alert(
-        err instanceof Error ? err.message : 'Failed to import data from text'
-      );
+      setStatus({ type: 'error', message: 'Invalid JSON data' });
     }
   };
 
   return (
-    <div className='data-view'>
-      <div className='data-section'>
+    <div className={styles.dataView}>
+      <div className={styles.dataSection}>
         <h3>Export Data</h3>
-        <div className='button-group'>
+        <div className={styles.buttonGroup}>
           <button onClick={handleExportToFile}>Export to File</button>
           <button onClick={handleExportToClipboard}>Export to Clipboard</button>
         </div>
       </div>
 
-      <div className='data-section'>
+      <div className={styles.dataSection}>
         <h3>Import Data</h3>
-        <div className='import-options'>
-          <div className='file-import'>
-            <label className='file-input-label'>
-              Import from File
-              <input
-                type='file'
-                accept='.json'
-                onChange={handleImportFromFile}
-                style={{ display: 'none' }}
-              />
-            </label>
+        <p>
+          Paste your JSON data below to import aliases, triggers, and variables.
+        </p>
+        {status && (
+          <div className={`${styles.statusMessage} ${styles[status.type]}`}>
+            {status.message}
           </div>
-
-          <div className='text-import'>
-            <textarea
-              value={importText}
-              onChange={e => setImportText(e.target.value)}
-              placeholder='Paste JSON data here...'
-              rows={10}
-            />
-            <button onClick={handleImportFromText}>Import from Text</button>
+        )}
+        <div className={styles.importSection}>
+          <label className={styles.jsonLabel}>JSON Data</label>
+          <textarea
+            className={styles.jsonTextarea}
+            value={importText}
+            onChange={e => setImportText(e.target.value)}
+            placeholder='Paste your JSON data here...'
+            rows={10}
+          />
+          <div className={styles.importButtonRow}>
+            <button
+              className={styles.importButton}
+              onClick={handleImportFromText}
+              disabled={!importText.trim()}
+            >
+              Import
+            </button>
           </div>
         </div>
       </div>

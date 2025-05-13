@@ -6,7 +6,7 @@
   border-bottom: 1px solid #333;
 }
 
-.menu-button {
+.menuButton {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -22,43 +22,21 @@
   transition: all 0.2s ease;
 }
 
-.menu-button:hover {
+.menuButton:hover {
   background-color: #333;
   border-color: #00ff00;
 }
 
-.button-icon {
+.buttonIcon {
   font-size: 20px;
 }
 
-.button-label {
+.buttonLabel {
   font-size: 12px;
   font-weight: bold;
 }
 
-.popup-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.popup {
-  display: flex;
-  flex-direction: column;
-  background-color: #1a1a1a;
-  border: 1px solid #333;
-  border-radius: 4px;
-  min-width: 620px;
-  min-height: 570px;
-  max-width: 80dvw;
-  max-height: 80dvh;
-}
-
-.popup-header {
+.popupHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -66,12 +44,12 @@
   border-bottom: 1px solid #333;
 }
 
-.popup-header h3 {
+.popupHeader h3 {
   margin: 0;
   color: #00ff00;
 }
 
-.close-button {
+.closeButton {
   background: none;
   border: none;
   color: #00ff00;
@@ -86,17 +64,17 @@
   transition: all 0.2s ease;
 }
 
-.close-button .button-icon {
+.closeButton .buttonIcon {
   font-size: 24px;
   line-height: 1;
 }
 
-.close-button:hover {
+.closeButton:hover {
   color: #fff;
   background: rgba(255, 255, 255, 0.1);
 }
 
-.popup-nav {
+.popupNav {
   display: flex;
   gap: 5px;
   padding: 10px;
@@ -104,7 +82,7 @@
   background-color: #222;
 }
 
-.popup-nav-button {
+.popupNavButton {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -120,21 +98,26 @@
   transition: all 0.2s ease;
 }
 
-.popup-nav-button:hover {
+.popupNavButton:hover {
   background-color: #333;
   border-color: #00ff00;
 }
 
-.popup-nav-icon {
+.popupNavButton[aria-selected="true"] {
+  background-color: #333;
+  border-color: #00ff00;
+}
+
+.popupNavIcon {
   font-size: 14px;
 }
 
-.popup-nav-label {
+.popupNavLabel {
   font-size: 12px;
   font-weight: bold;
 }
 
-.popup-content {
+.popupContent {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
@@ -142,14 +125,28 @@
   min-height: 200px;
 }
 
-/* Mobile responsive styles for screens smaller than 430px */
-@media only screen and (max-width: 430px) {
-  .popup {
-    height: 100vh;
-    max-height: unset;
-    max-width: unset;
-    min-height: unset;
-    min-width: unset;
-    width: 100%;
-  }
+.popupOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.popup {
+  background: #181818;
+  border-radius: 8px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+  min-width: 80dvw;
+  min-height: 60dvw;
+  max-width: 90dvw;
+  max-height: 90dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+} 

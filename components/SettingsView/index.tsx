@@ -1,55 +1,54 @@
 import React from 'react';
-import './styles.css';
+import styles from './styles.module.css';
 
 export interface Settings {
   highlightInputOnCommand: boolean;
   showCommandInOutput: boolean;
 }
 
-interface SettingsProps {
+interface SettingsViewProps {
   settings: Settings;
-  onSettingsChange: (settings: Settings) => void;
+  onChange: (settings: Settings) => void;
 }
 
-export const SettingsView: React.FC<SettingsProps> = ({
-  settings,
-  onSettingsChange,
-}) => {
+export function SettingsView({ settings, onChange }: SettingsViewProps) {
   const handleToggle = (key: keyof Settings) => {
-    onSettingsChange({
+    onChange({
       ...settings,
       [key]: !settings[key],
     });
   };
 
   return (
-    <div className='settings-content'>
-      <div className='setting-item'>
-        <label>
-          Highlight input field when command is sent
-          <div className='toggle-switch'>
-            <input
-              type='checkbox'
-              checked={settings.highlightInputOnCommand}
-              onChange={() => handleToggle('highlightInputOnCommand')}
-            />
-            <span className='toggle-slider'></span>
-          </div>
-        </label>
-      </div>
-      <div className='setting-item'>
-        <label>
-          Show command in output when sent
-          <div className='toggle-switch'>
-            <input
-              type='checkbox'
-              checked={settings.showCommandInOutput}
-              onChange={() => handleToggle('showCommandInOutput')}
-            />
-            <span className='toggle-slider'></span>
-          </div>
-        </label>
+    <div className={styles.settingsView}>
+      <div className={styles.settingsContent}>
+        <div className={styles.settingItem}>
+          <label>
+            Highlight input on command
+            <div className={styles.toggleSwitch}>
+              <input
+                type='checkbox'
+                checked={settings.highlightInputOnCommand}
+                onChange={() => handleToggle('highlightInputOnCommand')}
+              />
+              <span className={styles.toggleSlider} />
+            </div>
+          </label>
+        </div>
+        <div className={styles.settingItem}>
+          <label>
+            Show command in output
+            <div className={styles.toggleSwitch}>
+              <input
+                type='checkbox'
+                checked={settings.showCommandInOutput}
+                onChange={() => handleToggle('showCommandInOutput')}
+              />
+              <span className={styles.toggleSlider} />
+            </div>
+          </label>
+        </div>
       </div>
     </div>
   );
-};
+}

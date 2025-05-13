@@ -1,20 +1,20 @@
-.trigger-view {
+.viewContainer {
   display: flex;
-	height: 60vh;
+  height: 60vh;
 }
 
-.trigger-sidebar {
+.sidebar {
   display: flex;
   flex-direction: column;
   gap: 8px;
   width: 180px;
   background: #222;
   color: #fff;
-  padding: 8px;
+  padding: 24px;
   border-radius: 8px 0 0 8px;
 }
 
-.trigger-sidebar button {
+.sidebar button {
   background: #1976d2;
   color: #fff;
   border: none;
@@ -24,7 +24,7 @@
   cursor: pointer;
 }
 
-.trigger-sidebar ul {
+.sidebar ul {
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -35,32 +35,19 @@
   overflow-y: auto;
 }
 
-.trigger-sidebar li {
+.sidebar li {
   padding: 8px 16px;
   cursor: pointer;
   border-radius: 4px;
   transition: background 0.2s;
 }
 
-.trigger-item-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.trigger-item-content input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  margin: 0;
-}
-
-.trigger-sidebar li.selected,
-.trigger-sidebar li:hover {
+.selected,
+.sidebar li:hover {
   background: #444;
 }
 
-.trigger-details {
+.detailsPanel {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -72,14 +59,14 @@
   height: 100%;
 }
 
-.trigger-details label {
+.detailsPanel label {
   display: flex;
   flex-direction: column;
   gap: 4px;
   font-weight: 500;
 }
 
-.trigger-details input {
+.detailsPanel input {
   width: 100%;
   padding: 6px 8px;
   border: 1px solid #ccc;
@@ -89,7 +76,7 @@
   box-sizing: border-box;
 }
 
-.trigger-details textarea {
+.detailsPanel textarea {
   flex: 1 1 auto;
   min-height: 300px;
   width: 100%;
@@ -105,12 +92,12 @@
   color: #fff;
 }
 
-.trigger-details .actions {
+.actions {
   display: flex;
   gap: 8px;
 }
 
-.trigger-details button {
+.actions button {
   padding: 4px 12px;
   border: none;
   border-radius: 4px;
@@ -120,20 +107,18 @@
   transition: background 0.2s;
 }
 
-.enabled-checkbox {
+.actions button[disabled] {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+.itemContent {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 8px 0;
 }
 
-.enabled-checkbox input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-}
-
-.drag-handle {
+.dragHandle {
   cursor: grab;
   color: #666;
   font-size: 1.2em;
@@ -141,15 +126,89 @@
   user-select: none;
 }
 
-.drag-handle:active {
+.dragHandle:active {
   cursor: grabbing;
 }
 
-.trigger-sidebar li.dragging {
+.dragging {
   opacity: 0.5;
   background: #444;
 }
 
-.trigger-sidebar li.drag-over {
+.dragOver {
   border-top: 2px solid #1976d2;
+}
+
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #222;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  min-width: 300px;
+}
+
+.popupOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.formGroup {
+  margin-bottom: 16px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.formGroup input,
+.formGroup select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1em;
+}
+
+.statusMessage {
+  padding: 8px 16px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.error {
+  background: #c62828;
+  color: #fff;
+}
+
+.success {
+  background: #2e7d32;
+  color: #fff;
+}
+
+.info {
+  background: #1976d2;
+  color: #fff;
+}
+
+@media only screen and (max-width: 430px) {
+  .popup {
+    height: 100vh;
+    max-height: unset;
+    max-width: unset;
+    min-height: unset;
+    min-width: unset;
+    width: 100%;
+  }
 } 

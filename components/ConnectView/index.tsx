@@ -1,17 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
-import './styles.css';
+import styles from './styles.module.css';
 
-export type MudProfile = {
+export interface MudProfile {
   name: string;
-  address: string;
-  port: string;
-  encoding?: string;
-};
+  host: string;
+  port: number;
+}
 
-type ConnectViewProps = {
+interface ConnectViewProps {
   onConnect: (profile: MudProfile) => void;
   onCancel: () => void;
-};
+}
 
 const STORAGE_KEY = 'mud_profiles';
 const ENCODINGS = [
@@ -22,15 +21,18 @@ const ENCODINGS = [
 ];
 const emptyProfile: MudProfile = {
   name: '',
-  address: '',
-  port: '',
-  encoding: 'utf8',
+  host: '',
+  port: 23,
 };
 
-export default function ConnectView({ onConnect }: ConnectViewProps) {
+export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
   const [profiles, setProfiles] = useState<MudProfile[]>([]);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [editBuffer, setEditBuffer] = useState<MudProfile | null>(null);
+  const [status, setStatus] = useState<{
+    type: 'error' | 'success';
+    message: string;
+  } | null>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
   // Load profiles only once on mount
@@ -56,12 +58,13 @@ export default function ConnectView({ onConnect }: ConnectViewProps) {
     setSelectedIdx(idx);
   };
 
-  const handleFieldChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!editBuffer) return;
     const { name, value } = e.target;
-    setEditBuffer({ ...editBuffer, [name]: value });
+    setEditBuffer({
+      ...editBuffer,
+      [name]: name === 'port' ? parseInt(value) || 23 : value,
+    });
   };
 
   const handleAdd = () => {
@@ -85,8 +88,8 @@ export default function ConnectView({ onConnect }: ConnectViewProps) {
     if (selectedIdx === null || !editBuffer) return;
     if (
       !editBuffer.name.trim() ||
-      !editBuffer.address.trim() ||
-      !editBuffer.port.trim()
+      !editBuffer.host.trim() ||
+      !editBuffer.port.toString().trim()
     )
       return;
 
@@ -101,8 +104,8 @@ export default function ConnectView({ onConnect }: ConnectViewProps) {
     if (!editBuffer) return;
     if (
       !editBuffer.name.trim() ||
-      !editBuffer.address.trim() ||
-      !editBuffer.port.trim()
+      !editBuffer.host.trim() ||
+      !editBuffer.port.toString().trim()
     )
       return;
     onConnect(editBuffer);
@@ -129,33 +132,78 @@ export default function ConnectView({ onConnect }: ConnectViewProps) {
     localStorage.setItem(STORAGE_KEY, profilesJsonStr);
   }
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editBuffer || !editBuffer.name || !editBuffer.host) {
+      setStatus({
+        type: 'error',
+        message: 'Please fill in all required fields',
+      });
+      return;
+    }
+    onConnect(editBuffer);
+  };
+
   return (
-    <div className='connect-view' role='form' aria-label='Connection settings'>
+    <div
+      className={styles.connectView}
+      style={{ display: 'flex', height: '60vh' }}
+    >
       <div
-        className='connect-sidebar'
-        role='navigation'
-        aria-label='Profile list'
+        style={{
+          width: 200,
+          background: '#222',
+          color: '#fff',
+          borderRadius: '8px 0 0 8px',
+          padding: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
+        }}
       >
         <button
           onClick={handleAdd}
-          title='Add Profile'
-          aria-label='Add new profile'
+          style={{
+            marginBottom: 8,
+            background: '#1976d2',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 4,
+            padding: '4px 0',
+            fontSize: '1.2em',
+            cursor: 'pointer',
+          }}
         >
-          ＋
+          Add Profile
         </button>
-        <ul role='list'>
+        <ul
+          style={{
+            listStyle: 'none',
+            padding: 0,
+            margin: 0,
+            flex: 1,
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+          }}
+        >
           {profiles.length === 0 ? (
-            <li className='empty-message' role='listitem'>
-              No saved profiles
+            <li style={{ color: '#aaa', padding: '8px 16px' }}>
+              (No profiles)
             </li>
           ) : (
             profiles.map((profile, idx) => (
               <li
-                key={profile.name + idx}
-                className={selectedIdx === idx ? 'selected' : ''}
+                key={idx}
+                style={{
+                  padding: '8px 16px',
+                  cursor: 'pointer',
+                  borderRadius: 4,
+                  background: selectedIdx === idx ? '#444' : undefined,
+                  fontWeight: selectedIdx === idx ? 'bold' : undefined,
+                }}
                 onClick={() => handleSelect(idx)}
-                role='listitem'
-                aria-selected={selectedIdx === idx}
               >
                 {profile.name || (
                   <span style={{ color: '#aaa' }}>(unnamed)</span>
@@ -165,100 +213,164 @@ export default function ConnectView({ onConnect }: ConnectViewProps) {
           )}
         </ul>
       </div>
-      <div className='connect-details' role='form' aria-label='Profile details'>
+      <div
+        style={{
+          flex: 1,
+          background: '#222',
+          borderRadius: '0 8px 8px 0',
+          padding: 24,
+          boxSizing: 'border-box',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 16,
+        }}
+      >
         {editBuffer ? (
           <>
-            <label>
+            <label
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 4,
+                fontWeight: 500,
+              }}
+            >
               Profile Name
               <input
                 ref={nameInputRef}
+                type='text'
                 name='name'
                 value={editBuffer.name}
                 onChange={handleFieldChange}
-                autoFocus
-                aria-label='Profile name'
-                aria-required='true'
+                placeholder='My MUD Profile'
+                required
+                style={{
+                  width: '100%',
+                  padding: 8,
+                  border: '1px solid #ccc',
+                  borderRadius: 4,
+                  fontSize: '1em',
+                  fontFamily: 'inherit',
+                  boxSizing: 'border-box',
+                  background: '#222',
+                  color: '#fff',
+                }}
               />
             </label>
-            <label>
-              Server Address
+            <label
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 4,
+                fontWeight: 500,
+              }}
+            >
+              Host
               <input
-                name='address'
-                value={editBuffer.address}
+                type='text'
+                name='host'
+                value={editBuffer.host}
                 onChange={handleFieldChange}
-                aria-label='Server address'
-                aria-required='true'
+                placeholder='mud.example.com'
+                required
+                style={{
+                  width: '100%',
+                  padding: 8,
+                  border: '1px solid #ccc',
+                  borderRadius: 4,
+                  fontSize: '1em',
+                  fontFamily: 'inherit',
+                  boxSizing: 'border-box',
+                  background: '#222',
+                  color: '#fff',
+                }}
               />
             </label>
-            <label>
+            <label
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 4,
+                fontWeight: 500,
+              }}
+            >
               Port
               <input
+                type='number'
                 name='port'
                 value={editBuffer.port}
                 onChange={handleFieldChange}
-                aria-label='Server port'
-                aria-required='true'
+                min='1'
+                max='65535'
+                style={{
+                  width: '100%',
+                  padding: 8,
+                  border: '1px solid #ccc',
+                  borderRadius: 4,
+                  fontSize: '1em',
+                  fontFamily: 'inherit',
+                  boxSizing: 'border-box',
+                  background: '#222',
+                  color: '#fff',
+                }}
               />
             </label>
-            <label>
-              Encoding
-              <select
-                name='encoding'
-                value={editBuffer.encoding || 'utf8'}
-                onChange={handleFieldChange}
-                aria-label='Encoding'
-              >
-                {ENCODINGS.map(enc => (
-                  <option key={enc.value} value={enc.value}>
-                    {enc.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <div
-              className='actions'
-              role='toolbar'
-              aria-label='Profile actions'
-            >
+            <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
               <button
                 onClick={handleSave}
                 disabled={!hasUnsaved}
-                style={{ background: hasUnsaved ? '#1976d2' : '#aaa' }}
-                aria-label='Save profile'
-                aria-disabled={!hasUnsaved}
+                style={{
+                  background: hasUnsaved ? '#1976d2' : '#aaa',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 4,
+                  padding: '8px 16px',
+                  cursor: hasUnsaved ? 'pointer' : 'not-allowed',
+                }}
               >
                 Save
               </button>
               <button
                 onClick={handleDelete}
-                style={{ background: '#c62828' }}
-                aria-label='Delete profile'
+                style={{
+                  background: '#c62828',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 4,
+                  padding: '8px 16px',
+                }}
               >
                 Delete
               </button>
               <button
                 onClick={handleConnect}
-                disabled={
-                  !editBuffer.name.trim() ||
-                  !editBuffer.address.trim() ||
-                  !editBuffer.port.trim()
-                }
-                style={{ background: '#2e7d32' }}
-                aria-label='Connect to server'
-                aria-disabled={
-                  !editBuffer.name.trim() ||
-                  !editBuffer.address.trim() ||
-                  !editBuffer.port.trim()
-                }
+                style={{
+                  background: '#2e7d32',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 4,
+                  padding: '8px 16px',
+                }}
               >
                 Connect
+              </button>
+              <button
+                onClick={onCancel}
+                style={{
+                  background: '#666',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 4,
+                  padding: '8px 16px',
+                }}
+              >
+                Cancel
               </button>
             </div>
           </>
         ) : (
-          <div style={{ color: '#888' }} role='status'>
-            Select a profile to edit
-          </div>
+          <div style={{ color: '#888' }}>Select a profile to edit</div>
         )}
       </div>
     </div>

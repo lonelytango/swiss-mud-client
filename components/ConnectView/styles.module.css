@@ -1,0 +1,92 @@
+.connectView {
+  display: flex;
+  gap: 16px;
+  padding: 24px;
+  background: #222;
+  border-radius: 8px;
+  color: #fff;
+}
+
+.connectView h3 {
+  margin: 0;
+  color: #00ff00;
+}
+
+.connectView p {
+  margin: 0;
+  color: #ccc;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formGroup label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-weight: 500;
+}
+
+.formGroup input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1em;
+  font-family: inherit;
+  box-sizing: border-box;
+  background: #222;
+  color: #fff;
+}
+
+.formGroup input:focus {
+  border-color: #1976d2;
+  outline: none;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.actions button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background: #1976d2;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.actions button:hover {
+  background: #1565c0;
+}
+
+.actions button[type="button"] {
+  background: #666;
+}
+
+.actions button[type="button"]:hover {
+  background: #555;
+}
+
+.statusMessage {
+  padding: 8px 16px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.error {
+  background: #c62828;
+  color: #fff;
+}
+
+.success {
+  background: #2e7d32;
+  color: #fff;
+} 

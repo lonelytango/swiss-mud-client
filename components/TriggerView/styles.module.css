@@ -1,0 +1,116 @@
+.triggerView {
+  display: flex;
+  height: 60vh;
+}
+
+.triggerSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 180px;
+  background: #222;
+  color: #fff;
+  padding: 24px;
+  border-radius: 8px 0 0 8px;
+}
+
+.triggerDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  background: #222;
+  border-radius: 0 8px 8px 0;
+  padding: 24px;
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.triggerItemContent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Component-specific overrides */
+.triggerDetails textarea {
+  min-height: 200px;
+}
+
+.triggerSidebar button {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 0;
+  font-size: 1.2em;
+  cursor: pointer;
+}
+
+.triggerSidebar ul {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.triggerSidebar li {
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.triggerItemContent input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  margin: 0;
+}
+
+.triggerSidebar li.selected,
+.triggerSidebar li:hover {
+  background: #444;
+}
+
+.triggerDetails label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-weight: 500;
+}
+
+.triggerDetails input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1em;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.triggerDetails textarea {
+  flex: 1 1 auto;
+  min-height: 300px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  font-family: inherit;
+  box-sizing: border-box;
+  resize: vertical;
+  line-height: 1.5;
+  background: #222;
+  color: #fff;
+}
+
+.triggerDetails .actions {
+  display: flex;
+  gap: 8px;
+} 

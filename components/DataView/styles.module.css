@@ -1,0 +1,170 @@
+.dataView {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  background: #222;
+  border-radius: 8px;
+  color: #fff;
+}
+
+.dataView h3 {
+  margin: 0;
+  color: #00ff00;
+}
+
+.dataView p {
+  margin: 0;
+  color: #ccc;
+}
+
+.importSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.importSection label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-weight: 500;
+}
+
+.importSection textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  font-family: inherit;
+  box-sizing: border-box;
+  resize: vertical;
+  line-height: 1.5;
+  background: #222;
+  color: #fff;
+}
+
+.importSection button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background: #1976d2;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+  align-self: flex-start;
+}
+
+.importSection button:hover {
+  background: #1565c0;
+}
+
+.importSection button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+.statusMessage {
+  padding: 8px 16px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.error {
+  background: #c62828;
+  color: #fff;
+}
+
+.success {
+  background: #2e7d32;
+  color: #fff;
+}
+
+.dataSection {
+  background: #181818;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 12px;
+}
+
+.importOptions {
+  display: flex;
+  gap: 24px;
+  margin-top: 12px;
+}
+
+.fileImport {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 160px;
+}
+
+.fileInputLabel {
+  font-weight: 500;
+  color: #ccc;
+  cursor: pointer;
+}
+
+.textImport {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 220px;
+}
+
+.jsonLabel {
+  font-weight: 500;
+  color: #ccc;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.jsonTextarea {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  font-family: inherit;
+  resize: vertical;
+  line-height: 1.5;
+  background: #222;
+  color: #fff;
+}
+
+.importButtonRow {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.importButton {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background: #1976d2;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.importButton:hover:enabled {
+  background: #1565c0;
+}
+
+.importButton:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+} 
