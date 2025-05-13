@@ -74,16 +74,26 @@ const DataView: React.FC<DataViewProps> = ({ onImport }) => {
 
       <div className={styles.dataSection}>
         <h3>Import Data</h3>
-        <p>
-          Paste your JSON data below to import aliases, triggers, and variables.
-        </p>
+
+        <label className={styles.fileInputLabel}>
+          <input
+            type='file'
+            accept='.json'
+            onChange={handleImportFromFile}
+            style={{ display: 'none' }}
+          />
+          Import from File
+        </label>
         {status && (
           <div className={`${styles.statusMessage} ${styles[status.type]}`}>
             {status.message}
           </div>
         )}
         <div className={styles.importSection}>
-          <label className={styles.jsonLabel}>JSON Data</label>
+          <label className={styles.jsonLabel}>
+            Paste your JSON data below to import aliases, triggers, variables
+            and settings.
+          </label>
           <textarea
             className={styles.jsonTextarea}
             value={importText}

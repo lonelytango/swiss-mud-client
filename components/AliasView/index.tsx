@@ -124,7 +124,7 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
     e.currentTarget.classList.remove('dragging');
   };
 
-  const handleDragOver = (e: React.DragEvent<HTMLLIElement>, idx: number) => {
+  const handleDragOver = (e: React.DragEvent<HTMLLIElement>) => {
     e.preventDefault();
     e.currentTarget.classList.add('drag-over');
   };
@@ -160,7 +160,7 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
               onClick={() => handleSelect(index)}
               draggable
               onDragStart={e => handleDragStart(e, index)}
-              onDragOver={e => handleDragOver(e, index)}
+              onDragOver={e => handleDragOver(e)}
               onDrop={e => handleDrop(e, index)}
               onDragEnd={handleDragEnd}
             >
