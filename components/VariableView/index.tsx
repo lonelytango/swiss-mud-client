@@ -4,7 +4,7 @@ import { useAppContext } from '../../contexts/AppContext';
 import type { Variable } from '../../types';
 import classNames from 'classnames';
 
-const emptyVariable: Variable = { name: '', value: '', description: '' };
+const emptyVariable: Variable = { name: '', value: '' };
 const STORAGE_KEY = 'mud_variables';
 
 export default function VariableView() {
@@ -189,16 +189,6 @@ export default function VariableView() {
                 type='text'
                 name='value'
                 value={selected.value}
-                onChange={handleFieldChange}
-              />
-            </label>
-          </div>
-          <div className={commonStyles.formGroup}>
-            <label>
-              Description
-              <textarea
-                name='description'
-                value={selected.description}
                 onChange={handleFieldChange}
               />
             </label>

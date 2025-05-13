@@ -13,6 +13,7 @@ describe('processAliases', () => {
         name: 'test',
         pattern: '^test$',
         command: 'test command',
+        enabled: true,
       },
     ];
 
@@ -27,6 +28,7 @@ describe('processAliases', () => {
         name: 'test',
         pattern: '^t$',
         command: 'send("test command")',
+        enabled: true,
       },
     ];
 
@@ -47,6 +49,7 @@ describe('processAliases', () => {
         name: 'wait',
         pattern: '^w$',
         command: 'wait(1000)',
+        enabled: true,
       },
     ];
 
@@ -72,6 +75,7 @@ describe('processAliases', () => {
             wait(1000)
             send("second")
         `,
+        enabled: true,
       },
     ];
 
@@ -104,6 +108,7 @@ describe('processAliases', () => {
             const item = matches[1]
             send(\`wield \${item}\`)
         `,
+        enabled: true,
       },
     ];
 
@@ -126,6 +131,7 @@ describe('processAliases', () => {
         command: `
             send(\`wield \${weapon}\`)
         `,
+        enabled: true,
       },
     ];
 
@@ -155,6 +161,7 @@ describe('processAliases', () => {
             wait(500)
             send(\`cast 'fireball' \${target}\`)
         `,
+        enabled: true,
       },
     ];
 
@@ -210,6 +217,7 @@ describe('processAliases', () => {
             
             wait(1000)
         `,
+        enabled: true,
       },
     ];
 
@@ -241,6 +249,7 @@ describe('processAliases', () => {
         command: `
             send(\`wield \${nonexistent}\`)
         `,
+        enabled: true,
       },
     ];
 
@@ -263,6 +272,7 @@ describe('processAliases', () => {
               send(\`attack \${target}\`)
             }
         `,
+        enabled: true,
       },
     ];
 
@@ -295,6 +305,7 @@ describe('processAliases', () => {
         command: `
 					send("north, east, south, west")
 				`,
+        enabled: true,
       },
     ];
 
@@ -317,6 +328,7 @@ describe('processAliases', () => {
         command: `
 					send(\`wield \${weapon}, attack \${target}, cast 'fireball' \${target}\`)
 				`,
+        enabled: true,
       },
     ];
 
@@ -346,6 +358,7 @@ describe('processAliases', () => {
 					wait(500)
 					send("south, west, climb up")
 				`,
+        enabled: true,
       },
     ];
 
@@ -370,6 +383,7 @@ describe('processAliases', () => {
         command: `
 					send("north, , east, , south")
 				`,
+        enabled: true,
       },
     ];
 
@@ -391,6 +405,7 @@ describe('processAliases', () => {
         command: `
 					send("north , east , south , west")
 				`,
+        enabled: true,
       },
     ];
 
@@ -414,6 +429,7 @@ describe('processAliases', () => {
           command: `
                     speedwalk("e,w,eu,ne")
                 `,
+          enabled: true,
         },
       ];
 
@@ -436,6 +452,7 @@ describe('processAliases', () => {
           command: `
                     speedwalk("2e,w,eastup,2northeast,climb up")
                 `,
+          enabled: true,
         },
       ];
 
@@ -461,6 +478,7 @@ describe('processAliases', () => {
           command: `
                     speedwalk("2e,climb ladder,jump down")
                 `,
+          enabled: true,
         },
       ];
 
@@ -484,6 +502,7 @@ describe('processAliases', () => {
         command: `
 					send(\`echo Last line was: \${line}\`)
 				`,
+        enabled: true,
       },
     ];
 
@@ -508,6 +527,7 @@ describe('processAliases', () => {
         command: `
 					send(\`echo Last line was: \${line}\`)
 				`,
+        enabled: true,
       },
     ];
 
@@ -527,6 +547,7 @@ describe('processAliases', () => {
             setVariable(matches[1], matches[2])
             send(\`echo Set \${matches[1]} to \${matches[2]}\`)
           `,
+          enabled: true,
         },
       ];
 
@@ -557,6 +578,7 @@ describe('processAliases', () => {
             setVariable('treeDirection', "北")
             setVariable('destination', 'hello')
           `,
+          enabled: true,
         },
       ];
 
@@ -584,6 +606,7 @@ describe('processAliases', () => {
             setVariable('armor', 'plate')
             send('echo Variables set')
           `,
+          enabled: true,
         },
       ];
 
@@ -615,6 +638,7 @@ describe('processAliases', () => {
             }
             send(\`echo Set weapon for \${target}\`)
           `,
+          enabled: true,
         },
       ];
 
