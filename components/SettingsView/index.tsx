@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './styles.module.css';
+import commonStyles from '../../styles/common.module.css';
 
 export interface Settings {
   highlightInputOnCommand: boolean;
@@ -20,8 +21,8 @@ export function SettingsView({ settings, onChange }: SettingsViewProps) {
   };
 
   return (
-    <div className={styles.settingsView}>
-      <div className={styles.settingsContent}>
+    <div className={commonStyles.viewContainer}>
+      <div className={commonStyles.detailsPanel}>
         <div className={styles.settingItem}>
           <label>
             Highlight input on command

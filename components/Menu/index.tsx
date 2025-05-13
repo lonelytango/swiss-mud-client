@@ -158,7 +158,7 @@ export function Menu({
         setActivePopup={setActivePopup}
         activePopup={activePopup}
       >
-        <ConnectView onConnect={handleProfileConnect} onCancel={handleClose} />
+        <ConnectView onConnect={handleProfileConnect} />
       </Popup>
 
       <Popup

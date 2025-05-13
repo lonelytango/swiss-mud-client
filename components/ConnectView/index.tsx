@@ -3,13 +3,13 @@ import commonStyles from '../../styles/common.module.css';
 
 export interface MudProfile {
   name: string;
-  host: string;
+  address: string;
   port: number;
+  encoding: string;
 }
 
 interface ConnectViewProps {
   onConnect: (profile: MudProfile) => void;
-  onCancel: () => void;
 }
 
 const STORAGE_KEY = 'mud_profiles';
@@ -21,18 +21,15 @@ const ENCODINGS = [
 ];
 const emptyProfile: MudProfile = {
   name: '',
-  host: '',
+  address: '',
   port: 23,
+  encoding: 'utf8',
 };
 
-export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
+export default function ConnectView({ onConnect }: ConnectViewProps) {
   const [profiles, setProfiles] = useState<MudProfile[]>([]);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [editBuffer, setEditBuffer] = useState<MudProfile | null>(null);
-  const [status, setStatus] = useState<{
-    type: 'error' | 'success';
-    message: string;
-  } | null>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
   // Load profiles only once on mount
@@ -58,7 +55,9 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
     setSelectedIdx(idx);
   };
 
-  const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFieldChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     if (!editBuffer) return;
     const { name, value } = e.target;
     setEditBuffer({
@@ -88,7 +87,7 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
     if (selectedIdx === null || !editBuffer) return;
     if (
       !editBuffer.name.trim() ||
-      !editBuffer.host.trim() ||
+      !editBuffer.address.trim() ||
       !editBuffer.port.toString().trim()
     )
       return;
@@ -104,7 +103,7 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
     if (!editBuffer) return;
     if (
       !editBuffer.name.trim() ||
-      !editBuffer.host.trim() ||
+      !editBuffer.address.trim() ||
       !editBuffer.port.toString().trim()
     )
       return;
@@ -132,22 +131,10 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
     localStorage.setItem(STORAGE_KEY, profilesJsonStr);
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editBuffer || !editBuffer.name || !editBuffer.host) {
-      setStatus({
-        type: 'error',
-        message: 'Please fill in all required fields',
-      });
-      return;
-    }
-    onConnect(editBuffer);
-  };
-
   return (
     <div className={commonStyles.viewContainer}>
       <div className={commonStyles.sidebar}>
-        <button onClick={handleAdd}>Add Profile</button>
+        <button onClick={handleAdd}>+</button>
         <ul>
           {profiles.length === 0 ? (
             <li style={{ color: '#aaa', padding: '8px 16px' }}>
@@ -190,8 +177,8 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
                 Host
                 <input
                   type='text'
-                  name='host'
-                  value={editBuffer.host}
+                  name='address'
+                  value={editBuffer.address}
                   onChange={handleFieldChange}
                   placeholder='mud.example.com'
                   required
@@ -211,6 +198,22 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
                 />
               </label>
             </div>
+            <div className={commonStyles.formGroup}>
+              <label>
+                Encoding
+                <select
+                  name='encoding'
+                  value={editBuffer.encoding}
+                  onChange={handleFieldChange}
+                >
+                  {ENCODINGS.map(encoding => (
+                    <option key={encoding.value} value={encoding.value}>
+                      {encoding.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
             <div className={commonStyles.actions}>
               <button
                 type='button'
@@ -223,9 +226,10 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
                 Save
               </button>
               <button
+                className={commonStyles.confirmAction}
                 type='button'
                 onClick={handleConnect}
-                disabled={!editBuffer.name || !editBuffer.host}
+                disabled={!editBuffer.name || !editBuffer.address}
               >
                 Connect
               </button>
@@ -233,15 +237,6 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
           </>
         ) : (
           <div style={{ color: '#aaa' }}>Select or create a profile</div>
-        )}
-        {status && (
-          <div
-            className={`${commonStyles.statusMessage} ${
-              commonStyles[status.type]
-            }`}
-          >
-            {status.message}
-          </div>
         )}
       </div>
     </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styles from './styles.module.css';
+import commonStyles from '../../styles/common.module.css';
 import { DataManager, type MudData } from '../../managers/DataManager';
 
 interface DataViewProps {
@@ -66,7 +67,7 @@ const DataView: React.FC<DataViewProps> = ({ onImport }) => {
     <div className={styles.dataView}>
       <div className={styles.dataSection}>
         <h3>Export Data</h3>
-        <div className={styles.buttonGroup}>
+        <div className={commonStyles.actions}>
           <button onClick={handleExportToFile}>Export to File</button>
           <button onClick={handleExportToClipboard}>Export to Clipboard</button>
         </div>
@@ -85,7 +86,11 @@ const DataView: React.FC<DataViewProps> = ({ onImport }) => {
           Import from File
         </label>
         {status && (
-          <div className={`${styles.statusMessage} ${styles[status.type]}`}>
+          <div
+            className={`${commonStyles.statusMessage} ${
+              commonStyles[status.type]
+            }`}
+          >
             {status.message}
           </div>
         )}
@@ -95,7 +100,7 @@ const DataView: React.FC<DataViewProps> = ({ onImport }) => {
             and settings.
           </label>
           <textarea
-            className={styles.jsonTextarea}
+            className={commonStyles.textarea}
             value={importText}
             onChange={e => setImportText(e.target.value)}
             placeholder='Paste your JSON data here...'
@@ -103,7 +108,7 @@ const DataView: React.FC<DataViewProps> = ({ onImport }) => {
           />
           <div className={styles.importButtonRow}>
             <button
-              className={styles.importButton}
+              className={commonStyles.actions}
               onClick={handleImportFromText}
               disabled={!importText.trim()}
             >

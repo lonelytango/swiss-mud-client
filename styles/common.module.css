@@ -20,7 +20,8 @@
   border: none;
   border-radius: 4px;
   padding: 4px 0;
-  font-size: 1.2em;
+  font-size: 2em;
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -94,17 +95,22 @@
 
 .actions {
   display: flex;
-  gap: 8px;
+  gap: 16px;
 }
 
 .actions button {
-  padding: 4px 12px;
+  padding: 8px 12px;
   border: none;
   border-radius: 4px;
   background: #1976d2;
   color: #fff;
   cursor: pointer;
   transition: background 0.2s;
+  font-weight: 700;
+}
+
+.actions .confirmAction {
+  background: #0b792e;
 }
 
 .actions button[disabled] {
@@ -179,6 +185,7 @@
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 1em;
+  font-family: inherit;
 }
 
 .statusMessage {

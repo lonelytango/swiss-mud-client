@@ -117,21 +117,25 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
   // Drag and drop handlers
   const handleDragStart = (e: React.DragEvent<HTMLLIElement>, idx: number) => {
     e.dataTransfer.setData('text/plain', idx.toString());
-    e.currentTarget.classList.add('dragging');
+    e.currentTarget.classList.add(commonStyles.dragging);
   };
 
   const handleDragEnd = (e: React.DragEvent<HTMLLIElement>) => {
-    e.currentTarget.classList.remove('dragging');
+    e.currentTarget.classList.remove(commonStyles.dragging);
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLLIElement>) => {
     e.preventDefault();
-    e.currentTarget.classList.add('drag-over');
+    e.currentTarget.classList.add(commonStyles.dragOver);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLLIElement>) => {
+    e.currentTarget.classList.remove(commonStyles.dragOver);
   };
 
   const handleDrop = (e: React.DragEvent<HTMLLIElement>, targetIdx: number) => {
     e.preventDefault();
-    e.currentTarget.classList.remove('drag-over');
+    e.currentTarget.classList.remove(commonStyles.dragOver);
 
     const sourceIdx = parseInt(e.dataTransfer.getData('text/plain'));
     if (sourceIdx === targetIdx) return;
@@ -147,7 +151,7 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
   return (
     <div className={commonStyles.viewContainer}>
       <div className={commonStyles.sidebar}>
-        <button onClick={handleAdd}>Add Alias</button>
+        <button onClick={handleAdd}>+</button>
         <ul>
           {localAliases.map((alias, index) => (
             <li
@@ -163,6 +167,7 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
               onDragOver={e => handleDragOver(e)}
               onDrop={e => handleDrop(e, index)}
               onDragEnd={handleDragEnd}
+              onDragLeave={handleDragLeave}
             >
               <div className={commonStyles.itemContent}>
                 <span className={commonStyles.dragHandle}>⋮</span>
