@@ -77,5 +77,5 @@ VITE_WS_URL=<your ws proxy url>
 
 - Run deployment script:
 ```
-npm run deploy
+bun run deploy
 ```
