@@ -92,6 +92,7 @@ export default function ConnectView({ onConnect }: ConnectViewProps) {
     )
       return;
 
+    //Save profile
     const updated = profiles.map((profile, idx) =>
       idx === selectedIdx ? { ...editBuffer } : profile
     );
@@ -108,6 +109,13 @@ export default function ConnectView({ onConnect }: ConnectViewProps) {
     )
       return;
     onConnect(editBuffer);
+
+    //Save profile
+    const updated = profiles.map((profile, idx) =>
+      idx === selectedIdx ? { ...editBuffer } : profile
+    );
+    setProfiles(updated);
+    saveProfiles(updated);
   };
 
   // Check if there are unsaved changes
@@ -189,7 +197,7 @@ export default function ConnectView({ onConnect }: ConnectViewProps) {
               <label>
                 Port
                 <input
-                  type='number'
+                  type='text'
                   name='port'
                   value={editBuffer.port}
                   onChange={handleFieldChange}
