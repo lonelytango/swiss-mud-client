@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "test": "jest",
     "preview": "vite preview",
-    "deploy": "fly deploy --build-arg VITE_WS_URL=proxy_url"
+    "deploy": "./deploy.sh"
   },
   "dependencies": {
     "ansi-to-html": "^0.7.2",
