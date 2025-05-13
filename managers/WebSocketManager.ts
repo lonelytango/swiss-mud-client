@@ -25,7 +25,7 @@ export class WebSocketManager {
     }
 
     this.currentProfile = profile;
-    const url = import.meta.env.VITE_WS_URL;
+    const url = import.meta.env.VITE_WS_URL || 'ws://0.0.0.0:3000';
     this.ws = new WebSocket(url);
     this.setupEventHandlers();
   }
