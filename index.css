@@ -66,3 +66,9 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.user-cmd {
+  color: #63b3f4;
+  font-family: monospace;
+  /* Add any other styles you want for user commands */
+}
