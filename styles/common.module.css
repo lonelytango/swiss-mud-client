@@ -51,7 +51,7 @@
 .detailsPanel {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
   flex: 1;
   background: #222;
   border-radius: 0 8px 8px 0;
@@ -174,7 +174,6 @@
 
 .formGroup label {
   display: block;
-  margin-bottom: 8px;
   font-weight: 500;
 }
 
