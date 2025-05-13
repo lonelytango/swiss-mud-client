@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import styles from './styles.module.css';
+import commonStyles from '../../styles/common.module.css';
 import { useAppContext } from '../../contexts/AppContext';
 import type { Variable } from '../../types';
 
@@ -106,17 +106,17 @@ export default function VariableView() {
   const selected = editBuffer;
 
   return (
-    <div className={styles.variableView}>
-      <div className={styles.variableSidebar}>
+    <div className={commonStyles.viewContainer}>
+      <div className={commonStyles.sidebar}>
         <button onClick={handleAdd}>Add Variable</button>
         <ul>
           {localVariables.map((variable, index) => (
             <li
               key={index}
-              className={selectedIdx === index ? styles.selected : ''}
+              className={selectedIdx === index ? commonStyles.selected : ''}
               onClick={() => handleSelect(index)}
             >
-              <div className={styles.variableItemContent}>
+              <div className={commonStyles.itemContent}>
                 <span>{variable.name}</span>
               </div>
             </li>
@@ -124,42 +124,47 @@ export default function VariableView() {
         </ul>
       </div>
       {selected && (
-        <div className={styles.variableDetails}>
-          <label>
-            Name
-            <input
-              type='text'
-              name='name'
-              value={selected.name}
-              onChange={handleFieldChange}
-            />
-          </label>
-          <label>
-            Value
-            <input
-              type='text'
-              name='value'
-              value={selected.value}
-              onChange={handleFieldChange}
-            />
-          </label>
-          <label>
-            Description
-            <textarea
-              name='description'
-              value={selected.description}
-              onChange={handleFieldChange}
-            />
-          </label>
-          <div className={styles.actions}>
-            <button
-              onClick={handleSave}
-              disabled={!hasUnsaved}
-              style={{ background: hasUnsaved ? '#1976d2' : '#aaa' }}
-            >
+        <div className={commonStyles.detailsPanel}>
+          <div className={commonStyles.formGroup}>
+            <label>
+              Name
+              <input
+                type='text'
+                name='name'
+                value={selected.name}
+                onChange={handleFieldChange}
+              />
+            </label>
+          </div>
+          <div className={commonStyles.formGroup}>
+            <label>
+              Value
+              <input
+                type='text'
+                name='value'
+                value={selected.value}
+                onChange={handleFieldChange}
+              />
+            </label>
+          </div>
+          <div className={commonStyles.formGroup}>
+            <label>
+              Description
+              <textarea
+                name='description'
+                value={selected.description}
+                onChange={handleFieldChange}
+              />
+            </label>
+          </div>
+          <div className={commonStyles.actions}>
+            <button onClick={handleSave} disabled={!hasUnsaved}>
               Save
             </button>
-            <button onClick={handleDelete} className={styles.delete}>
+            <button
+              onClick={handleDelete}
+              className={commonStyles.deleteButton}
+            >
               Delete
             </button>
           </div>

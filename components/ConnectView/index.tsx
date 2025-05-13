@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import styles from './styles.module.css';
+import commonStyles from '../../styles/common.module.css';
 
 export interface MudProfile {
   name: string;
@@ -145,49 +145,10 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
   };
 
   return (
-    <div
-      className={styles.connectView}
-      style={{ display: 'flex', height: '60vh' }}
-    >
-      <div
-        style={{
-          width: 200,
-          background: '#222',
-          color: '#fff',
-          borderRadius: '8px 0 0 8px',
-          padding: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 8,
-        }}
-      >
-        <button
-          onClick={handleAdd}
-          style={{
-            marginBottom: 8,
-            background: '#1976d2',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 4,
-            padding: '4px 0',
-            fontSize: '1.2em',
-            cursor: 'pointer',
-          }}
-        >
-          Add Profile
-        </button>
-        <ul
-          style={{
-            listStyle: 'none',
-            padding: 0,
-            margin: 0,
-            flex: 1,
-            overflowY: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 2,
-          }}
-        >
+    <div className={commonStyles.viewContainer}>
+      <div className={commonStyles.sidebar}>
+        <button onClick={handleAdd}>Add Profile</button>
+        <ul>
           {profiles.length === 0 ? (
             <li style={{ color: '#aaa', padding: '8px 16px' }}>
               (No profiles)
@@ -196,13 +157,7 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
             profiles.map((profile, idx) => (
               <li
                 key={idx}
-                style={{
-                  padding: '8px 16px',
-                  cursor: 'pointer',
-                  borderRadius: 4,
-                  background: selectedIdx === idx ? '#444' : undefined,
-                  fontWeight: selectedIdx === idx ? 'bold' : undefined,
-                }}
+                className={selectedIdx === idx ? commonStyles.selected : ''}
                 onClick={() => handleSelect(idx)}
               >
                 {profile.name || (
@@ -213,164 +168,80 @@ export default function ConnectView({ onConnect, onCancel }: ConnectViewProps) {
           )}
         </ul>
       </div>
-      <div
-        style={{
-          flex: 1,
-          background: '#222',
-          borderRadius: '0 8px 8px 0',
-          padding: 24,
-          boxSizing: 'border-box',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 16,
-        }}
-      >
+      <div className={commonStyles.detailsPanel}>
         {editBuffer ? (
           <>
-            <label
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 4,
-                fontWeight: 500,
-              }}
-            >
-              Profile Name
-              <input
-                ref={nameInputRef}
-                type='text'
-                name='name'
-                value={editBuffer.name}
-                onChange={handleFieldChange}
-                placeholder='My MUD Profile'
-                required
-                style={{
-                  width: '100%',
-                  padding: 8,
-                  border: '1px solid #ccc',
-                  borderRadius: 4,
-                  fontSize: '1em',
-                  fontFamily: 'inherit',
-                  boxSizing: 'border-box',
-                  background: '#222',
-                  color: '#fff',
-                }}
-              />
-            </label>
-            <label
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 4,
-                fontWeight: 500,
-              }}
-            >
-              Host
-              <input
-                type='text'
-                name='host'
-                value={editBuffer.host}
-                onChange={handleFieldChange}
-                placeholder='mud.example.com'
-                required
-                style={{
-                  width: '100%',
-                  padding: 8,
-                  border: '1px solid #ccc',
-                  borderRadius: 4,
-                  fontSize: '1em',
-                  fontFamily: 'inherit',
-                  boxSizing: 'border-box',
-                  background: '#222',
-                  color: '#fff',
-                }}
-              />
-            </label>
-            <label
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 4,
-                fontWeight: 500,
-              }}
-            >
-              Port
-              <input
-                type='number'
-                name='port'
-                value={editBuffer.port}
-                onChange={handleFieldChange}
-                min='1'
-                max='65535'
-                style={{
-                  width: '100%',
-                  padding: 8,
-                  border: '1px solid #ccc',
-                  borderRadius: 4,
-                  fontSize: '1em',
-                  fontFamily: 'inherit',
-                  boxSizing: 'border-box',
-                  background: '#222',
-                  color: '#fff',
-                }}
-              />
-            </label>
-            <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+            <div className={commonStyles.formGroup}>
+              <label>
+                Profile Name
+                <input
+                  ref={nameInputRef}
+                  type='text'
+                  name='name'
+                  value={editBuffer.name}
+                  onChange={handleFieldChange}
+                  placeholder='My MUD Profile'
+                  required
+                />
+              </label>
+            </div>
+            <div className={commonStyles.formGroup}>
+              <label>
+                Host
+                <input
+                  type='text'
+                  name='host'
+                  value={editBuffer.host}
+                  onChange={handleFieldChange}
+                  placeholder='mud.example.com'
+                  required
+                />
+              </label>
+            </div>
+            <div className={commonStyles.formGroup}>
+              <label>
+                Port
+                <input
+                  type='number'
+                  name='port'
+                  value={editBuffer.port}
+                  onChange={handleFieldChange}
+                  placeholder='23'
+                  required
+                />
+              </label>
+            </div>
+            <div className={commonStyles.actions}>
               <button
-                onClick={handleSave}
-                disabled={!hasUnsaved}
-                style={{
-                  background: hasUnsaved ? '#1976d2' : '#aaa',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 4,
-                  padding: '8px 16px',
-                  cursor: hasUnsaved ? 'pointer' : 'not-allowed',
-                }}
-              >
-                Save
-              </button>
-              <button
+                type='button'
                 onClick={handleDelete}
-                style={{
-                  background: '#c62828',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 4,
-                  padding: '8px 16px',
-                }}
+                disabled={selectedIdx === null}
               >
                 Delete
               </button>
-              <button
-                onClick={handleConnect}
-                style={{
-                  background: '#2e7d32',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 4,
-                  padding: '8px 16px',
-                }}
-              >
-                Connect
+              <button type='button' onClick={handleSave} disabled={!hasUnsaved}>
+                Save
               </button>
               <button
-                onClick={onCancel}
-                style={{
-                  background: '#666',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 4,
-                  padding: '8px 16px',
-                }}
+                type='button'
+                onClick={handleConnect}
+                disabled={!editBuffer.name || !editBuffer.host}
               >
-                Cancel
+                Connect
               </button>
             </div>
           </>
         ) : (
-          <div style={{ color: '#888' }}>Select a profile to edit</div>
+          <div style={{ color: '#aaa' }}>Select or create a profile</div>
+        )}
+        {status && (
+          <div
+            className={`${commonStyles.statusMessage} ${
+              commonStyles[status.type]
+            }`}
+          >
+            {status.message}
+          </div>
         )}
       </div>
     </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { Trigger } from '../../types';
-import styles from './styles.module.css';
+// import styles from './styles.module.css';
+import commonStyles from '../../styles/common.module.css';
 import classNames from 'classnames';
 
 interface TriggerViewProps {
@@ -131,11 +132,7 @@ const TriggerView: React.FC<TriggerViewProps> = ({ triggers, onChange }) => {
 
   const handleDragOver = (e: React.DragEvent<HTMLLIElement>) => {
     e.preventDefault();
-    e.currentTarget.classList.add(styles.dragOver);
-  };
-
-  const handleDragLeave = (e: React.DragEvent<HTMLLIElement>) => {
-    e.currentTarget.classList.remove('drag-over');
+    e.currentTarget.classList.add(commonStyles.dragOver);
   };
 
   const handleDrop = (e: React.DragEvent<HTMLLIElement>, targetIdx: number) => {
@@ -154,17 +151,17 @@ const TriggerView: React.FC<TriggerViewProps> = ({ triggers, onChange }) => {
   };
 
   return (
-    <div className={styles.triggerView}>
-      <div className={styles.triggerSidebar}>
+    <div className={commonStyles.viewContainer}>
+      <div className={commonStyles.sidebar}>
         <button onClick={handleAdd}>Add Trigger</button>
         <ul>
           {localTriggers.map((trigger, index) => (
             <li
               key={index}
               className={classNames({
-                [styles.selected]: selectedIdx === index,
-                [styles.dragging]: false,
-                [styles.dragOver]: false,
+                [commonStyles.selected]: selectedIdx === index,
+                [commonStyles.dragging]: false,
+                [commonStyles.dragOver]: false,
               })}
               onClick={() => handleSelect(index)}
               draggable
@@ -173,8 +170,8 @@ const TriggerView: React.FC<TriggerViewProps> = ({ triggers, onChange }) => {
               onDrop={e => handleDrop(e, index)}
               onDragEnd={handleDragEnd}
             >
-              <div className={styles.triggerItemContent}>
-                <span className={styles.dragHandle}>⋮</span>
+              <div className={commonStyles.itemContent}>
+                <span className={commonStyles.dragHandle}>⋮</span>
                 <input
                   type='checkbox'
                   checked={trigger.enabled}
@@ -194,38 +191,44 @@ const TriggerView: React.FC<TriggerViewProps> = ({ triggers, onChange }) => {
         </ul>
       </div>
       {selected && (
-        <div className={styles.triggerDetails}>
-          <label>
-            Name
-            <input
-              type='text'
-              value={selected.name}
-              onChange={handleFieldChange}
-            />
-          </label>
-          <label>
-            Pattern
-            <input
-              type='text'
-              value={selected.pattern}
-              onChange={handleFieldChange}
-            />
-          </label>
-          <label>
-            Command
-            <textarea value={selected.command} onChange={handleFieldChange} />
-          </label>
-          <div className={styles.actions}>
-            <button
-              onClick={handleSave}
-              disabled={!hasUnsaved}
-              style={{ background: hasUnsaved ? '#1976d2' : '#aaa' }}
-            >
+        <div className={commonStyles.detailsPanel}>
+          <div className={commonStyles.formGroup}>
+            <label>
+              Name
+              <input
+                type='text'
+                name='name'
+                value={selected.name}
+                onChange={handleFieldChange}
+              />
+            </label>
+          </div>
+          <div className={commonStyles.formGroup}>
+            <label>
+              Pattern
+              <input
+                type='text'
+                name='pattern'
+                value={selected.pattern}
+                onChange={handleFieldChange}
+              />
+            </label>
+          </div>
+          <div className={commonStyles.formGroup}>
+            <label>
+              Command
+              <textarea
+                name='command'
+                value={selected.command}
+                onChange={handleFieldChange}
+              />
+            </label>
+          </div>
+          <div className={commonStyles.actions}>
+            <button onClick={handleSave} disabled={!hasUnsaved}>
               Save
             </button>
-            <button onClick={handleDelete} style={{ background: '#c62828' }}>
-              Delete
-            </button>
+            <button onClick={handleDelete}>Delete</button>
           </div>
         </div>
       )}
