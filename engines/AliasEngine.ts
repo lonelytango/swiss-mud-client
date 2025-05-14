@@ -1,5 +1,5 @@
 import type { Alias, Variable, Command } from '../types';
-import { parseSendCommands, parseSpeedwalk } from '../utils/CommandUtils';
+import { parseSpeedwalk } from '../utils/CommandUtils';
 import { alert } from '../utils/CommandAction';
 
 // This function expands an input string according to the defined aliases and variables
@@ -20,15 +20,21 @@ export function processAliases(
       const capturedCommands: Command[] = [];
 
       // Create wrapper functions to capture the commands
+
       const send = (command: string) => {
-        const sendCommands = parseSendCommands(command);
-        capturedCommands.push(
-          ...sendCommands.map(command => ({
+        capturedCommands.push({
+          type: 'command' as const,
+          content: command,
+        });
+      };
+
+      const sendAll = (...commands: string[]) => {
+        commands.forEach(command => {
+          capturedCommands.push({
             type: 'command' as const,
             content: command,
-          }))
-        );
-        // We don't actually execute the command here, just capture it
+          });
+        });
       };
 
       const wait = (ms: number) => {
@@ -57,6 +63,7 @@ export function processAliases(
       const sandbox: any = {
         matches: match,
         send,
+        sendAll,
         wait,
         speedwalk,
         alert,

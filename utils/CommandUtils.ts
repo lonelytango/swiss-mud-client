@@ -1,17 +1,5 @@
 // CommandUtils.ts
 
-/**
- * Parses a comma-delimited string of commands into an array of commands
- * @param commands Comma-delimited string of commands (e.g. "w,e,u,d")
- * @returns An array of commands
- */
-export function parseSendCommands(commands: string): string[] {
-  return commands
-    .split(',')
-    .map(command => command.trim())
-    .filter(command => command.length > 0); // Skip empty commands
-}
-
 // Direction mapping for speedwalk
 const DIRECTION_MAP: { [key: string]: string } = {
   n: 'north',

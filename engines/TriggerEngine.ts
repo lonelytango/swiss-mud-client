@@ -33,12 +33,18 @@ export function processTriggers(
             const directionCommands = parseSpeedwalk(actions);
             directionCommands.forEach(cmd => send(cmd));
           };
+
+          const sendAll = (...commands: string[]) => {
+            commands.forEach(command => send(command));
+          };
+
           const commandFn = new Function(
             'matches',
             'send',
             'setVariable',
             'speedwalk',
             'alert',
+            'sendAll',
             ...variableNames,
             trigger.command
           );
@@ -48,6 +54,7 @@ export function processTriggers(
             setVariable || (() => {}),
             speedwalk,
             alert,
+            sendAll,
             ...variableValues
           );
         } catch (e) {

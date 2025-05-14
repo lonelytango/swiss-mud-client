@@ -70,9 +70,9 @@ export class CommandEngine {
   }
 
   // Handle trigger send
-  private triggerSend(command: string) {
+  private triggerSend = (command: string) => {
     return this.options.onCommandSend(command, this.settings);
-  }
+  };
 
   public processLine(line: string): void {
     const commands = processTriggers(
