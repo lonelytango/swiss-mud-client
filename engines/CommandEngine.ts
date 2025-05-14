@@ -1,6 +1,5 @@
-import { processAliases } from './AliasEngine';
-import { processTriggers } from './TriggerEngine';
-import type { Alias, Variable, Trigger, Settings } from '../types';
+import { processAliases, processTriggers } from './PatternEngine';
+import type { Variable, Settings, Alias, Trigger } from '../types';
 
 export interface CommandEngineOptions {
   onCommandSend: (command: string, settings: Settings) => void;

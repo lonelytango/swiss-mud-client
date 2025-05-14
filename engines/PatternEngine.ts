@@ -1,15 +1,10 @@
-import type { Variable, Command } from '../types';
+import type { Variable, Command, Alias, Trigger, Pattern } from '../types';
 import { parseSpeedwalk } from '../utils/CommandUtils';
 import { alert } from '../utils/CommandAction';
 
-export function processPatterns(
+function processPatterns(
   input: string,
-  patterns: Array<{
-    pattern: string;
-    command: string;
-    enabled: boolean;
-    name?: string;
-  }>,
+  patterns: Pattern[],
   variables: Variable[],
   setVariable?: (name: string, value: string) => void,
   type: 'alias' | 'trigger' = 'alias'
@@ -87,4 +82,28 @@ export function processPatterns(
     }
   }
   return null;
+}
+
+export function processTriggers(
+  line: string,
+  triggers: Trigger[],
+  setVariable?: (name: string, value: string) => void,
+  variables?: { name: string; value: string }[]
+): Command[] | null {
+  return processPatterns(
+    line,
+    triggers,
+    variables || [],
+    setVariable,
+    'trigger'
+  );
+}
+
+export function processAliases(
+  input: string,
+  aliases: Alias[],
+  variables: Variable[],
+  setVariable?: (name: string, value: string) => void
+): Command[] | null {
+  return processPatterns(input, aliases, variables, setVariable, 'alias');
 }

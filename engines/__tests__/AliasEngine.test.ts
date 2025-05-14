@@ -1,5 +1,5 @@
 // Jest test file for aliasEngine
-import { processAliases } from '../AliasEngine';
+import { processAliases } from '../PatternEngine';
 import type { Alias, Variable } from '../../types';
 
 describe('processAliases', () => {

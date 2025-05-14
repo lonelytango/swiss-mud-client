@@ -1,4 +1,4 @@
-import { processTriggers } from '../TriggerEngine';
+import { processTriggers } from '../PatternEngine';
 import type { Trigger } from '../../types';
 
 describe('processTriggers', () => {
