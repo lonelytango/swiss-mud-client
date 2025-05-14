@@ -12,6 +12,7 @@
     "deploy": "./deploy.sh"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
     "ansi-to-html": "^0.7.2",
     "classnames": "^2.5.1",
     "iconv-lite": "^0.6.3",

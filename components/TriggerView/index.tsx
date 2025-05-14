@@ -3,6 +3,8 @@ import type { Trigger } from '../../types';
 // import styles from './styles.module.css';
 import commonStyles from '../../styles/common.module.css';
 import classNames from 'classnames';
+import Editor from '@monaco-editor/react';
+import EditorOptions from '../../config/EditorOptions';
 
 interface TriggerViewProps {
   triggers: Trigger[];
@@ -222,11 +224,19 @@ const TriggerView: React.FC<TriggerViewProps> = ({ triggers, onChange }) => {
           <div className={commonStyles.formGroup}>
             <label>
               Command
-              <textarea
-                name='command'
-                value={selected.command}
-                onChange={handleFieldChange}
-              />
+              <div className={commonStyles.editorContainer}>
+                <Editor
+                  defaultLanguage='javascript'
+                  value={selected.command}
+                  onChange={value => {
+                    if (editBuffer) {
+                      setEditBuffer({ ...editBuffer, command: value || '' });
+                    }
+                  }}
+                  theme={EditorOptions.theme}
+                  options={EditorOptions}
+                />
+              </div>
             </label>
           </div>
           <div className={commonStyles.actions}>

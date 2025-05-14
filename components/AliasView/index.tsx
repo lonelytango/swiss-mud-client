@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import type { Alias } from '../../types';
 import commonStyles from '../../styles/common.module.css';
 import classNames from 'classnames';
+import Editor from '@monaco-editor/react';
+import EditorOptions from '../../config/EditorOptions';
 
 interface AliasViewProps {
   aliases: Alias[];
@@ -209,7 +211,19 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
           </label>
           <label>
             Command
-            <textarea value={selected.command} onChange={handleFieldChange} />
+            <div className={commonStyles.editorContainer}>
+              <Editor
+                defaultLanguage='javascript'
+                value={selected.command}
+                onChange={value => {
+                  if (editBuffer) {
+                    setEditBuffer({ ...editBuffer, command: value || '' });
+                  }
+                }}
+                theme={EditorOptions.theme}
+                options={EditorOptions}
+              />
+            </div>
           </label>
           <div className={commonStyles.actions}>
             <button
