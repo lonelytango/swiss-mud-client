@@ -7,9 +7,6 @@ import { WebSocketManager } from '../managers/WebSocketManager';
 // Store WebSocketManager instance
 let wsManager: WebSocketManager | null = null;
 
-// Create audio element for alerts
-const alertSound = new Audio('/alert.mp3');
-
 /**
  * Set the WebSocketManager instance to use for sending commands
  * @param manager The WebSocketManager instance
@@ -35,6 +32,8 @@ export function send(command: string): void {
  * Plays an alert sound
  */
 export function alert(): void {
+  // Create audio element for alerts
+  const alertSound = new Audio('/alert.mp3');
   alertSound.play().catch(error => {
     console.warn('Failed to play alert sound:', error);
   });

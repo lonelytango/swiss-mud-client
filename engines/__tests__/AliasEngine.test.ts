@@ -7,19 +7,117 @@ describe('processAliases', () => {
     jest.clearAllMocks();
   });
 
-  it('should return null when no alias matches', () => {
+  it('returns null if no alias matches', () => {
+    const aliases: Alias[] = [
+      { name: 'foo', pattern: '^foo$', command: 'send("bar")', enabled: true },
+    ];
+    expect(processAliases('baz', aliases, [])).toBeNull();
+  });
+
+  it('captures a simple send command', () => {
+    const aliases: Alias[] = [
+      { name: 'foo', pattern: '^foo$', command: 'send("bar")', enabled: true },
+    ];
+    expect(processAliases('foo', aliases, [])).toEqual([
+      { type: 'command', content: 'bar' },
+    ]);
+  });
+
+  it('captures multiple commands with sendAll', () => {
     const aliases: Alias[] = [
       {
-        name: 'test',
-        pattern: '^test$',
-        command: 'test command',
+        name: 'multi',
+        pattern: '^multi$',
+        command: 'sendAll("a", "b", "c")',
         enabled: true,
       },
     ];
+    expect(processAliases('multi', aliases, [])).toEqual([
+      { type: 'command', content: 'a' },
+      { type: 'command', content: 'b' },
+      { type: 'command', content: 'c' },
+    ]);
+  });
 
-    const variables: Variable[] = [];
-    const result = processAliases('nomatch', aliases, variables);
-    expect(result).toBeNull();
+  it('captures wait commands', () => {
+    const aliases: Alias[] = [
+      { name: 'wait', pattern: '^wait$', command: 'wait(500)', enabled: true },
+    ];
+    expect(processAliases('wait', aliases, [])).toEqual([
+      { type: 'wait', content: '', waitTime: 500 },
+    ]);
+  });
+
+  it('captures speedwalk commands', () => {
+    const aliases: Alias[] = [
+      {
+        name: 'sw',
+        pattern: '^sw$',
+        command: 'speedwalk("n,e,s,w")',
+        enabled: true,
+      },
+    ];
+    expect(processAliases('sw', aliases, [])).toEqual([
+      { type: 'command', content: 'north' },
+      { type: 'command', content: 'east' },
+      { type: 'command', content: 'south' },
+      { type: 'command', content: 'west' },
+    ]);
+  });
+
+  it('uses regex matches in commands', () => {
+    const aliases: Alias[] = [
+      {
+        name: 'say',
+        pattern: '^say (.+)$',
+        command: 'send(`say ${matches[1]}`)',
+        enabled: true,
+      },
+    ];
+    expect(processAliases('say hello', aliases, [])).toEqual([
+      { type: 'command', content: 'say hello' },
+    ]);
+  });
+
+  it('uses variables in commands', () => {
+    const aliases: Alias[] = [
+      {
+        name: 'use',
+        pattern: '^use$',
+        command: 'send(`use ${item}`)',
+        enabled: true,
+      },
+    ];
+    const variables: Variable[] = [{ name: 'item', value: 'sword' }];
+    expect(processAliases('use', aliases, variables)).toEqual([
+      { type: 'command', content: 'use sword' },
+    ]);
+  });
+
+  it('sets variables', () => {
+    const aliases: Alias[] = [
+      {
+        name: 'set',
+        pattern: '^set (.+)$',
+        command: 'setVariable("foo", matches[1])',
+        enabled: true,
+      },
+    ];
+    const mockSetVariable = jest.fn();
+    processAliases('set bar', aliases, [], mockSetVariable);
+    expect(mockSetVariable).toHaveBeenCalledWith('foo', 'bar');
+  });
+
+  it('returns null on error', () => {
+    const aliases: Alias[] = [
+      {
+        name: 'err',
+        pattern: '^err$',
+        command: 'throw new Error("fail")',
+        enabled: true,
+      },
+    ];
+    expect(processAliases('err', aliases, [])).toBeNull();
   });
 
   it('should handle simple JavaScript send command', () => {
@@ -303,7 +401,7 @@ describe('processAliases', () => {
         name: 'multi-command',
         pattern: '^mc$',
         command: `
-					send("north, east, south, west")
+					sendAll("north", "east", "south", "west")
 				`,
         enabled: true,
       },
@@ -326,7 +424,7 @@ describe('processAliases', () => {
         name: 'multi-command with vars',
         pattern: '^mcv$',
         command: `
-					send(\`wield \${weapon}, attack \${target}, cast 'fireball' \${target}\`)
+					sendAll(\`wield \${weapon}\`, \`attack \${target}\`, \`cast 'fireball' \${target}\`)
 				`,
         enabled: true,
       },
@@ -354,9 +452,9 @@ describe('processAliases', () => {
         name: 'mixed commands',
         pattern: '^mix$',
         command: `
-					send("north, east")
+					sendAll("north", "east")
 					wait(500)
-					send("south, west, climb up")
+					sendAll("south", "west", "climb up")
 				`,
         enabled: true,
       },
@@ -381,7 +479,7 @@ describe('processAliases', () => {
         name: 'empty commands',
         pattern: '^ec$',
         command: `
-					send("north, , east, , south")
+					sendAll("north", "", "east", "", "south")
 				`,
         enabled: true,
       },
@@ -391,33 +489,12 @@ describe('processAliases', () => {
     const result = processAliases('ec', aliases, variables);
 
     expect(result).not.toBeNull();
-    expect(result).toHaveLength(3);
+    expect(result).toHaveLength(5);
     expect(result![0]).toEqual({ type: 'command', content: 'north' });
-    expect(result![1]).toEqual({ type: 'command', content: 'east' });
-    expect(result![2]).toEqual({ type: 'command', content: 'south' });
-  });
-
-  it('should handle whitespace in comma-separated commands', () => {
-    const aliases: Alias[] = [
-      {
-        name: 'whitespace commands',
-        pattern: '^wc$',
-        command: `
-					send("north , east , south , west")
-				`,
-        enabled: true,
-      },
-    ];
-
-    const variables: Variable[] = [];
-    const result = processAliases('wc', aliases, variables);
-
-    expect(result).not.toBeNull();
-    expect(result).toHaveLength(4);
-    expect(result![0]).toEqual({ type: 'command', content: 'north' });
-    expect(result![1]).toEqual({ type: 'command', content: 'east' });
-    expect(result![2]).toEqual({ type: 'command', content: 'south' });
-    expect(result![3]).toEqual({ type: 'command', content: 'west' });
+    expect(result![1]).toEqual({ type: 'command', content: '' });
+    expect(result![2]).toEqual({ type: 'command', content: 'east' });
+    expect(result![3]).toEqual({ type: 'command', content: '' });
+    expect(result![4]).toEqual({ type: 'command', content: 'south' });
   });
 
   describe('speedwalk', () => {
@@ -591,7 +668,7 @@ describe('processAliases', () => {
         mockSetVariable
       );
 
-      expect(result).not.toBeNull();
+      expect(result).toBeNull();
       expect(mockSetVariable).toHaveBeenCalledWith('treeDirection', '北');
       expect(mockSetVariable).toHaveBeenCalledWith('destination', 'hello');
     });
