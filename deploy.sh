@@ -16,4 +16,4 @@ fi
 
 # Run the deploy command with the environment variable
 # this is needed to make the current architecture work.
-fly deploy --build-arg VITE_WS_URL="$VITE_WS_URL"
+fly deploy --build-arg VITE_WS_URL="$VITE_WS_URL" --build-arg VITE_APP_VERSION="$VITE_APP_VERSION"

@@ -27,6 +27,9 @@
   width: 100%;
   box-sizing: border-box;
   padding-top: max(0.5rem, env(safe-area-inset-top));
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .statusConnected {
@@ -108,6 +111,15 @@
 .userCmd {
   color: #1976d2;
   font-weight: bold;
+}
+
+.statusText {
+  flex-grow: 1;
+}
+
+.versionText {
+  font-size: 0.8em;
+  color: #888888; /* Lighter color for the version */
 }
 
 @media only screen and (max-width: 430px) {

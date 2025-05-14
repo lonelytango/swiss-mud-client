@@ -37,6 +37,9 @@ function App() {
   // For Triggering Commands
   const [line, setLine] = useState<string>('');
 
+  // Retrieve app version from environment variables
+  const appVersion = import.meta.env.VITE_APP_VERSION || '0.0.0.0-dev';
+
   // Add iOS viewport adjustment
   useEffect(() => {
     // Set viewport meta tag for mobile devices
@@ -294,9 +297,12 @@ function App() {
         })}
         role='status'
       >
-        {selectedProfile
-          ? `${status} (${selectedProfile.name})`
-          : 'No profile selected'}
+        <span className={styles.statusText}>
+          {selectedProfile
+            ? `${status} (${selectedProfile.name})`
+            : 'No profile selected'}
+        </span>
+        <span className={styles.versionText}>v{appVersion}</span>
       </div>
       <div className={styles.container} role='main'>
         <div
