@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styles from './styles.module.css';
-import type { Alias, Trigger } from '../../types';
+import type { Alias, Trigger, Script } from '../../types';
 import ConnectView, { type MudProfile } from '../ConnectView';
 import AliasView from '../AliasView';
 import TriggerView from '../TriggerView';
@@ -9,6 +9,7 @@ import DataView from '../DataView';
 import { SettingsView } from '../SettingsView';
 import { DataManager, type MudData } from '../../managers/DataManager';
 import { useAppContext } from '../../contexts/AppContext';
+import ScriptView from '../ScriptView';
 
 type MenuButton = {
   id: string;
@@ -102,12 +103,16 @@ export function Menu({
   setAliases,
   triggers,
   setTriggers,
+  scripts,
+  setScripts,
 }: {
   onProfileConnect?: (profile: MudProfile) => void;
   aliases: Alias[];
   setAliases: React.Dispatch<React.SetStateAction<Alias[]>>;
   triggers: Trigger[];
   setTriggers: React.Dispatch<React.SetStateAction<Trigger[]>>;
+  scripts: Script[];
+  setScripts: React.Dispatch<React.SetStateAction<Script[]>>;
 }) {
   const [activePopup, setActivePopup] = useState<string | null>(null);
   const { setVariables, settings, setSettings } = useAppContext();
@@ -189,7 +194,7 @@ export function Menu({
         setActivePopup={setActivePopup}
         activePopup={activePopup}
       >
-        <p>Script management coming soon</p>
+        <ScriptView scripts={scripts} onChange={setScripts} />
       </Popup>
 
       <Popup

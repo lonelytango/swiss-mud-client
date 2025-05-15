@@ -1,4 +1,11 @@
-import type { Variable, Command, Alias, Trigger, Pattern } from '../types';
+import type {
+  Variable,
+  Command,
+  Alias,
+  Trigger,
+  Pattern,
+  Script,
+} from '../types';
 import { parseSpeedwalk } from '../utils/CommandUtils';
 import { alert } from '../utils/CommandAction';
 
@@ -7,7 +14,8 @@ function processPatterns(
   patterns: Pattern[],
   variables: Variable[],
   setVariable?: (name: string, value: string) => void,
-  type: 'alias' | 'trigger' = 'alias'
+  type: 'alias' | 'trigger' = 'alias',
+  scripts?: Script[]
 ): Command[] | null {
   for (const patternObj of patterns) {
     if (!patternObj.enabled) continue;
@@ -20,15 +28,18 @@ function processPatterns(
       const send = (command: string) => {
         capturedCommands.push({ type: 'command' as const, content: command });
       };
+
       const sendAll = (...commands: string[]) => {
         commands.forEach(command => {
           capturedCommands.push({ type: 'command' as const, content: command });
         });
       };
+
       const wait = (ms: number) => {
         capturedCommands.push({ type: 'wait', content: '', waitTime: ms });
         return Promise.resolve();
       };
+
       const speedwalk = (actions: string) => {
         const directionCommands = parseSpeedwalk(actions);
         capturedCommands.push(
@@ -37,6 +48,25 @@ function processPatterns(
             content: command,
           }))
         );
+      };
+
+      const sendEvent = (eventName: string) => {
+        if (!scripts) return;
+        const script = scripts.find(s => s.enabled && s.event === eventName);
+        if (!script) {
+          console.warn(`No script found for event: ${eventName}`);
+          return;
+        }
+        try {
+          // eslint-disable-next-line no-new-func
+          const fn = new Function('send', script.command);
+          fn(send);
+        } catch (err) {
+          console.error(
+            `Failed to execute script for event '${eventName}':`,
+            err
+          );
+        }
       };
 
       // Prepare sandbox
@@ -48,6 +78,7 @@ function processPatterns(
         speedwalk,
         alert,
         setVariable: setVariable || (() => {}),
+        sendEvent,
       };
       variables.forEach(variable => {
         if (variable.name) {
@@ -88,16 +119,32 @@ export function processTriggers(
   line: string,
   triggers: Trigger[],
   variables: Variable[] = [],
-  setVariable?: (name: string, value: string) => void
+  setVariable?: (name: string, value: string) => void,
+  scripts?: Script[]
 ): Command[] | null {
-  return processPatterns(line, triggers, variables, setVariable, 'trigger');
+  return processPatterns(
+    line,
+    triggers,
+    variables,
+    setVariable,
+    'trigger',
+    scripts
+  );
 }
 
 export function processAliases(
   input: string,
   aliases: Alias[],
   variables: Variable[],
-  setVariable?: (name: string, value: string) => void
+  setVariable?: (name: string, value: string) => void,
+  scripts?: Script[]
 ): Command[] | null {
-  return processPatterns(input, aliases, variables, setVariable, 'alias');
+  return processPatterns(
+    input,
+    aliases,
+    variables,
+    setVariable,
+    'alias',
+    scripts
+  );
 }

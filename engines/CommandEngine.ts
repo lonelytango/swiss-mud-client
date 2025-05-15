@@ -1,5 +1,5 @@
 import { processAliases, processTriggers } from './PatternEngine';
-import type { Variable, Settings, Alias, Trigger } from '../types';
+import type { Variable, Settings, Alias, Trigger, Script } from '../types';
 
 export interface CommandEngineOptions {
   onCommandSend: (command: string, settings: Settings) => void;
@@ -10,6 +10,7 @@ export class CommandEngine {
   private aliases: Alias[];
   private variables: Variable[];
   private triggers: Trigger[];
+  private scripts: Script[];
   private options: CommandEngineOptions;
   private settings: Settings;
 
@@ -18,11 +19,13 @@ export class CommandEngine {
     variables: Variable[],
     triggers: Trigger[],
     settings: Settings,
-    options: CommandEngineOptions
+    options: CommandEngineOptions,
+    scripts: Script[] = []
   ) {
     this.aliases = aliases;
     this.variables = variables;
     this.triggers = triggers;
+    this.scripts = scripts;
     this.options = options;
     this.settings = settings;
   }
@@ -39,6 +42,10 @@ export class CommandEngine {
     this.triggers = triggers;
   }
 
+  public setScripts(scripts: Script[]) {
+    this.scripts = scripts;
+  }
+
   public setSettings(settings: Settings) {
     this.settings = settings;
   }
@@ -49,7 +56,8 @@ export class CommandEngine {
       input,
       this.aliases,
       this.variables,
-      this.options.onVariableSet
+      this.options.onVariableSet,
+      this.scripts
     );
 
     // Execute commands
@@ -73,7 +81,8 @@ export class CommandEngine {
       line,
       this.triggers,
       this.variables,
-      this.options.onVariableSet
+      this.options.onVariableSet,
+      this.scripts
     );
     if (commands) {
       commands.forEach(command => {

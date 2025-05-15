@@ -5,7 +5,7 @@ import styles from './App.module.css';
 import classNames from 'classnames';
 import { CommandEngine } from './engines/CommandEngine';
 import { WebSocketManager } from './managers/WebSocketManager';
-import { Alias, Trigger, Settings } from './types';
+import { Alias, Trigger, Settings, Script } from './types';
 import { handleCommandInput } from './utils/CommandHandler';
 import { setWebSocketManager, send } from './utils/CommandAction';
 import { useAppContext } from './contexts/AppContext';
@@ -23,6 +23,7 @@ function App() {
   const [canSend, setCanSend] = useState(false);
   const [aliases, setAliases] = useState<Alias[]>([]);
   const [triggers, setTriggers] = useState<Trigger[]>([]);
+  const [scripts, setScripts] = useState<Script[]>([]);
   const { variables, setVariables, settings } = useAppContext();
   const [commandEngine, setCommandEngine] = useState<CommandEngine | null>(
     null
@@ -93,8 +94,10 @@ function App() {
   useEffect(() => {
     const storedAliases = localStorage.getItem('mud_aliases');
     const storedTriggers = localStorage.getItem('mud_triggers');
+    const storedScripts = localStorage.getItem('mud_scripts');
     let parsedAliases: Alias[] = [];
     let parsedTriggers: Trigger[] = [];
+    let parsedScripts: Script[] = [];
 
     if (storedAliases) {
       try {
@@ -114,35 +117,51 @@ function App() {
       }
     }
 
-    setCommandEngine(
-      new CommandEngine(parsedAliases, variables, parsedTriggers, settings, {
-        onCommandSend: (command: string, settings: Settings) => {
-          if (settings.showCommandInOutput) {
-            setMessages(prev => {
-              const next = [
-                ...prev,
-                `<div class="user-cmd">&gt; ${command}</div>`,
-              ];
-              return next.length > 1000 ? next.slice(-1000) : next;
-            });
-          }
+    if (storedScripts) {
+      try {
+        parsedScripts = JSON.parse(storedScripts);
+        setScripts(parsedScripts);
+      } catch (e) {
+        console.error('Failed to parse scripts:', e);
+      }
+    }
 
-          // Send the command to the MUD server
-          send(command);
-        },
-        onVariableSet: (name: string, value: string) => {
-          setVariables(prev => {
-            const existingIndex = prev.findIndex(v => v.name === name);
-            if (existingIndex >= 0) {
-              const updated = [...prev];
-              updated[existingIndex] = { ...updated[existingIndex], value };
-              return updated;
-            } else {
-              return [...prev, { name, value, description: '' }];
+    setCommandEngine(
+      new CommandEngine(
+        parsedAliases,
+        variables,
+        parsedTriggers,
+        settings,
+        {
+          onCommandSend: (command: string, settings: Settings) => {
+            if (settings.showCommandInOutput) {
+              setMessages(prev => {
+                const next = [
+                  ...prev,
+                  `<div class="user-cmd">&gt; ${command}</div>`,
+                ];
+                return next.length > 1000 ? next.slice(-1000) : next;
+              });
             }
-          });
+
+            // Send the command to the MUD server
+            send(command);
+          },
+          onVariableSet: (name: string, value: string) => {
+            setVariables(prev => {
+              const existingIndex = prev.findIndex(v => v.name === name);
+              if (existingIndex >= 0) {
+                const updated = [...prev];
+                updated[existingIndex] = { ...updated[existingIndex], value };
+                return updated;
+              } else {
+                return [...prev, { name, value, description: '' }];
+              }
+            });
+          },
         },
-      })
+        scripts
+      )
     );
   }, [wsManager]);
 
@@ -166,6 +185,13 @@ function App() {
       commandEngine.setTriggers(triggers);
     }
   }, [triggers]);
+
+  // Update the CommandEngine when scripts change
+  useEffect(() => {
+    if (commandEngine) {
+      commandEngine.setScripts(scripts);
+    }
+  }, [scripts]);
 
   useEffect(() => {
     if (commandEngine) {
@@ -290,6 +316,8 @@ function App() {
         setAliases={setAliases}
         triggers={triggers}
         setTriggers={setTriggers}
+        scripts={scripts}
+        setScripts={setScripts}
       />
       <div
         className={classNames(styles.status, {
