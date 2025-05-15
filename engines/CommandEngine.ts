@@ -55,7 +55,7 @@ export class CommandEngine {
 
   public async processCommand(input: string): Promise<void> {
     // Try alias expansion
-    const expanded = processAliases(
+    const commands = processAliases(
       input,
       this.aliases,
       this.variables,
@@ -63,19 +63,10 @@ export class CommandEngine {
       this.scripts
     );
 
-    // Execute commands
-    if (expanded) {
-      // Process commands with waits
-      for (const cmd of expanded) {
-        if (cmd.type === 'wait' && cmd.waitTime) {
-          await new Promise(resolve => setTimeout(resolve, cmd.waitTime));
-        } else if (cmd.type === 'command') {
-          this.options.onCommandSend(cmd.content, this.settings);
-        }
-      }
-    } else {
-      // No alias matched, send the raw input
-      this.options.onCommandSend(input, this.settings);
+    if (commands) {
+      commands.forEach(command => {
+        this.options.onCommandSend(command.content, this.settings);
+      });
     }
   }
 
@@ -87,6 +78,7 @@ export class CommandEngine {
       this.options.onVariableSet,
       this.scripts
     );
+
     if (commands) {
       commands.forEach(command => {
         this.options.onCommandSend(command.content, this.settings);

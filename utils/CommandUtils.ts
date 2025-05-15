@@ -91,12 +91,15 @@ export function parseSpeedwalk(
 
   for (const action of actionArray) {
     const { count, direction } = parseDirection(action);
-    const fullDirection = DIRECTION_MAP[direction.toLowerCase()] || direction;
+    const fullDirection = DIRECTION_MAP[direction.toLowerCase()] || null;
+    if (!fullDirection) {
+      console.error('Unknown direction', direction);
+      continue;
+    }
     for (let i = 0; i < count; i++) {
       directionCommands.push(fullDirection);
     }
   }
-
   if (backwards) {
     // Reverse order and convert each to its opposite
     return directionCommands.reverse().map(dir => getOppositeDirection(dir));

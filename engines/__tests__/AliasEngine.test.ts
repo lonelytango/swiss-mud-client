@@ -529,7 +529,7 @@ describe('processAliases', () => {
           name: 'speedwalk repeat test',
           pattern: '^swr$',
           command: `
-                    speedwalk("2e,w,eastup,2northeast,climb up")
+                    speedwalk("2e,w,eu,2ne")
                 `,
           enabled: true,
         },
@@ -539,14 +539,13 @@ describe('processAliases', () => {
       const result = processAliases('swr', aliases, variables);
 
       expect(result).not.toBeNull();
-      expect(result).toHaveLength(7);
+      expect(result).toHaveLength(6);
       expect(result![0]).toEqual({ type: 'command', content: 'east' });
       expect(result![1]).toEqual({ type: 'command', content: 'east' });
       expect(result![2]).toEqual({ type: 'command', content: 'west' });
       expect(result![3]).toEqual({ type: 'command', content: 'eastup' });
       expect(result![4]).toEqual({ type: 'command', content: 'northeast' });
       expect(result![5]).toEqual({ type: 'command', content: 'northeast' });
-      expect(result![6]).toEqual({ type: 'command', content: 'climb up' });
     });
 
     it('should handle custom directional commands', () => {
@@ -555,7 +554,7 @@ describe('processAliases', () => {
           name: 'speedwalk custom test',
           pattern: '^swc$',
           command: `
-                    speedwalk("2e,climb ladder,jump down")
+                    speedwalk("2e,w,s")
                 `,
           enabled: true,
         },
@@ -568,8 +567,81 @@ describe('processAliases', () => {
       expect(result).toHaveLength(4);
       expect(result![0]).toEqual({ type: 'command', content: 'east' });
       expect(result![1]).toEqual({ type: 'command', content: 'east' });
-      expect(result![2]).toEqual({ type: 'command', content: 'climb ladder' });
-      expect(result![3]).toEqual({ type: 'command', content: 'jump down' });
+      expect(result![2]).toEqual({ type: 'command', content: 'west' });
+      expect(result![3]).toEqual({ type: 'command', content: 'south' });
+    });
+
+    it('should handle reverse speedwalk commands', () => {
+      const aliases: Alias[] = [
+        {
+          name: 'reverse speedwalk test',
+          pattern: '^rsw$',
+          command: `
+                    speedwalk("n,e,s,w", true)
+                `,
+          enabled: true,
+        },
+      ];
+
+      const variables: Variable[] = [];
+      const result = processAliases('rsw', aliases, variables);
+
+      expect(result).not.toBeNull();
+      expect(result).toHaveLength(4);
+      expect(result![0]).toEqual({ type: 'command', content: 'east' }); // w -> e
+      expect(result![1]).toEqual({ type: 'command', content: 'north' }); // s -> n
+      expect(result![2]).toEqual({ type: 'command', content: 'west' }); // e -> w
+      expect(result![3]).toEqual({ type: 'command', content: 'south' }); // n -> s
+    });
+
+    it('should handle reverse speedwalk with repeated directions', () => {
+      const aliases: Alias[] = [
+        {
+          name: 'reverse speedwalk repeat test',
+          pattern: '^rswr$',
+          command: `
+                    speedwalk("2n,3e,2s", true)
+                `,
+          enabled: true,
+        },
+      ];
+
+      const variables: Variable[] = [];
+      const result = processAliases('rswr', aliases, variables);
+
+      expect(result).not.toBeNull();
+      expect(result).toHaveLength(7);
+      expect(result![0]).toEqual({ type: 'command', content: 'north' }); // 2s -> 2n
+      expect(result![1]).toEqual({ type: 'command', content: 'north' });
+      expect(result![2]).toEqual({ type: 'command', content: 'west' }); // 3e -> 3w
+      expect(result![3]).toEqual({ type: 'command', content: 'west' });
+      expect(result![4]).toEqual({ type: 'command', content: 'west' });
+      expect(result![5]).toEqual({ type: 'command', content: 'south' }); // 2n -> 2s
+      expect(result![6]).toEqual({ type: 'command', content: 'south' });
+    });
+
+    it('should handle reverse speedwalk with complex directions', () => {
+      const aliases: Alias[] = [
+        {
+          name: 'reverse speedwalk complex test',
+          pattern: '^rswc$',
+          command: `
+                    speedwalk("ne,2nu,sw,ed", true)
+                `,
+          enabled: true,
+        },
+      ];
+
+      const variables: Variable[] = [];
+      const result = processAliases('rswc', aliases, variables);
+
+      expect(result).not.toBeNull();
+      expect(result).toHaveLength(5);
+      expect(result![0]).toEqual({ type: 'command', content: 'westup' }); // ed -> wu
+      expect(result![1]).toEqual({ type: 'command', content: 'northeast' }); // sw -> ne
+      expect(result![2]).toEqual({ type: 'command', content: 'southdown' }); // 2nu -> 2sd
+      expect(result![3]).toEqual({ type: 'command', content: 'southdown' });
+      expect(result![4]).toEqual({ type: 'command', content: 'southwest' }); // ne -> sw
     });
   });
 

@@ -26,12 +26,10 @@ const AliasView: React.FC<AliasViewProps> = ({
     aliases.length > 0 ? 0 : null
   );
   const [editBuffer, setEditBuffer] = useState<Alias | null>(null);
-  const [localAliases, setLocalAliases] = useState<Alias[]>(aliases);
   const initialLoad = useRef(true);
 
   // Helper function to save aliases
   const saveAliases = (updated: Alias[]) => {
-    setLocalAliases(updated);
     onChange(updated);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   };
@@ -58,28 +56,19 @@ const AliasView: React.FC<AliasViewProps> = ({
     // eslint-disable-next-line
   }, []);
 
-  // Keep localAliases in sync with parent aliases (except on initial load)
-  useEffect(() => {
-    if (!initialLoad.current) {
-      setLocalAliases(aliases);
-    } else {
-      initialLoad.current = false;
-    }
-  }, [aliases]);
-
   // When selectedIdx changes, update editBuffer
   useEffect(() => {
-    if (selectedIdx !== null && localAliases[selectedIdx]) {
-      setEditBuffer({ ...localAliases[selectedIdx] });
+    if (selectedIdx !== null && aliases[selectedIdx]) {
+      setEditBuffer({ ...aliases[selectedIdx] });
     } else {
       setEditBuffer(null);
     }
-  }, [selectedIdx, localAliases]);
+  }, [selectedIdx, aliases]);
 
   // Add new alias and select it
   const handleAdd = () => {
-    const newAliases = [...localAliases, { ...emptyAlias }];
-    setLocalAliases(newAliases);
+    const newAliases = [...aliases, { ...emptyAlias }];
+    saveAliases(newAliases);
     setEditBuffer({ ...emptyAlias });
     setSelectedIdx(newAliases.length - 1);
   };
@@ -96,7 +85,7 @@ const AliasView: React.FC<AliasViewProps> = ({
   // Save changes to selected alias
   const handleSave = () => {
     if (selectedIdx === null || !editBuffer) return;
-    const updated = localAliases.map((alias, idx) =>
+    const updated = aliases.map((alias, idx) =>
       idx === selectedIdx ? { ...editBuffer } : alias
     );
     saveAliases(updated);
@@ -113,7 +102,7 @@ const AliasView: React.FC<AliasViewProps> = ({
   const handleDelete = () => {
     if (selectedIdx === null) return;
     if (!window.confirm('Delete this alias?')) return;
-    const newAliases = localAliases.filter((_, idx) => idx !== selectedIdx);
+    const newAliases = aliases.filter((_, idx) => idx !== selectedIdx);
     saveAliases(newAliases);
     setSelectedIdx(newAliases.length > 0 ? 0 : null);
   };
@@ -127,7 +116,7 @@ const AliasView: React.FC<AliasViewProps> = ({
   const hasUnsaved =
     selectedIdx !== null &&
     editBuffer &&
-    JSON.stringify(editBuffer) !== JSON.stringify(localAliases[selectedIdx]);
+    JSON.stringify(editBuffer) !== JSON.stringify(aliases[selectedIdx]);
 
   const selected = editBuffer;
 
@@ -157,7 +146,7 @@ const AliasView: React.FC<AliasViewProps> = ({
     const sourceIdx = parseInt(e.dataTransfer.getData('text/plain'));
     if (sourceIdx === targetIdx) return;
 
-    const updated = [...localAliases];
+    const updated = [...aliases];
     const [movedItem] = updated.splice(sourceIdx, 1);
     updated.splice(targetIdx, 0, movedItem);
 
@@ -170,7 +159,7 @@ const AliasView: React.FC<AliasViewProps> = ({
       <div className={commonStyles.sidebar}>
         <button onClick={handleAdd}>+</button>
         <ul>
-          {localAliases.map((alias, index) => (
+          {aliases.map((alias, index) => (
             <li
               key={index}
               className={classNames({
@@ -193,7 +182,7 @@ const AliasView: React.FC<AliasViewProps> = ({
                   checked={alias.enabled}
                   onChange={e => {
                     e.stopPropagation();
-                    const updated = localAliases.map((a, i) =>
+                    const updated = aliases.map((a, i) =>
                       i === index ? { ...a, enabled: e.target.checked } : a
                     );
                     saveAliases(updated);
@@ -214,6 +203,7 @@ const AliasView: React.FC<AliasViewProps> = ({
               type='text'
               value={selected.name}
               onChange={handleFieldChange}
+              name='name'
             />
           </label>
           <label>
@@ -222,6 +212,7 @@ const AliasView: React.FC<AliasViewProps> = ({
               type='text'
               value={selected.pattern}
               onChange={handleFieldChange}
+              name='pattern'
             />
           </label>
           <label>
