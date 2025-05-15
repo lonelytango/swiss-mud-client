@@ -11,12 +11,17 @@ import EditorOptions from '../../config/EditorOptions';
 interface AliasViewProps {
   aliases: Alias[];
   onChange: (aliases: Alias[]) => void;
+  saveRef?: React.RefObject<{ save: () => void } | null>;
 }
 
 const emptyAlias: Alias = { name: '', pattern: '', command: '', enabled: true };
 const STORAGE_KEY = 'mud_aliases';
 
-const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
+const AliasView: React.FC<AliasViewProps> = ({
+  aliases,
+  onChange,
+  saveRef,
+}) => {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(
     aliases.length > 0 ? 0 : null
   );
@@ -96,6 +101,13 @@ const AliasView: React.FC<AliasViewProps> = ({ aliases, onChange }) => {
     );
     saveAliases(updated);
   };
+
+  // Expose save method to parent via ref
+  useEffect(() => {
+    if (saveRef) {
+      saveRef.current = { save: handleSave };
+    }
+  }, [handleSave, saveRef]);
 
   // Delete selected alias
   const handleDelete = () => {

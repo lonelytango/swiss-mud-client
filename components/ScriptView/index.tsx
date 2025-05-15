@@ -11,12 +11,17 @@ import EditorOptions from '../../config/EditorOptions';
 interface ScriptViewProps {
   scripts: Script[];
   onChange: (scripts: Script[]) => void;
+  saveRef?: React.RefObject<{ save: () => void } | null>;
 }
 
 const emptyScript: Script = { name: '', event: '', command: '', enabled: true };
 const STORAGE_KEY = 'mud_scripts';
 
-const ScriptView: React.FC<ScriptViewProps> = ({ scripts, onChange }) => {
+const ScriptView: React.FC<ScriptViewProps> = ({
+  scripts,
+  onChange,
+  saveRef,
+}) => {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(
     scripts.length > 0 ? 0 : null
   );
@@ -95,6 +100,13 @@ const ScriptView: React.FC<ScriptViewProps> = ({ scripts, onChange }) => {
     );
     saveScripts(updated);
   };
+
+  // Expose save method to parent via ref
+  useEffect(() => {
+    if (saveRef) {
+      saveRef.current = { save: handleSave };
+    }
+  }, [handleSave, saveRef]);
 
   // Delete selected script
   const handleDelete = () => {

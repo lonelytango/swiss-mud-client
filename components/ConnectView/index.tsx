@@ -13,6 +13,7 @@ export interface MudProfile {
 
 interface ConnectViewProps {
   onConnect: (profile: MudProfile) => void;
+  saveRef?: React.RefObject<{ save: () => void } | null>;
 }
 
 const STORAGE_KEY = 'mud_profiles';
@@ -29,7 +30,7 @@ const emptyProfile: MudProfile = {
   encoding: 'utf8',
 };
 
-export default function ConnectView({ onConnect }: ConnectViewProps) {
+export default function ConnectView({ onConnect, saveRef }: ConnectViewProps) {
   const [profiles, setProfiles] = useState<MudProfile[]>([]);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [editBuffer, setEditBuffer] = useState<MudProfile | null>(null);
@@ -126,6 +127,13 @@ export default function ConnectView({ onConnect }: ConnectViewProps) {
     selectedIdx !== null &&
     editBuffer &&
     JSON.stringify(editBuffer) !== JSON.stringify(profiles[selectedIdx]);
+
+  // Expose save method to parent via ref
+  useEffect(() => {
+    if (saveRef) {
+      saveRef.current = { save: handleSave };
+    }
+  }, [handleSave, saveRef]);
 
   function loadProfiles(): MudProfile[] {
     try {

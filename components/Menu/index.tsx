@@ -1,7 +1,7 @@
 // components/Menu/index.tsx
 // Menu for the application.
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styles from './styles.module.css';
 import type { Alias, Trigger, Script } from '../../types';
 import ConnectView, { type MudProfile } from '../ConnectView';
@@ -120,6 +120,42 @@ export function Menu({
   const [activePopup, setActivePopup] = useState<string | null>(null);
   const { setVariables, settings, setSettings } = useAppContext();
 
+  // Save refs for each view
+  const aliasSaveRef = useRef<{ save: () => void } | null>(null);
+  const triggerSaveRef = useRef<{ save: () => void } | null>(null);
+  const scriptSaveRef = useRef<{ save: () => void } | null>(null);
+  const variableSaveRef = useRef<{ save: () => void } | null>(null);
+  const connectSaveRef = useRef<{ save: () => void } | null>(null);
+
+  useEffect(() => {
+    if (!activePopup) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // ESC closes popup
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setActivePopup(null);
+        return;
+      }
+      // Cmd+S or Ctrl+S saves
+      if ((e.key === 's' || e.key === 'S') && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        if (activePopup === 'alias' && aliasSaveRef.current) {
+          aliasSaveRef.current.save();
+        } else if (activePopup === 'triggers' && triggerSaveRef.current) {
+          triggerSaveRef.current.save();
+        } else if (activePopup === 'scripts' && scriptSaveRef.current) {
+          scriptSaveRef.current.save();
+        } else if (activePopup === 'variables' && variableSaveRef.current) {
+          variableSaveRef.current.save();
+        } else if (activePopup === 'connect' && connectSaveRef.current) {
+          connectSaveRef.current.save();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activePopup]);
+
   const handleButtonClick = (id: string) => {
     setActivePopup(id);
   };
@@ -167,7 +203,10 @@ export function Menu({
         setActivePopup={setActivePopup}
         activePopup={activePopup}
       >
-        <ConnectView onConnect={handleProfileConnect} />
+        <ConnectView
+          onConnect={handleProfileConnect}
+          saveRef={connectSaveRef}
+        />
       </Popup>
 
       <Popup
@@ -177,7 +216,11 @@ export function Menu({
         setActivePopup={setActivePopup}
         activePopup={activePopup}
       >
-        <TriggerView triggers={triggers} onChange={setTriggers} />
+        <TriggerView
+          triggers={triggers}
+          onChange={setTriggers}
+          saveRef={triggerSaveRef}
+        />
       </Popup>
 
       <Popup
@@ -187,7 +230,11 @@ export function Menu({
         setActivePopup={setActivePopup}
         activePopup={activePopup}
       >
-        <AliasView aliases={aliases} onChange={setAliases} />
+        <AliasView
+          aliases={aliases}
+          onChange={setAliases}
+          saveRef={aliasSaveRef}
+        />
       </Popup>
 
       <Popup
@@ -197,7 +244,11 @@ export function Menu({
         setActivePopup={setActivePopup}
         activePopup={activePopup}
       >
-        <ScriptView scripts={scripts} onChange={setScripts} />
+        <ScriptView
+          scripts={scripts}
+          onChange={setScripts}
+          saveRef={scriptSaveRef}
+        />
       </Popup>
 
       <Popup
@@ -207,7 +258,7 @@ export function Menu({
         setActivePopup={setActivePopup}
         activePopup={activePopup}
       >
-        <VariableView />
+        <VariableView saveRef={variableSaveRef} />
       </Popup>
 
       <Popup

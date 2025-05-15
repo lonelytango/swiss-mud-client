@@ -10,7 +10,11 @@ import classNames from 'classnames';
 const emptyVariable: Variable = { name: '', value: '' };
 const STORAGE_KEY = 'mud_variables';
 
-export default function VariableView() {
+export default function VariableView({
+  saveRef,
+}: {
+  saveRef?: React.RefObject<{ save: () => void } | null>;
+}) {
   const { variables, setVariables } = useAppContext();
   const [selectedIdx, setSelectedIdx] = useState<number | null>(
     variables.length > 0 ? 0 : null
@@ -86,6 +90,13 @@ export default function VariableView() {
     );
     saveVariables(updated);
   };
+
+  // Expose save method to parent via ref
+  useEffect(() => {
+    if (saveRef) {
+      saveRef.current = { save: handleSave };
+    }
+  }, [handleSave, saveRef]);
 
   // Delete selected variable
   const handleDelete = () => {

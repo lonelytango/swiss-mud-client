@@ -11,6 +11,7 @@ import EditorOptions from '../../config/EditorOptions';
 interface TriggerViewProps {
   triggers: Trigger[];
   onChange: (triggers: Trigger[]) => void;
+  saveRef?: React.RefObject<{ save: () => void } | null>;
 }
 
 const emptyTrigger: Trigger = {
@@ -21,7 +22,11 @@ const emptyTrigger: Trigger = {
 };
 const STORAGE_KEY = 'mud_triggers';
 
-const TriggerView: React.FC<TriggerViewProps> = ({ triggers, onChange }) => {
+const TriggerView: React.FC<TriggerViewProps> = ({
+  triggers,
+  onChange,
+  saveRef,
+}) => {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(
     triggers.length > 0 ? 0 : null
   );
@@ -101,6 +106,13 @@ const TriggerView: React.FC<TriggerViewProps> = ({ triggers, onChange }) => {
     );
     saveTriggers(updated);
   };
+
+  // Expose save method to parent via ref
+  useEffect(() => {
+    if (saveRef) {
+      saveRef.current = { save: handleSave };
+    }
+  }, [handleSave, saveRef]);
 
   // Delete selected trigger
   const handleDelete = () => {
