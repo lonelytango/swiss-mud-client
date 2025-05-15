@@ -156,8 +156,7 @@
   font-weight: 500;
 }
 
-.formGroup input,
-.formGroup select {
+.formGroup input {
   width: 100%;
   padding: 8px;
   border: 1px solid #ccc;

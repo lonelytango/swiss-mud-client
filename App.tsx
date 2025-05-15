@@ -308,6 +308,7 @@ function App() {
         <div
           ref={outputRef}
           className={styles.output}
+          style={{ fontFamily: settings.fontFamily }}
           onClick={() => inputRef.current?.focus()}
           onScroll={handleOutputScroll}
           role='log'

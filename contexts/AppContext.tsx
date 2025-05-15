@@ -19,6 +19,7 @@ export function AppContextProvider({
   const [settings, setSettings] = useState<Settings>({
     highlightInputOnCommand: true,
     showCommandInOutput: true,
+    fontFamily: 'Fira Mono, Consolas, Courier New, monospace',
   });
 
   // Load variables from localStorage on mount
@@ -37,7 +38,14 @@ export function AppContextProvider({
     if (storeSettings) {
       try {
         const parsedSettings = JSON.parse(storeSettings);
-        setSettings(parsedSettings);
+        setSettings({
+          highlightInputOnCommand:
+            parsedSettings.highlightInputOnCommand ?? true,
+          showCommandInOutput: parsedSettings.showCommandInOutput ?? true,
+          fontFamily:
+            parsedSettings.fontFamily ??
+            'Fira Mono, Consolas, Courier New, monospace',
+        });
       } catch (e) {
         console.error('Failed to parse settings:', e);
       }

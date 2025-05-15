@@ -87,11 +87,10 @@
   display: flex;
   justify-content: space-between;
   flex-direction: row;
-  gap: 8px;
+  gap: 12px;
   align-items: center;
   width: 100%;
   cursor: pointer;
-  max-width: 50%;
 }
 
 /* Toggle Switch Styles */

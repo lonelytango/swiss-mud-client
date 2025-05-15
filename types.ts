@@ -22,4 +22,5 @@ export interface Command {
 export interface Settings {
   highlightInputOnCommand: boolean;
   showCommandInOutput: boolean;
+  fontFamily: string; // Font family for output
 }
