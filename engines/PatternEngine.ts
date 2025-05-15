@@ -43,14 +43,25 @@ function processPatterns(
         return Promise.resolve();
       };
 
-      const speedwalk = (actions: string) => {
-        const directionCommands = parseSpeedwalk(actions);
-        capturedCommands.push(
-          ...directionCommands.map(command => ({
+      const speedwalk = (
+        actions: string,
+        backwards: boolean = false,
+        delay: number = 0
+      ) => {
+        const directionCommands = parseSpeedwalk(actions, backwards);
+        for (let i = 0; i < directionCommands.length; i++) {
+          capturedCommands.push({
             type: 'command' as const,
-            content: command,
-          }))
-        );
+            content: directionCommands[i],
+          });
+          if (delay > 0 && i < directionCommands.length - 1) {
+            capturedCommands.push({
+              type: 'wait',
+              content: '',
+              waitTime: delay * 1000, // convert seconds to ms
+            });
+          }
+        }
       };
 
       const sendEvent = (eventName: string) => {
