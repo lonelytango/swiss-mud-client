@@ -48,11 +48,12 @@ function Popup({
   return (
     <div
       className={styles.popupOverlay}
+      onClick={onClose}
       role='dialog'
       aria-modal='true'
       aria-labelledby='popup-title'
     >
-      <div className={styles.popup}>
+      <div className={styles.popup} onClick={e => e.stopPropagation()}>
         <div className={styles.popupHeader}>
           <h3 id='popup-title'>{title}</h3>
           <button

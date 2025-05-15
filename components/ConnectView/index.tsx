@@ -224,6 +224,15 @@ export default function ConnectView({ onConnect }: ConnectViewProps) {
             </div>
             <div className={commonStyles.actions}>
               <button
+                className={commonStyles.confirmAction}
+                type='button'
+                onClick={handleConnect}
+                disabled={!editBuffer.name || !editBuffer.address}
+              >
+                Connect
+              </button>
+              <button
+                className={commonStyles.deleteAction}
                 type='button'
                 onClick={handleDelete}
                 disabled={selectedIdx === null}
@@ -232,14 +241,6 @@ export default function ConnectView({ onConnect }: ConnectViewProps) {
               </button>
               <button type='button' onClick={handleSave} disabled={!hasUnsaved}>
                 Save
-              </button>
-              <button
-                className={commonStyles.confirmAction}
-                type='button'
-                onClick={handleConnect}
-                disabled={!editBuffer.name || !editBuffer.address}
-              >
-                Connect
               </button>
             </div>
           </>

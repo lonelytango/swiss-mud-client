@@ -10,6 +10,7 @@ const EditorOptions: editor.IStandaloneEditorConstructionOptions = {
   automaticLayout: true,
   scrollBeyondLastLine: false,
   inlayHints: { enabled: 'off' },
+  lineDecorationsWidth: 0,
 };
 
 export default EditorOptions;
