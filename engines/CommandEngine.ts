@@ -72,8 +72,8 @@ export class CommandEngine {
     const commands = processTriggers(
       line,
       this.triggers,
-      this.options.onVariableSet,
-      this.variables
+      this.variables,
+      this.options.onVariableSet
     );
     if (commands) {
       commands.forEach(command => {

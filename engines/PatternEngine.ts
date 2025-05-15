@@ -87,16 +87,10 @@ function processPatterns(
 export function processTriggers(
   line: string,
   triggers: Trigger[],
-  setVariable?: (name: string, value: string) => void,
-  variables?: { name: string; value: string }[]
+  variables: Variable[] = [],
+  setVariable?: (name: string, value: string) => void
 ): Command[] | null {
-  return processPatterns(
-    line,
-    triggers,
-    variables || [],
-    setVariable,
-    'trigger'
-  );
+  return processPatterns(line, triggers, variables, setVariable, 'trigger');
 }
 
 export function processAliases(

@@ -86,7 +86,7 @@ describe('processTriggers', () => {
       };
 
       const mockSetVariable = jest.fn();
-      processTriggers('You see a goblin', [jsTrigger], mockSetVariable);
+      processTriggers('You see a goblin', [jsTrigger], [], mockSetVariable);
 
       expect(mockSetVariable).toHaveBeenCalledWith('target', 'a goblin');
     });
@@ -107,6 +107,7 @@ describe('processTriggers', () => {
       processTriggers(
         'You are hungry and thirsty',
         [jsTrigger],
+        [],
         mockSetVariable
       );
 
@@ -133,13 +134,18 @@ describe('processTriggers', () => {
       const mockSetVariable = jest.fn();
 
       // Test dragon case
-      processTriggers('A red dragon appears!', [jsTrigger], mockSetVariable);
+      processTriggers(
+        'A red dragon appears!',
+        [jsTrigger],
+        [],
+        mockSetVariable
+      );
       expect(mockSetVariable).toHaveBeenCalledWith('weapon', 'dragonbane');
 
       mockSetVariable.mockClear();
 
       // Test non-dragon case
-      processTriggers('A goblin appears!', [jsTrigger], mockSetVariable);
+      processTriggers('A goblin appears!', [jsTrigger], [], mockSetVariable);
       expect(mockSetVariable).toHaveBeenCalledWith('weapon', 'sword');
     });
   });
