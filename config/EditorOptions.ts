@@ -1,3 +1,6 @@
+// config/EditorOptions.ts
+// Options for the Monaco Editor.
+
 import { editor } from 'monaco-editor';
 
 const EditorOptions: editor.IStandaloneEditorConstructionOptions = {

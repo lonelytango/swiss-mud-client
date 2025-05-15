@@ -1,3 +1,6 @@
+/* styles/common.module.css */
+/* Common styles for the application. */
+
 .viewContainer {
   display: flex;
   gap: 16px;

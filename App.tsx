@@ -1,3 +1,6 @@
+// App.tsx
+// Main component for the application.
+
 import React, { useEffect, useRef, useState } from 'react';
 import { Menu } from './components/Menu';
 import type { MudProfile } from './components/ConnectView';

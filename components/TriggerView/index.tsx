@@ -1,6 +1,8 @@
+// components/TriggerView/index.tsx
+// View for the triggers.
+
 import React, { useState, useEffect, useRef } from 'react';
 import type { Trigger } from '../../types';
-// import styles from './styles.module.css';
 import commonStyles from '../../styles/common.module.css';
 import classNames from 'classnames';
 import Editor from '@monaco-editor/react';

@@ -1,7 +1,6 @@
-/**
- * Sends a command to the MUD server
- * @param command The command to send
- */
+// utils/CommandAction.ts
+// Utility functions for sending commands to the MUD server.
+
 import { WebSocketManager } from '../managers/WebSocketManager';
 
 // Store WebSocketManager instance

@@ -1,3 +1,6 @@
+// engines/__tests__/TriggerEngine.test.ts
+// Tests for the TriggerEngine.
+
 import { processTriggers } from '../PatternEngine';
 import type { Trigger } from '../../types';
 

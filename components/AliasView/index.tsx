@@ -1,3 +1,6 @@
+// components/AliasView/index.tsx
+// View for the aliases.
+
 import React, { useState, useEffect, useRef } from 'react';
 import type { Alias } from '../../types';
 import commonStyles from '../../styles/common.module.css';

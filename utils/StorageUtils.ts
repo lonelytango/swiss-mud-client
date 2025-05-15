@@ -1,3 +1,6 @@
+// utils/StorageUtils.ts
+// Utility functions for storing and retrieving values from localStorage and sessionStorage.
+
 /**
  * Saves a value to localStorage
  * @param key The key to save the value to

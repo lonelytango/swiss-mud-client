@@ -1,3 +1,6 @@
+// components/DataView/index.tsx
+// View for the data.
+
 import React, { useState } from 'react';
 import styles from './styles.module.css';
 import commonStyles from '../../styles/common.module.css';

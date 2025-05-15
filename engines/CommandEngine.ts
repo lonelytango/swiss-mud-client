@@ -1,3 +1,6 @@
+// engines/CommandEngine.ts
+// Engine for processing commands.
+
 import { processAliases, processTriggers } from './PatternEngine';
 import type { Variable, Settings, Alias, Trigger, Script } from '../types';
 

@@ -1,4 +1,6 @@
-// Jest test file for aliasEngine
+// engines/__tests__/AliasEngine.test.ts
+// Tests for the AliasEngine.
+
 import { processAliases } from '../PatternEngine';
 import type { Alias, Variable } from '../../types';
 

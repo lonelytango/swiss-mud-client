@@ -1,3 +1,6 @@
+// managers/DataManager.ts
+// Manages the data for the application.
+
 export interface MudData {
   mud_profiles: any[];
   mud_variables: any[];

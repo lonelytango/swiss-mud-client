@@ -1,3 +1,6 @@
+// components/ScriptView/index.tsx
+// View for the scripts.
+
 import React, { useState, useEffect, useRef } from 'react';
 import type { Script } from '../../types';
 import commonStyles from '../../styles/common.module.css';

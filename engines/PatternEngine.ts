@@ -1,3 +1,6 @@
+// engines/PatternEngine.ts
+// Engine for processing patterns.
+
 import type {
   Variable,
   Command,

@@ -1,3 +1,6 @@
+// components/SettingsView/index.tsx
+// View for the settings.
+
 import React from 'react';
 import styles from './styles.module.css';
 import commonStyles from '../../styles/common.module.css';

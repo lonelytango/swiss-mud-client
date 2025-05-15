@@ -1,3 +1,6 @@
+// components/ConnectView/index.tsx
+// View for the connect.
+
 import React, { useEffect, useRef, useState } from 'react';
 import commonStyles from '../../styles/common.module.css';
 

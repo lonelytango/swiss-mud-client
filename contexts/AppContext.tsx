@@ -1,3 +1,6 @@
+// contexts/AppContext.tsx
+// Context for the application.
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Variable, Settings } from '../types';
 

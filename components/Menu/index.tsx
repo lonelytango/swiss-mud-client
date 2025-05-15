@@ -1,3 +1,6 @@
+// components/Menu/index.tsx
+// Menu for the application.
+
 import React, { useState } from 'react';
 import styles from './styles.module.css';
 import type { Alias, Trigger, Script } from '../../types';

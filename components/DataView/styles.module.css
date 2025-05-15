@@ -1,3 +1,6 @@
+/* components/DataView/styles.module.css */
+/* Styles for the DataView component. */
+
 .dataView {
   display: flex;
   flex-direction: column;

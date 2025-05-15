@@ -1,4 +1,5 @@
-// CommandUtils.ts
+// utils/CommandUtils.ts
+// Utility functions for parsing commands.
 
 // Direction mapping for speedwalk
 const DIRECTION_MAP: { [key: string]: string } = {

@@ -1,3 +1,6 @@
+// utils/CommandHandler.ts
+// Handles the command input and history.
+
 import { CommandEngine } from '../engines/CommandEngine';
 import { WebSocketManager } from '../managers/WebSocketManager';
 

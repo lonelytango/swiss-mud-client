@@ -1,3 +1,6 @@
+// components/VariableView/index.tsx
+// View for the variables.
+
 import React, { useState, useEffect, useRef } from 'react';
 import commonStyles from '../../styles/common.module.css';
 import { useAppContext } from '../../contexts/AppContext';
