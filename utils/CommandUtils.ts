@@ -86,6 +86,7 @@ export function parseSpeedwalk(
   actions: string,
   backwards: boolean = false
 ): string[] {
+  if (actions.length === 0) return [];
   const directionCommands: string[] = [];
   const actionArray = actions.split(',').map(action => action.trim());
 

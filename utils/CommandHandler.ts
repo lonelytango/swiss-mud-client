@@ -32,7 +32,7 @@ export function handleCommandInput(
   if (e.key === 'Enter') {
     const command = e.currentTarget.value;
     if (wsManager.isConnected() && canSend && commandEngine) {
-      commandEngine.processCommand(command);
+      commandEngine.processPattern(command, 'alias');
 
       if (command.trim()) {
         onCommandHistoryUpdate(command);

@@ -1,7 +1,7 @@
 // components/AliasView/index.tsx
 // View for the aliases.
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Alias } from '../../types';
 import commonStyles from '../../styles/common.module.css';
 import classNames from 'classnames';
@@ -26,7 +26,6 @@ const AliasView: React.FC<AliasViewProps> = ({
     aliases.length > 0 ? 0 : null
   );
   const [editBuffer, setEditBuffer] = useState<Alias | null>(null);
-  const initialLoad = useRef(true);
 
   // Helper function to save aliases
   const saveAliases = (updated: Alias[]) => {

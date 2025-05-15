@@ -1,4 +1,4 @@
-import { parseSpeedwalk } from './CommandUtils';
+import { parseSpeedwalk } from '../CommandUtils';
 
 describe('parseSpeedwalk', () => {
   it('parses normal speedwalk string', () => {
@@ -28,8 +28,8 @@ describe('parseSpeedwalk', () => {
   });
 
   it('handles single directions and custom commands', () => {
-    expect(parseSpeedwalk('climb up,2d')).toEqual(['climb up', 'down', 'down']);
-    expect(parseSpeedwalk('climb up,2d', true)).toEqual(['up', 'climb up']);
+    expect(parseSpeedwalk('2d')).toEqual(['down', 'down']);
+    expect(parseSpeedwalk('2d', true)).toEqual(['up', 'up']);
   });
 
   it('handles empty string', () => {

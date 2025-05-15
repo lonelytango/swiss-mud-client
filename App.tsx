@@ -207,7 +207,7 @@ function App() {
     // console.debug(`${messageCounter} - Line: ${line}`);
     if (line && commandEngine) {
       // console.debug(`Line: ${line}`);
-      commandEngine.processLine(line);
+      commandEngine.processPattern(line, 'trigger');
     }
   }, [line]);
 

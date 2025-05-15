@@ -1,10 +1,10 @@
 // engines/__tests__/TriggerEngine.test.ts
 // Tests for the TriggerEngine.
 
-import { processTriggers } from '../PatternEngine';
+import { processPatterns } from '../PatternEngine';
 import type { Trigger } from '../../types';
 
-describe('processTriggers', () => {
+describe('processPatterns', () => {
   const mockTriggers: Trigger[] = [
     {
       name: 'Kick on Say',
@@ -34,7 +34,7 @@ describe('processTriggers', () => {
   ];
 
   it('should process a line matching a trigger with one capture group', () => {
-    const result = processTriggers('你说道：hello', mockTriggers);
+    const result = processPatterns('你说道：hello', mockTriggers);
     expect(result).toEqual([
       {
         type: 'command',
@@ -44,7 +44,7 @@ describe('processTriggers', () => {
   });
 
   it('should process a line matching a trigger with multiple capture groups', () => {
-    const result = processTriggers('John says: How are you?', mockTriggers);
+    const result = processPatterns('John says: How are you?', mockTriggers);
     expect(result).toEqual([
       {
         type: 'command',
@@ -54,7 +54,7 @@ describe('processTriggers', () => {
   });
 
   it('should process a line matching a trigger with no capture groups', () => {
-    const result = processTriggers('You are hungry', mockTriggers);
+    const result = processPatterns('You are hungry', mockTriggers);
     expect(result).toEqual([
       {
         type: 'command',
@@ -64,12 +64,12 @@ describe('processTriggers', () => {
   });
 
   it('should not process a line that does not match any trigger', () => {
-    const result = processTriggers('Some random text', mockTriggers);
+    const result = processPatterns('Some random text', mockTriggers);
     expect(result).toBeNull();
   });
 
   it('should handle empty capture groups', () => {
-    const result = processTriggers('你说道：', mockTriggers);
+    const result = processPatterns('你说道：', mockTriggers);
     expect(result).toEqual([
       {
         type: 'command',
@@ -89,7 +89,7 @@ describe('processTriggers', () => {
       };
 
       const mockSetVariable = jest.fn();
-      processTriggers('You see a goblin', [jsTrigger], [], mockSetVariable);
+      processPatterns('You see a goblin', [jsTrigger], [], mockSetVariable);
 
       expect(mockSetVariable).toHaveBeenCalledWith('target', 'a goblin');
     });
@@ -107,7 +107,7 @@ describe('processTriggers', () => {
       };
 
       const mockSetVariable = jest.fn();
-      processTriggers(
+      processPatterns(
         'You are hungry and thirsty',
         [jsTrigger],
         [],
@@ -137,7 +137,7 @@ describe('processTriggers', () => {
       const mockSetVariable = jest.fn();
 
       // Test dragon case
-      processTriggers(
+      processPatterns(
         'A red dragon appears!',
         [jsTrigger],
         [],
@@ -148,7 +148,7 @@ describe('processTriggers', () => {
       mockSetVariable.mockClear();
 
       // Test non-dragon case
-      processTriggers('A goblin appears!', [jsTrigger], [], mockSetVariable);
+      processPatterns('A goblin appears!', [jsTrigger], [], mockSetVariable);
       expect(mockSetVariable).toHaveBeenCalledWith('weapon', 'sword');
     });
   });

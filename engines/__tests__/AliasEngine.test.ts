@@ -1,10 +1,10 @@
 // engines/__tests__/AliasEngine.test.ts
 // Tests for the AliasEngine.
 
-import { processAliases } from '../PatternEngine';
+import { processPatterns } from '../PatternEngine';
 import type { Alias, Variable } from '../../types';
 
-describe('processAliases', () => {
+describe('processPatterns', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -13,14 +13,14 @@ describe('processAliases', () => {
     const aliases: Alias[] = [
       { name: 'foo', pattern: '^foo$', command: 'send("bar")', enabled: true },
     ];
-    expect(processAliases('baz', aliases, [])).toBeNull();
+    expect(processPatterns('baz', aliases, [])).toBeNull();
   });
 
   it('captures a simple send command', () => {
     const aliases: Alias[] = [
       { name: 'foo', pattern: '^foo$', command: 'send("bar")', enabled: true },
     ];
-    expect(processAliases('foo', aliases, [])).toEqual([
+    expect(processPatterns('foo', aliases, [])).toEqual([
       { type: 'command', content: 'bar' },
     ]);
   });
@@ -34,7 +34,7 @@ describe('processAliases', () => {
         enabled: true,
       },
     ];
-    expect(processAliases('multi', aliases, [])).toEqual([
+    expect(processPatterns('multi', aliases, [])).toEqual([
       { type: 'command', content: 'a' },
       { type: 'command', content: 'b' },
       { type: 'command', content: 'c' },
@@ -45,7 +45,7 @@ describe('processAliases', () => {
     const aliases: Alias[] = [
       { name: 'wait', pattern: '^wait$', command: 'wait(500)', enabled: true },
     ];
-    expect(processAliases('wait', aliases, [])).toEqual([
+    expect(processPatterns('wait', aliases, [])).toEqual([
       { type: 'wait', content: '', waitTime: 500 },
     ]);
   });
@@ -59,7 +59,7 @@ describe('processAliases', () => {
         enabled: true,
       },
     ];
-    expect(processAliases('sw', aliases, [])).toEqual([
+    expect(processPatterns('sw', aliases, [])).toEqual([
       { type: 'command', content: 'north' },
       { type: 'command', content: 'east' },
       { type: 'command', content: 'south' },
@@ -76,7 +76,7 @@ describe('processAliases', () => {
         enabled: true,
       },
     ];
-    expect(processAliases('say hello', aliases, [])).toEqual([
+    expect(processPatterns('say hello', aliases, [])).toEqual([
       { type: 'command', content: 'say hello' },
     ]);
   });
@@ -91,7 +91,7 @@ describe('processAliases', () => {
       },
     ];
     const variables: Variable[] = [{ name: 'item', value: 'sword' }];
-    expect(processAliases('use', aliases, variables)).toEqual([
+    expect(processPatterns('use', aliases, variables)).toEqual([
       { type: 'command', content: 'use sword' },
     ]);
   });
@@ -106,7 +106,7 @@ describe('processAliases', () => {
       },
     ];
     const mockSetVariable = jest.fn();
-    processAliases('set bar', aliases, [], mockSetVariable);
+    processPatterns('set bar', aliases, [], mockSetVariable);
     expect(mockSetVariable).toHaveBeenCalledWith('foo', 'bar');
   });
 
@@ -119,7 +119,7 @@ describe('processAliases', () => {
         enabled: true,
       },
     ];
-    expect(processAliases('err', aliases, [])).toBeNull();
+    expect(processPatterns('err', aliases, [])).toBeNull();
   });
 
   it('should handle simple JavaScript send command', () => {
@@ -133,7 +133,7 @@ describe('processAliases', () => {
     ];
 
     const variables: Variable[] = [];
-    const result = processAliases('t', aliases, variables);
+    const result = processPatterns('t', aliases, variables);
 
     expect(result).not.toBeNull();
     expect(result).toHaveLength(1);
@@ -154,7 +154,7 @@ describe('processAliases', () => {
     ];
 
     const variables: Variable[] = [];
-    const result = processAliases('w', aliases, variables);
+    const result = processPatterns('w', aliases, variables);
 
     expect(result).not.toBeNull();
     expect(result).toHaveLength(1);
@@ -180,7 +180,7 @@ describe('processAliases', () => {
     ];
 
     const variables: Variable[] = [];
-    const result = processAliases('c', aliases, variables);
+    const result = processPatterns('c', aliases, variables);
 
     expect(result).not.toBeNull();
     expect(result).toHaveLength(3);
@@ -213,7 +213,7 @@ describe('processAliases', () => {
     ];
 
     const variables: Variable[] = [];
-    const result = processAliases('wa sword', aliases, variables);
+    const result = processPatterns('wa sword', aliases, variables);
 
     expect(result).not.toBeNull();
     expect(result).toHaveLength(1);
@@ -236,7 +236,7 @@ describe('processAliases', () => {
     ];
 
     const variables: Variable[] = [{ name: 'weapon', value: 'sword' }];
-    const result = processAliases('uw', aliases, variables);
+    const result = processPatterns('uw', aliases, variables);
 
     expect(result).not.toBeNull();
     expect(result).toHaveLength(1);
@@ -267,7 +267,7 @@ describe('processAliases', () => {
 
     const variables: Variable[] = [{ name: 'weapon', value: 'longsword' }];
 
-    const result = processAliases('attack goblin', aliases, variables);
+    const result = processPatterns('attack goblin', aliases, variables);
 
     expect(result).not.toBeNull();
     expect(result).toHaveLength(7);
@@ -322,7 +322,7 @@ describe('processAliases', () => {
     ];
 
     const variables: Variable[] = [];
-    const result = processAliases('w', aliases, variables);
+    const result = processPatterns('w', aliases, variables);
 
     expect(result).not.toBeNull();
     expect(result).toHaveLength(3);
@@ -354,7 +354,7 @@ describe('processAliases', () => {
     ];
 
     const variables: Variable[] = [];
-    const result = processAliases('uv', aliases, variables);
+    const result = processPatterns('uv', aliases, variables);
 
     expect(result).toBeNull();
   });
@@ -379,7 +379,7 @@ describe('processAliases', () => {
     const variables: Variable[] = [];
 
     // Test the "if" branch
-    let result = processAliases('cond dragon', aliases, variables);
+    let result = processPatterns('cond dragon', aliases, variables);
     expect(result).not.toBeNull();
     expect(result).toHaveLength(1);
     expect(result![0]).toEqual({
@@ -388,7 +388,7 @@ describe('processAliases', () => {
     });
 
     // Test the "else" branch
-    result = processAliases('cond goblin', aliases, variables);
+    result = processPatterns('cond goblin', aliases, variables);
     expect(result).not.toBeNull();
     expect(result).toHaveLength(1);
     expect(result![0]).toEqual({
@@ -410,7 +410,7 @@ describe('processAliases', () => {
     ];
 
     const variables: Variable[] = [];
-    const result = processAliases('mc', aliases, variables);
+    const result = processPatterns('mc', aliases, variables);
 
     expect(result).not.toBeNull();
     expect(result).toHaveLength(4);
@@ -436,7 +436,7 @@ describe('processAliases', () => {
       { name: 'weapon', value: 'sword' },
       { name: 'target', value: 'goblin' },
     ];
-    const result = processAliases('mcv', aliases, variables);
+    const result = processPatterns('mcv', aliases, variables);
 
     expect(result).not.toBeNull();
     expect(result).toHaveLength(3);
@@ -463,7 +463,7 @@ describe('processAliases', () => {
     ];
 
     const variables: Variable[] = [];
-    const result = processAliases('mix', aliases, variables);
+    const result = processPatterns('mix', aliases, variables);
 
     expect(result).not.toBeNull();
     expect(result).toHaveLength(6);
@@ -488,7 +488,7 @@ describe('processAliases', () => {
     ];
 
     const variables: Variable[] = [];
-    const result = processAliases('ec', aliases, variables);
+    const result = processPatterns('ec', aliases, variables);
 
     expect(result).not.toBeNull();
     expect(result).toHaveLength(5);
@@ -513,7 +513,7 @@ describe('processAliases', () => {
       ];
 
       const variables: Variable[] = [];
-      const result = processAliases('sw', aliases, variables);
+      const result = processPatterns('sw', aliases, variables);
 
       expect(result).not.toBeNull();
       expect(result).toHaveLength(4);
@@ -536,7 +536,7 @@ describe('processAliases', () => {
       ];
 
       const variables: Variable[] = [];
-      const result = processAliases('swr', aliases, variables);
+      const result = processPatterns('swr', aliases, variables);
 
       expect(result).not.toBeNull();
       expect(result).toHaveLength(6);
@@ -561,7 +561,7 @@ describe('processAliases', () => {
       ];
 
       const variables: Variable[] = [];
-      const result = processAliases('swc', aliases, variables);
+      const result = processPatterns('swc', aliases, variables);
 
       expect(result).not.toBeNull();
       expect(result).toHaveLength(4);
@@ -584,7 +584,7 @@ describe('processAliases', () => {
       ];
 
       const variables: Variable[] = [];
-      const result = processAliases('rsw', aliases, variables);
+      const result = processPatterns('rsw', aliases, variables);
 
       expect(result).not.toBeNull();
       expect(result).toHaveLength(4);
@@ -607,7 +607,7 @@ describe('processAliases', () => {
       ];
 
       const variables: Variable[] = [];
-      const result = processAliases('rswr', aliases, variables);
+      const result = processPatterns('rswr', aliases, variables);
 
       expect(result).not.toBeNull();
       expect(result).toHaveLength(7);
@@ -633,7 +633,7 @@ describe('processAliases', () => {
       ];
 
       const variables: Variable[] = [];
-      const result = processAliases('rswc', aliases, variables);
+      const result = processPatterns('rswc', aliases, variables);
 
       expect(result).not.toBeNull();
       expect(result).toHaveLength(5);
@@ -660,7 +660,7 @@ describe('processAliases', () => {
     const variables: Variable[] = [
       { name: 'line', value: 'A goblin appears!' },
     ];
-    const result = processAliases('cl', aliases, variables);
+    const result = processPatterns('cl', aliases, variables);
 
     expect(result).not.toBeNull();
     expect(result).toHaveLength(1);
@@ -683,7 +683,7 @@ describe('processAliases', () => {
     ];
 
     const variables: Variable[] = [];
-    const result = processAliases('cul', aliases, variables);
+    const result = processPatterns('cul', aliases, variables);
 
     expect(result).toBeNull(); // Should return null when line is undefined
   });
@@ -704,7 +704,7 @@ describe('processAliases', () => {
 
       const variables: Variable[] = [];
       const mockSetVariable = jest.fn();
-      const result = processAliases(
+      const result = processPatterns(
         'sv weapon sword',
         aliases,
         variables,
@@ -735,7 +735,7 @@ describe('processAliases', () => {
 
       const variables: Variable[] = [];
       const mockSetVariable = jest.fn();
-      const result = processAliases(
+      const result = processPatterns(
         'tjcx',
         aliases,
         variables,
@@ -763,7 +763,12 @@ describe('processAliases', () => {
 
       const variables: Variable[] = [];
       const mockSetVariable = jest.fn();
-      const result = processAliases('smv', aliases, variables, mockSetVariable);
+      const result = processPatterns(
+        'smv',
+        aliases,
+        variables,
+        mockSetVariable
+      );
 
       expect(result).not.toBeNull();
       expect(result).toHaveLength(1);
@@ -797,7 +802,7 @@ describe('processAliases', () => {
       const mockSetVariable = jest.fn();
 
       // Test dragon case
-      let result = processAliases(
+      let result = processPatterns(
         'cvs dragon',
         aliases,
         variables,
@@ -809,7 +814,7 @@ describe('processAliases', () => {
       mockSetVariable.mockClear();
 
       // Test non-dragon case
-      result = processAliases(
+      result = processPatterns(
         'cvs goblin',
         aliases,
         variables,

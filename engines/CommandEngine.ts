@@ -1,7 +1,7 @@
 // engines/CommandEngine.ts
 // Engine for processing commands.
 
-import { processAliases, processTriggers } from './PatternEngine';
+import { processPatterns } from './PatternEngine';
 import type { Variable, Settings, Alias, Trigger, Script } from '../types';
 
 export interface CommandEngineOptions {
@@ -53,27 +53,14 @@ export class CommandEngine {
     this.settings = settings;
   }
 
-  public async processCommand(input: string): Promise<void> {
-    // Try alias expansion
-    const commands = processAliases(
+  public async processPattern(
+    input: string,
+    type: 'alias' | 'trigger'
+  ): Promise<void> {
+    const patterns = type === 'alias' ? this.aliases : this.triggers;
+    const commands = processPatterns(
       input,
-      this.aliases,
-      this.variables,
-      this.options.onVariableSet,
-      this.scripts
-    );
-
-    if (commands) {
-      commands.forEach(command => {
-        this.options.onCommandSend(command.content, this.settings);
-      });
-    }
-  }
-
-  public processLine(line: string): void {
-    const commands = processTriggers(
-      line,
-      this.triggers,
+      patterns,
       this.variables,
       this.options.onVariableSet,
       this.scripts
