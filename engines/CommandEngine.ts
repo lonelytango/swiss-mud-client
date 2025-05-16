@@ -53,12 +53,9 @@ export class CommandEngine {
     this.settings = settings;
   }
 
-  public async processPattern(
-    input: string,
-    type: 'alias' | 'trigger'
-  ): Promise<void> {
+  public async processPattern(input: string, type: 'alias' | 'trigger') {
     const patterns = type === 'alias' ? this.aliases : this.triggers;
-    const commands = processPatterns(
+    const expanded = processPatterns(
       input,
       patterns,
       this.variables,
@@ -66,10 +63,21 @@ export class CommandEngine {
       this.scripts
     );
 
-    if (commands) {
-      commands.forEach(command => {
-        this.options.onCommandSend(command.content, this.settings);
-      });
+    // Execute commands
+    if (expanded) {
+      // Process commands with waits
+      for (const cmd of expanded) {
+        if (cmd.type === 'wait' && cmd.waitTime) {
+          await new Promise(resolve => setTimeout(resolve, cmd.waitTime));
+        } else if (cmd.type === 'command') {
+          this.options.onCommandSend(cmd.content, this.settings);
+        }
+      }
+    } else {
+      if (type === 'alias') {
+        // No alias matched, send the raw input
+        this.options.onCommandSend(input, this.settings);
+      }
     }
   }
 }

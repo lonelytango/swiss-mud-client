@@ -53,7 +53,6 @@ export function AppContextProvider({
     }
   }, []);
 
-  // Save variables to localStorage whenever they change
   useEffect(() => {
     if (variables.length > 0) {
       localStorage.setItem('mud_variables', JSON.stringify(variables));
