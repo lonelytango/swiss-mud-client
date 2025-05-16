@@ -13,7 +13,7 @@ import { handleCommandInput } from './utils/CommandHandler';
 import { setWebSocketManager, send } from './utils/CommandAction';
 import { useAppContext } from './contexts/AppContext';
 import { stripHtmlTags } from './utils/TextUtils';
-
+import { ON_SCREEN_CMD_LIMIT } from './constants';
 // let messageCounter = 0;
 
 function App() {
@@ -38,7 +38,6 @@ function App() {
   const [isLockedToBottom, setIsLockedToBottom] = useState(true);
   const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
 
-  // For Triggering Commands
   const [line, setLine] = useState<string>('');
 
   // Retrieve app version from environment variables
@@ -143,7 +142,9 @@ function App() {
                   ...prev,
                   `<div class="user-cmd">&gt; ${command}</div>`,
                 ];
-                return next.length > 1000 ? next.slice(-1000) : next;
+                return next.length > ON_SCREEN_CMD_LIMIT
+                  ? next.slice(-ON_SCREEN_CMD_LIMIT)
+                  : next;
               });
             }
 
@@ -229,7 +230,9 @@ function App() {
       onMessage: (data: string) => {
         setMessages(prev => {
           const next = [...prev, data];
-          return next.length > 1000 ? next.slice(-1000) : next;
+          return next.length > ON_SCREEN_CMD_LIMIT
+            ? next.slice(-ON_SCREEN_CMD_LIMIT)
+            : next;
         });
 
         const msgData = stripHtmlTags(data);
