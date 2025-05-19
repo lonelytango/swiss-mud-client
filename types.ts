@@ -23,6 +23,7 @@ export interface Settings {
   highlightInputOnCommand: boolean; // highlight the input when a command is sent
   showCommandInOutput: boolean; // show the command in the output
   fontFamily: string; // Font family for output
+  fontSize: number; // Font size for output in pixels
 }
 
 export interface Script {

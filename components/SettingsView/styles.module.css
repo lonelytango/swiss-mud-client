@@ -14,6 +14,10 @@
   cursor: pointer;
 }
 
+.settingItem select {
+  max-width: 200px;
+}
+
 /* Toggle Switch Styles */
 .toggleSwitch {
   position: relative;

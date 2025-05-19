@@ -343,7 +343,10 @@ function App() {
         <div
           ref={outputRef}
           className={styles.output}
-          style={{ fontFamily: settings.fontFamily }}
+          style={{
+            fontFamily: settings.fontFamily,
+            fontSize: `${settings.fontSize}px`,
+          }}
           onClick={() => {
             inputRef.current?.focus();
           }}

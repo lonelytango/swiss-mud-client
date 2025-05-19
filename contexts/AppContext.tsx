@@ -23,6 +23,7 @@ export function AppContextProvider({
     highlightInputOnCommand: true,
     showCommandInOutput: true,
     fontFamily: 'monospace',
+    fontSize: 14,
   });
 
   // Load variables from localStorage on mount
@@ -46,6 +47,7 @@ export function AppContextProvider({
             parsedSettings.highlightInputOnCommand ?? true,
           showCommandInOutput: parsedSettings.showCommandInOutput ?? true,
           fontFamily: parsedSettings.fontFamily ?? 'monospace',
+          fontSize: parsedSettings.fontSize || 14,
         });
       } catch (e) {
         console.error('Failed to parse settings:', e);

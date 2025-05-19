@@ -9,6 +9,7 @@ export interface Settings {
   highlightInputOnCommand: boolean;
   showCommandInOutput: boolean;
   fontFamily: string;
+  fontSize: number;
 }
 
 interface SettingsViewProps {
@@ -122,6 +123,24 @@ export function SettingsView({ settings, onChange }: SettingsViewProps) {
                 </option>
               ))}
             </select>
+          </label>
+        </div>
+        <div className={styles.settingItem}>
+          <label>
+            Output font size
+            <input
+              type='number'
+              min='8'
+              max='32'
+              value={settings.fontSize}
+              onChange={e =>
+                onChange({
+                  ...settings,
+                  fontSize: parseInt(e.target.value) || 14,
+                })
+              }
+              style={{ marginLeft: 8, width: '60px' }}
+            />
           </label>
         </div>
       </div>
