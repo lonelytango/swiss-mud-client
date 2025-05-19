@@ -343,11 +343,8 @@ function App() {
           ref={outputRef}
           className={styles.output}
           style={{ fontFamily: settings.fontFamily }}
-          onClick={e => {
-            // Only focus input if clicking on empty space (not selecting text)
-            if (e.target === e.currentTarget) {
-              inputRef.current?.focus();
-            }
+          onClick={() => {
+            inputRef.current?.focus();
           }}
           onScroll={handleOutputScroll}
           role='log'
