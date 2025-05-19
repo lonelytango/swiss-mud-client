@@ -37,6 +37,7 @@ function App() {
   const [messages, setMessages] = useState<string[]>([]);
   const [isLockedToBottom, setIsLockedToBottom] = useState(true);
   const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
+  const [triggersEnabled, setTriggersEnabled] = useState(true);
 
   const [line, setLine] = useState<string>('');
 
@@ -206,11 +207,11 @@ function App() {
   // Process incoming line with triggers
   useEffect(() => {
     // console.debug(`${messageCounter} - Line: ${line}`);
-    if (line && commandEngine) {
+    if (line && commandEngine && triggersEnabled) {
       // console.debug(`Line: ${line}`);
       commandEngine.processPattern(line, 'trigger');
     }
-  }, [line]);
+  }, [line, triggersEnabled]);
 
   // Setup WebSocket connection when a profile is selected
   useEffect(() => {
@@ -356,16 +357,30 @@ function App() {
             <div key={idx} dangerouslySetInnerHTML={{ __html: msg }} />
           ))}
         </div>
-        <input
-          ref={inputRef}
-          type='text'
-          className={styles.input}
-          placeholder='Type your command here...'
-          onKeyDown={handleKeyDown}
-          disabled={!canSend}
-          aria-label='Command input'
-          aria-disabled={!canSend}
-        />
+        <div className={styles.inputContainer}>
+          <input
+            ref={inputRef}
+            type='text'
+            className={styles.input}
+            placeholder='Type your command here...'
+            onKeyDown={handleKeyDown}
+            disabled={!canSend}
+            aria-label='Command input'
+            aria-disabled={!canSend}
+          />
+          <button
+            className={classNames(styles.triggerToggle, {
+              [styles.triggerToggleDisabled]: !triggersEnabled,
+            })}
+            onClick={() => setTriggersEnabled(!triggersEnabled)}
+            aria-label={
+              triggersEnabled ? 'Disable triggers' : 'Enable triggers'
+            }
+            title={triggersEnabled ? 'Disable triggers' : 'Enable triggers'}
+          >
+            {triggersEnabled ? '🔔' : '🔕'}
+          </button>
+        </div>
       </div>
     </div>
   );
