@@ -67,10 +67,10 @@ export default function VariableView({
 
   // Add new variable and select it
   const handleAdd = () => {
-    const newVariables = [...localVariables, { ...emptyVariable }];
+    const newVariables = [{ ...emptyVariable }, ...localVariables];
     setLocalVariables(newVariables);
     setEditBuffer({ ...emptyVariable });
-    setSelectedIdx(newVariables.length - 1);
+    setSelectedIdx(0);
   };
 
   // Update edit buffer inline

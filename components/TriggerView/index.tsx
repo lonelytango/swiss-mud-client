@@ -83,10 +83,10 @@ const TriggerView: React.FC<TriggerViewProps> = ({
 
   // Add new trigger and select it
   const handleAdd = () => {
-    const newTriggers = [...localTriggers, { ...emptyTrigger }];
+    const newTriggers = [{ ...emptyTrigger }, ...localTriggers];
     setLocalTriggers(newTriggers);
     setEditBuffer({ ...emptyTrigger });
-    setSelectedIdx(newTriggers.length - 1);
+    setSelectedIdx(0);
   };
 
   // Update edit buffer inline

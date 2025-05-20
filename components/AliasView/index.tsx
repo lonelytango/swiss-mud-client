@@ -66,10 +66,10 @@ const AliasView: React.FC<AliasViewProps> = ({
 
   // Add new alias and select it
   const handleAdd = () => {
-    const newAliases = [...aliases, { ...emptyAlias }];
+    const newAliases = [{ ...emptyAlias }, ...aliases];
     saveAliases(newAliases);
     setEditBuffer({ ...emptyAlias });
-    setSelectedIdx(newAliases.length - 1);
+    setSelectedIdx(0);
   };
 
   // Update edit buffer inline

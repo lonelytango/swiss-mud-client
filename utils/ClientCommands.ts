@@ -52,7 +52,7 @@ export class ClientCommandManager {
     const help: string[] = [];
     const processed = new Set<string>();
 
-    this.commands.forEach((command, key) => {
+    this.commands.forEach(command => {
       if (!processed.has(command.name)) {
         processed.add(command.name);
         const aliases = command.aliases
