@@ -14,6 +14,7 @@ import { setWebSocketManager, send } from './utils/CommandAction';
 import { useAppContext } from './contexts/AppContext';
 import { stripHtmlTags } from './utils/TextUtils';
 import { ON_SCREEN_CMD_LIMIT } from './constants';
+import { ClientCommandManager } from './utils/ClientCommands';
 // let messageCounter = 0;
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
   const [isLockedToBottom, setIsLockedToBottom] = useState(true);
   const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
   const [triggersEnabled, setTriggersEnabled] = useState(true);
+  const clientCommands = useRef(new ClientCommandManager());
 
   const [line, setLine] = useState<string>('');
 
@@ -275,9 +277,26 @@ function App() {
     }
   }, [messages, isLockedToBottom]);
 
+  // Initialize client commands
+  useEffect(() => {
+    clientCommands.current.setClearScreenHandler(() => {
+      setMessages([]);
+    });
+  }, []);
+
   // Handle keyboard input
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!commandEngine || !wsManager) return;
+
+    if (e.key === 'Enter') {
+      const command = e.currentTarget.value.trim();
+
+      // Try to execute client command first
+      if (clientCommands.current.executeCommand(command)) {
+        e.currentTarget.value = '';
+        return;
+      }
+    }
 
     handleCommandInput(e, {
       commandEngine,
