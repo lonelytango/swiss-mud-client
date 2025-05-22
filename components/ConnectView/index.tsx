@@ -3,6 +3,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import commonStyles from '../../styles/common.module.css';
+import classNames from 'classnames';
 
 export interface MudProfile {
   name: string;
@@ -150,6 +151,41 @@ export default function ConnectView({ onConnect, saveRef }: ConnectViewProps) {
     localStorage.setItem(STORAGE_KEY, profilesJsonStr);
   }
 
+  // Drag and drop handlers
+  const handleDragStart = (e: React.DragEvent<HTMLLIElement>, idx: number) => {
+    e.dataTransfer.setData('text/plain', idx.toString());
+    e.currentTarget.classList.add(commonStyles.dragging);
+  };
+
+  const handleDragEnd = (e: React.DragEvent<HTMLLIElement>) => {
+    e.currentTarget.classList.remove(commonStyles.dragging);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLLIElement>) => {
+    e.preventDefault();
+    e.currentTarget.classList.add(commonStyles.dragOver);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLLIElement>) => {
+    e.currentTarget.classList.remove(commonStyles.dragOver);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLLIElement>, targetIdx: number) => {
+    e.preventDefault();
+    e.currentTarget.classList.remove(commonStyles.dragOver);
+
+    const sourceIdx = parseInt(e.dataTransfer.getData('text/plain'));
+    if (sourceIdx === targetIdx) return;
+
+    const updated = [...profiles];
+    const [movedItem] = updated.splice(sourceIdx, 1);
+    updated.splice(targetIdx, 0, movedItem);
+
+    setProfiles(updated);
+    saveProfiles(updated);
+    setSelectedIdx(targetIdx);
+  };
+
   return (
     <div className={commonStyles.viewContainer}>
       <div className={commonStyles.sidebar}>
@@ -163,12 +199,25 @@ export default function ConnectView({ onConnect, saveRef }: ConnectViewProps) {
             profiles.map((profile, idx) => (
               <li
                 key={idx}
-                className={selectedIdx === idx ? commonStyles.selected : ''}
+                className={classNames({
+                  [commonStyles.selected]: selectedIdx === idx,
+                  [commonStyles.dragging]: false,
+                  [commonStyles.dragOver]: false,
+                })}
                 onClick={() => handleSelect(idx)}
+                draggable
+                onDragStart={e => handleDragStart(e, idx)}
+                onDragOver={handleDragOver}
+                onDrop={e => handleDrop(e, idx)}
+                onDragEnd={handleDragEnd}
+                onDragLeave={handleDragLeave}
               >
-                {profile.name || (
-                  <span style={{ color: '#aaa' }}>(unnamed)</span>
-                )}
+                <div className={commonStyles.itemContent}>
+                  <span className={commonStyles.dragHandle}>⋮</span>
+                  {profile.name || (
+                    <span style={{ color: '#aaa' }}>(unnamed)</span>
+                  )}
+                </div>
               </li>
             ))
           )}

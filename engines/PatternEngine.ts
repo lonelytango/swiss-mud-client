@@ -69,17 +69,30 @@ export function processPatterns(
           return;
         }
         try {
+          // Create a sandbox with all available functions and variables
+          const sandbox: any = {
+            send,
+            sendAll,
+            wait,
+            speedwalk,
+            alert,
+            setVariable: setVariable || (() => {}),
+          };
+
+          // Add variables to sandbox
+          variables.forEach(variable => {
+            if (variable.name) {
+              Object.defineProperty(sandbox, variable.name, {
+                get: () => variable.value,
+                enumerable: true,
+                configurable: false,
+              });
+            }
+          });
+
           // eslint-disable-next-line no-new-func
-          const fn = new Function(
-            'send',
-            'sendAll',
-            'wait',
-            'speedwalk',
-            'alert',
-            'setVariable',
-            script.command
-          );
-          fn(send, sendAll, wait, speedwalk, alert, setVariable || (() => {}));
+          const fn = new Function(...Object.keys(sandbox), script.command);
+          fn(...Object.values(sandbox));
         } catch (err) {
           console.error(
             `Failed to execute script for event '${eventName}':`,
