@@ -70,8 +70,16 @@ export function processPatterns(
         }
         try {
           // eslint-disable-next-line no-new-func
-          const fn = new Function('send', script.command);
-          fn(send);
+          const fn = new Function(
+            'send',
+            'sendAll',
+            'wait',
+            'speedwalk',
+            'alert',
+            'setVariable',
+            script.command
+          );
+          fn(send, sendAll, wait, speedwalk, alert, setVariable || (() => {}));
         } catch (err) {
           console.error(
             `Failed to execute script for event '${eventName}':`,

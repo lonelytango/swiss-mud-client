@@ -303,7 +303,13 @@ function App() {
       wsManager,
       canSend,
       onCommandHistoryUpdate: command => {
-        setCommandHistory(prev => [command, ...prev]);
+        setCommandHistory(prev => {
+          // Only add the command if it's different from the previous one
+          if (prev.length === 0 || prev[0] !== command) {
+            return [command, ...prev];
+          }
+          return prev;
+        });
       },
       onHistoryIndexUpdate: setHistoryIndex,
       historyIndex,
