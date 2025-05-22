@@ -12,6 +12,8 @@ export function processPatterns(
   setVariable?: (name: string, value: string) => void,
   scripts?: Script[]
 ): Command[] | null {
+  let allCommands: Command[] = [];
+
   for (const patternObj of patterns) {
     if (!patternObj.enabled) continue;
     const regex = new RegExp(patternObj.pattern);
@@ -111,16 +113,17 @@ export function processPatterns(
       );
       try {
         patternFunction(...Object.values(sandbox));
+        if (capturedCommands.length > 0) {
+          allCommands = allCommands.concat(capturedCommands);
+        }
       } catch (error: unknown) {
         if (error instanceof Error) {
           console.error(`Error executing:`, error.message);
         } else {
           console.error(`Error executing:`, error);
         }
-        return null;
       }
-      return capturedCommands.length > 0 ? capturedCommands : null;
     }
   }
-  return null;
+  return allCommands.length > 0 ? allCommands : null;
 }
