@@ -395,6 +395,9 @@ function App() {
             disabled={!canSend}
             aria-label='Command input'
             aria-disabled={!canSend}
+            autoCorrect='off'
+            autoComplete='off'
+            spellCheck='false'
           />
           <button
             className={classNames(styles.triggerToggle, {

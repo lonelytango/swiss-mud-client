@@ -77,15 +77,16 @@ export function processPatterns(
             speedwalk,
             alert,
             setVariable: setVariable || (() => {}),
+            sendEvent,
           };
 
           // Add variables to sandbox
           variables.forEach(variable => {
-            if (variable.name) {
+            if (variable.name && !(variable.name in sandbox)) {
               Object.defineProperty(sandbox, variable.name, {
                 get: () => variable.value,
                 enumerable: true,
-                configurable: false,
+                configurable: true,
               });
             }
           });
@@ -114,11 +115,11 @@ export function processPatterns(
       };
 
       variables.forEach(variable => {
-        if (variable.name) {
+        if (variable.name && !(variable.name in sandbox)) {
           Object.defineProperty(sandbox, variable.name, {
             get: () => variable.value,
             enumerable: true,
-            configurable: false,
+            configurable: true,
           });
         }
       });
