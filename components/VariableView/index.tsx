@@ -73,6 +73,20 @@ export default function VariableView({
     setSelectedIdx(0);
   };
 
+  // Sort variables alphabetically by name
+  const handleSort = () => {
+    const sorted = [...localVariables].sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+    saveVariables(sorted);
+    // Maintain selection if possible
+    if (selectedIdx !== null) {
+      const selectedVar = localVariables[selectedIdx];
+      const newIndex = sorted.findIndex(v => v.name === selectedVar.name);
+      setSelectedIdx(newIndex);
+    }
+  };
+
   // Update edit buffer inline
   const handleFieldChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -157,7 +171,12 @@ export default function VariableView({
   return (
     <div className={commonStyles.viewContainer}>
       <div className={commonStyles.sidebar}>
-        <button onClick={handleAdd}>+</button>
+        <div className={commonStyles.buttonGroup}>
+          <button onClick={handleAdd}>+</button>
+          <button onClick={handleSort} title='Sort alphabetically'>
+            ⇅
+          </button>
+        </div>
         <ul>
           {localVariables.map((variable, index) => (
             <li

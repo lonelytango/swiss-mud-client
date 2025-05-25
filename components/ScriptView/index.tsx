@@ -77,10 +77,10 @@ const ScriptView: React.FC<ScriptViewProps> = ({
 
   // Add new script and select it
   const handleAdd = () => {
-    const newScripts = [...localScripts, { ...emptyScript }];
+    const newScripts = [{ ...emptyScript }, ...localScripts];
     setLocalScripts(newScripts);
     setEditBuffer({ ...emptyScript });
-    setSelectedIdx(newScripts.length - 1);
+    setSelectedIdx(0);
   };
 
   // Update edit buffer inline

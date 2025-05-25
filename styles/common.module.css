@@ -26,6 +26,7 @@
   font-size: 2em;
   font-weight: 700;
   cursor: pointer;
+  margin: 0;
 }
 
 .sidebar ul {
@@ -194,4 +195,17 @@
   border: 1px solid #ccc;
   border-radius: 4px;
   overflow: hidden;
+}
+
+.buttonGroup {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  margin-bottom: 4px;
+  width: 100%;
+}
+
+.buttonGroup button {
+  flex: 1;
+  min-width: 0;
 }
